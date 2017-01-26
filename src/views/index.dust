@@ -1,0 +1,7 @@
+{>"partials/header" name=name /}
+
+<div style="background: blue">
+Hello {name}
+</div>
+
+<script src="{@hash path="dist/client/scripts/app.js"}{/hash}"></script>
