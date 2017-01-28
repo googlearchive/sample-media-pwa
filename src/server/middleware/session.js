@@ -20,17 +20,11 @@ const MemcachedStore = require('connect-memcached')(session);
 const sessionConfig = require('../../config/session');
 
 if (process.env.NODE_ENV === 'production') {
-  console.log('Session is using memcache.');
+  console.log('[Middleware: Session] Using memcache.');
   sessionConfig.store = new MemcachedStore({
     hosts: sessionConfig.memcacheURL
   });
 }
 
-const init = app => {
-  console.log('Session initialized.');
-  app.use(session(sessionConfig));
-};
-
-module.exports = {
-  init
-};
+console.log('[Middleware: Session] initialized.');
+module.exports = session(sessionConfig);

@@ -1,0 +1,55 @@
+{
+  "featured": "chrome-channel/trailer",
+  "shows": [
+    {
+      "title": "Chrome Channel",
+      "slug": "chrome-channel",
+      "description": "Well, it's only the Chrome Developer Videos",
+      "episodes": [
+        {
+          "released": "2017-01-26T16:46:31.376Z",
+          "title": "Chrome Channel Trailer",
+          "description": "The trailer for the Chrome Channel.",
+          "slug": "trailer",
+          "duration": "155",
+          "poster": "/static/videos/chr-trailer/poster.jpg",
+          "sources": {
+            "dash": "/static/videos/chr-trailer/mp4/dash.mpd",
+            "hls": ""
+          }
+        },
+
+        {
+          "released": "2017-01-26T16:46:31.376Z",
+          "title": "Some other video",
+          "description": "It's another video!",
+          "slug": "trailer",
+          "duration": "155",
+          "sources": {
+            "dash": "/static/videos/chr-trailer/mp4/dash.mpd",
+            "hls": ""
+          }
+        }
+      ]
+    },
+
+    {
+      "title": "A11ycasts",
+      "slug": "a11ycasts",
+      "description": "Well, it's only the A11ycasts Videos",
+      "episodes": [
+        {
+          "released": "2017-01-26T16:46:31.376Z",
+          "title": "A11ycasts Trailer",
+          "description": "The trailer for A11ycasts.",
+          "slug": "trailer",
+          "duration": "155",
+          "sources": {
+            "dash": "/static/videos/chr-trailer/mp4/dash.mpd",
+            "hls": ""
+          }
+        }
+      ]
+    }
+  ]
+}

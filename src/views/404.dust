@@ -1,0 +1,8 @@
+{>"partials/header" title=title css=inlines.css /}
+
+<div>
+<h1>404</h1>
+<p>{text}</p>
+</div>
+
+{>"partials/footer" js=inlines.js /}

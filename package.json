@@ -8,22 +8,22 @@
     "clean-dist": "rm -rf dist",
     "make-dist": "mkdirp dist",
     "make-client": "mkdirp dist/client",
-    "copy": "npm run copy-server && npm run copy-config && npm run copy-views",
+    "copy-all": "npm run copy-server && npm run copy-config && npm run copy-views && npm run copy-client",
     "copy-server": "cp -R src/server dist",
     "copy-config": "cp -R src/config dist",
     "copy-views": "cp -R src/views dist",
-    "copy-videos": "",
+    "copy-client": "copy \"src/client/**/*.*\" \"!src/client/scripts/**/*.*\" \"!src/client/styles/**/*.*\" dist/client",
     "serve": "nodemon dist/server/index.js",
     "dev": "npm run build && parallelshell \"npm run watch\" \"npm run serve\"",
     "watch": "npm-watch",
-    "build": "npm run clean-dist && npm run make-dist && npm run copy && npm run make-client && npm run build-js",
+    "build": "npm run clean-dist && npm run make-dist && npm run make-client && npm run copy-all && npm run build-js",
     "build-js": "node build/transpile-javascript.js",
     "build-videos": "node build/video/process-videos.js --videos=src/data/videos",
     "release": "npm version patch && npm run build"
   },
   "watch": {
     "build-js": "src/client/**/*.js",
-    "copy": "src/**/*.*"
+    "copy-all": "src/**/*.*"
   },
   "author": "Paul Lewis",
   "license": "Apache-2.0",
@@ -43,6 +43,7 @@
   "dependencies": {
     "adaro": "^1.0.4",
     "connect-memcached": "^0.2.0",
+    "copy": "^0.3.0",
     "express": "^4.14.0",
     "express-session": "^1.14.2",
     "passport": "^0.3.2",

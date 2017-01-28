@@ -1,0 +1,15 @@
+{>"partials/header" title=title css=inlines.css /}
+
+<a href="..">Back</a>
+<div>
+<h1>All videos for {title}</h1>
+
+<ul>
+{#item}
+  <li><a href="./{slug}/">{title}</a></li>
+{/item}
+</ul>
+
+</div>
+
+{>"partials/footer" js=inlines.js /}

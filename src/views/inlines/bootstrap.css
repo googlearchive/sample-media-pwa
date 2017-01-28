@@ -15,32 +15,15 @@
  * limitations under the License.
  */
 
-'use strict';
+* {
+  box-sizing: border-box;
+}
 
-const path = require('path');
-const adaro = require('adaro');
-const helpersPath = path.join(__dirname, '..', 'helpers');
-const options = {
-  cache: (process.env.NODE_ENV === 'production' ? true : false),
-  helpers: [
-    require(`${helpersPath}/hash`)
-  ]
-};
+html, body {
+  margin: 0;
+  padding: 0;
+}
 
-const init = app => {
-  if (options.cache) {
-    console.log('Templating is cached.');
-  }
-
-  app.engine('dust', adaro.dust(options));
-  app.set('view engine', 'dust');
-
-  const viewPath = path.join(__dirname, '..', '..', 'views');
-  app.set('views', viewPath);
-
-  console.log('Templating initialized.');
-};
-
-module.exports = {
-  init
-};
+body {
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+}

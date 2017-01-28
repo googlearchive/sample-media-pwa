@@ -1,0 +1,12 @@
+{>"partials/header" title=title css=inlines.css /}
+
+<a href="..">Back</a>
+<div>
+
+  {>"partials/video/player" src=item.sources.dash /}
+
+<h1>{item.title}</h1>
+<p>{item.description}</p>
+</div>
+
+{>"partials/footer" js=inlines.js /}

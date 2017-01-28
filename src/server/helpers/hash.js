@@ -19,7 +19,6 @@
 
 const fs = require('fs');
 const crypto = require('crypto');
-const path = require('path');
 
 class Hash {
   static loadFileContents (path) {
@@ -43,16 +42,18 @@ class Hash {
 
   static init (dust) {
     dust.helpers.hash = (chunk, context, bodies, params) => {
-      const filePath = params.path;
-      return Hash.loadFileContents(filePath)
-          .then(fileData => Hash.createHashFromFileContents(fileData))
-          .then(fileHash => {
-            const newPath = filePath
-                .replace(/\/?dist\/client/, '/static')
-                .replace(/([^\.]+)\.(.+)/, `$1.${fileHash}.$2`);
+      return chunk.map(chunk => {
+        const filePath = params.path;
+        Hash.loadFileContents(filePath)
+            .then(fileData => Hash.createHashFromFileContents(fileData))
+            .then(fileHash => {
+              const newPath = filePath
+                  .replace(/\/?dist\/client/, '/static')
+                  .replace(/([^\.]+)\.(.+)/, `$1.${fileHash}.$2`);
 
-            return chunk.write(newPath);
-          });
+              return chunk.write(newPath).end();
+            });
+      });
     };
   }
 }

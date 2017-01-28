@@ -1,0 +1,3 @@
+<div>
+  <video controls width="60%" preload="metadata" data-src="{src}"></video>
+</div>

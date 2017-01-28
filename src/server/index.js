@@ -15,45 +15,26 @@
  * limitations under the License.
  */
 
-const path = require('path');
 const express = require('express');
 const app = express();
-
-const hashRemoval = require('./utils/hash-removal');
-const httpsRedirect = require('./utils/https-redirect');
-const session = require('./utils/session');
-const authentication = require('./utils/authentication');
-const templating = require('./utils/templating');
-const headers = require('./utils/headers');
-
 const PORT = process.env.PORT || 8080;
-const STATIC_PATH = path.join(__dirname, '..', 'client');
-const STATIC_OPTS = {
-  maxAge: 31536000000 // One year
-};
 
-// Init all the helpers for the server.
-session.init(app);
-authentication.init(app);
-httpsRedirect.init(app);
-hashRemoval.init(app);
-templating.init(app);
+// Init all the global middleware.
+app.use(require('./middleware/session'));
+app.use(require('./middleware/https-redirect'));
+app.use(require('./middleware/hash-removal'));
 
-// Set up static hosting for client assets, like the manifest, SW, etc.
-app.use('/static', express.static(STATIC_PATH, STATIC_OPTS));
+// Start up passport so that it's available to every app.
+const passport = require('passport');
+app.use(passport.initialize());
+app.use(passport.session());
 
-app.get('/', (req, res) => {
-  res.render('index', {
-    name: 'Paul'
-  });
-
-  headers.noCache(res);
-});
-
-// app.get('/admin', authentication.required, (req, res) => {
-//   res.status(200).send('Logged in!');
-//   headers.noCache(res);
-// });
+// And now the routes.
+app.use('/static', require('./apps/static'));
+app.use('/auth', require('./apps/authentication').app);
+app.use('/admin', require('./apps/admin'));
+app.use('/sw.js', require('./apps/service-worker'));
+app.use('/', require('./apps/dynamic'));
 
 app.listen(PORT, _ => {
   console.log(`App listening on port ${PORT}`);

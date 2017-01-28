@@ -1,0 +1,14 @@
+{>"partials/header" title=title css=inlines.css /}
+
+<div>
+<h1>All shows</h1>
+
+<ul>
+{#shows}
+  <li><a href="/{slug}/">{title}</a></li>
+{/shows}
+</ul>
+
+</div>
+
+{>"partials/footer" js=inlines.js /}

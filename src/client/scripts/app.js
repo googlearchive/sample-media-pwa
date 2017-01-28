@@ -17,12 +17,53 @@
 
 'use strict';
 
-import SideNav from './sidenav';
+import ServiceWorkerInstaller from './sw-install';
 
 class App {
   constructor () {
-    console.log('Booting App');
-    new SideNav();
+    ServiceWorkerInstaller.init();
+    this._loadPlayerIfNeeded();
+  }
+
+  _loadPlayerIfNeeded () {
+    const video = document.querySelector('video');
+
+    if (!video) {
+      console.log('No video here.');
+      return;
+    }
+
+    if ('shaka' in window) {
+      console.log('shaka loaded');
+      return Promise.resolve().then(_ => this._onShakaPlayerLoaded(video));
+    }
+
+    return new Promise(function(resolve, reject) {
+      var script = document.createElement('script');
+      script.src = '/static/third_party/libs/shaka-player.compiled.js';
+      script.onload = _ => {
+        resolve(video);
+      };
+      document.body.appendChild(script);
+    }).then(this._onShakaPlayerLoaded, err => {
+      console.warn(err.stack);
+    });
+  }
+
+  _onShakaPlayerLoaded (targetVideo) {
+    const manifest = targetVideo.dataset.src;
+    if (!manifest) {
+      console.log('Video without manifest. Bailing.');
+      return;
+    }
+
+    const player = new shaka.Player(targetVideo);
+
+    player.load(manifest).then(_ => {
+      console.log('Video loaded');
+    }, err => {
+      console.warn(err.message);
+    });
   }
 }
 

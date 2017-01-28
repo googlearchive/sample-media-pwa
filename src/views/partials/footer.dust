@@ -1,0 +1,7 @@
+<script>
+  {js|s}
+</script>
+<script async src="{@hash path="dist/client/scripts/app.js"}{/hash}"></script>
+
+</body>
+</html>

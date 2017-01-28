@@ -15,21 +15,13 @@
  * limitations under the License.
  */
 
-const init = app => {
-  console.log('Hash removal initialized.');
-  app.use(hashRemoval);
-};
+const noCache = (req, res, next) => {
+  // Set the item to not cache.
+  res.set({
+    'cache': 'private, no-cache'
+  });
 
-const hashRemoval = (req, res, next) => {
-  const hasHasInName = /[a-f0-9]{64}\./;
-  if (!hasHasInName) {
-    return next();
-  }
-
-  req.url = req.url.replace(hasHasInName, '');
   next();
 };
 
-module.exports = {
-  init
-};
+module.exports = noCache;

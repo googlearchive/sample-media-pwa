@@ -15,29 +15,15 @@
  * limitations under the License.
  */
 
-const init = app => {
-  console.log('Redirect initialized.');
-  app.use(gCloudHTTPSRedirect);
-};
+* {
+  box-sizing: border-box;
+}
 
-const gCloudHTTPSRedirect = (req, res, next) => {
-  if (req.hostname === 'localhost') {
-    return next();
-  }
+html, body {
+  margin: 0;
+  padding: 0;
+}
 
-  // For non-localhost hosts, check the header for the protocol used.
-  if (typeof req.headers['x-forwarded-proto'] === 'undefined') {
-    return next();
-  }
-
-  if (req.headers['x-forwarded-proto'].toLowerCase() === 'http') {
-    res.redirect(`https://${req.hostname}${req.url}`);
-    return;
-  }
-
-  next();
-};
-
-module.exports = {
-  init
-};
+body {
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+}

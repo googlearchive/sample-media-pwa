@@ -58,9 +58,7 @@ entries.forEach(entry => {
     bundle.write({
       intro,
       format: 'iife',
-      dest: `dist/${entry}`,
-      sourceMap: true,
-      sourceMapFile: `dist/client/scripts/${fileName}.map.js`
+      dest: `dist/${entry}`
     });
   });
 });

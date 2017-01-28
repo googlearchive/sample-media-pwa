@@ -3,6 +3,7 @@ node_modules
 dist
 src/config
 src/data/videos
+src/client/videos
 build/video
 build/video/video
 build/video/packager
