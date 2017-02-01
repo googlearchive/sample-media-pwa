@@ -38,11 +38,12 @@ const dustOptions = {
   cache: false,
   whitespace: true,
   helpers: [
-    require(`${helpersPath}/hash`)
+    require(`${helpersPath}/hash`),
+    require(`${helpersPath}/star-rating`)
   ]
 };
 
-const renderOptions = {
+const defaultViewOptions = {
   title: 'Biograf',
   shows: library.shows,
   inlines,
@@ -61,7 +62,11 @@ dynamic.set('views', viewPath);
 dynamic.use(require('../middleware/no-cache.js'));
 
 dynamic.get('/', (req, res) => {
-  res.status(200).render('home', renderOptions);
+  const viewOptions = Object.assign(defaultViewOptions, {
+    featured: videoLibrary.find(library.shows, library.featured.split('/'))
+  });
+
+  res.status(200).render('home', viewOptions);
 });
 
 dynamic.get('/*', (req, res) => {
@@ -72,7 +77,7 @@ dynamic.get('/*', (req, res) => {
 
   const pathParts = pathName.split('/');
   const search = videoLibrary.find(library.shows, pathParts);
-  const updatedRenderOptions = Object.assign(renderOptions, {
+  const viewOptions = Object.assign(defaultViewOptions, {
     title: `Biograf - ${search.title}`,
     item: search.items
   });
@@ -86,10 +91,10 @@ dynamic.get('/*', (req, res) => {
       return res.redirect(`${search.items[0].slug}/`);
     }
 
-    return res.status(200).render('listing', updatedRenderOptions);
+    return res.status(200).render('listing', viewOptions);
   }
 
-  res.status(200).render('video', updatedRenderOptions);
+  res.status(200).render('video', viewOptions);
 });
 
 console.log('[App: Dynamic] initialized.');

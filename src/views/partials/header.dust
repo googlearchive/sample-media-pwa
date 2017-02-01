@@ -15,7 +15,7 @@ limitations under the License.
   <meta charset="utf-8">
   <meta name="author" content="Paul Lewis" />
   <meta name="viewport" content="width=device-width,minimum-scale=1.0">
-  <meta name="theme-color" content="#FF00FF">
+  <meta name="theme-color" content="#1D2227">
 
   <link rel="icon" href="/static/images/icon@256.png">
   <link rel="manifest" href="{@hash path="dist/client/manifest.json"}{/hash}">
@@ -23,7 +23,53 @@ limitations under the License.
 
   <style>
     {css|s}
+
+    {#colors}
+    .primary-bg {
+      background: rgb({primary.r}, {primary.g}, {primary.b});
+    }
+
+    .primary-col {
+      color: rgb({primary.r}, {primary.g}, {primary.b});
+    }
+
+    .primary-light-bg {
+      background: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
+    }
+
+    .primary-light-col {
+      color: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
+    }
+
+    .secondary-bg {
+      background: rgb({secondary.r}, {secondary.g}, {secondary.b});
+    }
+
+    .secondary-col {
+      color: rgb({secondary.r}, {secondary.g}, {secondary.b});
+    }
+
+    .tertiary-bg {
+      background: rgb({tertiary.r}, {tertiary.g}, {tertiary.b});
+    }
+
+    .tertiary-col {
+      color: rgb({tertiary.r}, {tertiary.g}, {tertiary.b});
+    }
+
+    .tertiary-3px-border {
+      border: 3px solid rgb({tertiary.r}, {tertiary.g}, {tertiary.b});
+    }
+
+    .quaternary-bg {
+      background: rgb({quaternary.r}, {quaternary.g}, {quaternary.b});
+    }
+
+    .quaternary-col {
+      color: rgb({quaternary.r}, {quaternary.g}, {quaternary.b});
+    }
+    {/colors}
   </style>
 </head>
+<!-- Version {version} -->
 <body>
-

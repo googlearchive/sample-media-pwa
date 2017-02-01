@@ -150,6 +150,28 @@ class Swatch {
 
     return rgbVals[index];
   }
+
+  static lighten (rgbVal, percentage) {
+    const factor = 1 + (percentage / 100);
+    return Swatch._adjustColor(rgbVal, factor);
+  }
+
+  static darken (rgbVal, percentage) {
+    const factor = 1 - (percentage / 100);
+    return Swatch._adjustColor(rgbVal, factor);
+  }
+
+  static _clamp (value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  static _adjustColor (rgbVal, factor) {
+    return {
+      r: Swatch._clamp(Math.round(rgbVal.r * factor), 0, 255),
+      g: Swatch._clamp(Math.round(rgbVal.g * factor), 0, 255),
+      b: Swatch._clamp(Math.round(rgbVal.b * factor), 0, 255)
+    };
+  }
 }
 
 module.exports = Swatch;

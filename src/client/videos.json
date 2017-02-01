@@ -1,5 +1,5 @@
 {
-  "featured": "chrome-channel/trailer",
+  "featured": "cds/showreel",
   "shows": [
     {
       "title": "Chrome Channel",
@@ -13,9 +13,39 @@
           "slug": "trailer",
           "duration": "155",
           "poster": "/static/videos/chr-trailer/poster.jpg",
+          "artworkPath": "/static/videos/chr-trailer",
+          "rating": 4.4,
           "sources": {
+            "full": "/static/videos/chr-trailer/mp4/v-1080p-4500k-libx264.mp4",
             "dash": "/static/videos/chr-trailer/mp4/dash.mpd",
             "hls": ""
+          },
+          "colors": {
+            "primary": {
+              "r": 195,
+              "g": 52,
+              "b": 40
+            },
+            "primaryLight": {
+              "r": 252,
+              "g": 174,
+              "b": 137
+            },
+            "secondary": {
+              "r": 146,
+              "g": 39,
+              "b": 30
+            },
+            "tertiary": {
+              "r": 98,
+              "g": 26,
+              "b": 20
+            },
+            "quaternary": {
+              "r": 49,
+              "g": 13,
+              "b": 10
+            }
           }
         },
 
@@ -28,6 +58,56 @@
           "sources": {
             "dash": "/static/videos/chr-trailer/mp4/dash.mpd",
             "hls": ""
+          }
+        }
+      ]
+    },
+
+    {
+      "title": "Chrome Dev Summit",
+      "slug": "cds",
+      "desciption": "The videos from Chrome Dev Summit",
+      "episodes": [
+        {
+          "released": "2017-01-26T16:46:31.376Z",
+          "title": "CDS Showreel",
+          "description": "CDS Showreel description.",
+          "slug": "showreel",
+          "duration": "58",
+          "artworkPath": "/static/videos/cds-ep-1/",
+          "poster": "/static/videos/cds-ep-1/poster.jpg",
+          "rating": 4.3,
+          "sources": {
+            "full": "/static/videos/cds-ep-1/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "/static/videos/cds-ep-1/mp4/dash.mpd",
+            "hls": ""
+          },
+          "colors": {
+            "primary": {
+              "r": 186,
+              "g": 105,
+              "b": 230
+            },
+            "secondary": {
+              "r": 140,
+              "g": 79,
+              "b": 173
+            },
+            "tertiary": {
+              "r": 93,
+              "g": 53,
+              "b": 115
+            },
+            "quaternary": {
+              "r": 47,
+              "g": 26,
+              "b": 58
+            },
+            "primaryLight": {
+              "r": 255,
+              "g": 210,
+              "b": 255
+            }
           }
         }
       ]

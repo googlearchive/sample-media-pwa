@@ -4,6 +4,9 @@
     "browser": true,
     "es6": true
   },
+  "parserOptions": {
+    "sourceType": "module"
+  },
   "rules": {
     "new-cap": [0],
     "arrow-parens": [2, "as-needed"],

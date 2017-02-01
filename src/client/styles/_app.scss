@@ -15,10 +15,42 @@
  * limitations under the License.
  */
 
-'use strict';
+* {
+  box-sizing: border-box;
+}
 
-export default class SideNav {
-  constructor () {
-    console.log('SideNav');
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+  background: #1D2227;
+  color: #FFF;
+  height: 100%;
+}
+
+a {
+  color: #19D5B9;
+}
+
+.content-block {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.main-content {
+  position: relative;
+
+  &::after {
+    content: '';
+    transform: rotate(-180deg);
+    background-image: linear-gradient(-180deg, rgba(255,255,255,0.00) 50%, rgba(255,255,255,0.10) 100%);
+    position: absolute;
+    top: -2px;
+    left: 0;
+    width: 100%;
+    height: 200px;
   }
 }

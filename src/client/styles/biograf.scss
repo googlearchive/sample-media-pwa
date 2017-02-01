@@ -15,15 +15,5 @@
  * limitations under the License.
  */
 
-* {
-  box-sizing: border-box;
-}
-
-html, body {
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: 'Roboto', Arial, Helvetica, sans-serif;
-}
+@import '_app';
+@import '_video/_video';

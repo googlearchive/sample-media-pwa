@@ -1,0 +1,11 @@
+<svg width="100%" height="100%" viewBox="-1 0 140 24" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <path d="M11.413 18L4.36 21.708l1.346-7.854L0 8.292l7.886-1.146L11.413 0l3.526 7.146 7.885 1.146-5.706 5.562 1.346 7.854L11.413 18zm28 0l-7.054 3.708 1.346-7.854L28 8.292l7.886-1.146L39.413 0l3.526 7.146 7.885 1.146-5.706 5.562 1.346 7.854L39.413 18zm28 0l-7.054 3.708 1.346-7.854L56 8.292l7.886-1.146L67.413 0l3.526 7.146 7.885 1.146-5.706 5.562 1.346 7.854L67.413 18zm28 0l-7.054 3.708 1.346-7.854L84 8.292l7.886-1.146L95.413 0l3.526 7.146 7.885 1.146-5.706 5.562 1.346 7.854L95.413 18zm28 0l-7.054 3.708 1.346-7.854L112 8.292l7.886-1.146L123.413 0l3.526 7.146 7.885 1.146-5.706 5.562 1.346 7.854L123.413 18z" id="star-path"/>
+  </defs>
+  <mask id="star-mask" fill="#fff">
+    <use xlink:href="#star-path"/>
+  </mask>
+
+  <rect mask="url(#star-mask)" x="0" y="0" width="137" height="24" fill="rgb({colors.tertiary.r}, {colors.tertiary.g}, {colors.tertiary.b})" />
+  <rect mask="url(#star-mask)" x="0" y="0" width="{@starRating rating=rating /}" height="24" fill="rgb({colors.primaryLight.r}, {colors.primaryLight.g}, {colors.primaryLight.b})" />
+</svg>

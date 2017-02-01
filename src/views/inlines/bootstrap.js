@@ -1,1 +1,1 @@
-console.log('Bootstrap');
+/* Placeholder */

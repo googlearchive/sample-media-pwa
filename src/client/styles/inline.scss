@@ -15,16 +15,5 @@
  * limitations under the License.
  */
 
-'use strict';
-
-import ServiceWorkerInstaller from './sw-install';
-import VideoPlayer from './video-player/video-player';
-
-class App {
-  constructor () {
-    ServiceWorkerInstaller.init();
-    VideoPlayer.init();
-  }
-}
-
-new App();
+@import '_app';
+@import '_video/_video';

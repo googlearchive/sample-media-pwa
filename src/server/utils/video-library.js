@@ -25,12 +25,20 @@ class VideoLibrary {
   }
 
   static find (library, path) {
+    let breadcrumbs = [];
     let items = library;
     let title;
 
+    if (!Array.isArray(library)) {
+      throw new Error('library should be an array of shows');
+    }
+
+    if (!Array.isArray(path)) {
+      throw new Error('path should be an array of parts');
+    }
+
     for (let p = 0; p < path.length; p++) {
       const item = items.find(i => {
-        console.log(p, i.slug, path[p]);
         return i.slug === path[p];
       });
 
@@ -42,11 +50,13 @@ class VideoLibrary {
 
       title = item.title;
       items = item.episodes || item;
+      breadcrumbs.push(title);
     }
 
     return {
       title,
-      items
+      items,
+      breadcrumbs
     };
   }
 }

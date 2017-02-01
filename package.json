@@ -8,22 +8,33 @@
     "clean-dist": "rm -rf dist",
     "make-dist": "mkdirp dist",
     "make-client": "mkdirp dist/client",
-    "copy-all": "npm run copy-server && npm run copy-config && npm run copy-views && npm run copy-client",
+    "copy-all": "npm run copy-server && npm run copy-config && npm run copy-views && npm run copy-client && npm run copy-videos",
     "copy-server": "cp -R src/server dist",
     "copy-config": "cp -R src/config dist",
     "copy-views": "cp -R src/views dist",
-    "copy-client": "copy \"src/client/**/*.*\" \"!src/client/scripts/**/*.*\" \"!src/client/styles/**/*.*\" dist/client",
-    "serve": "nodemon dist/server/index.js",
+    "copy-videos": "cp -R src/client/videos dist/client",
+    "copy-client": "copy \"src/client/**/*.*\" \"!src/client/scripts/**/*.*\" \"!src/client/styles/**/*.*\" \"!src/client/videos/**/*.*\" dist/client",
+    "serve": "nodemon -e dust,js,css,json dist/server/index.js",
     "dev": "npm run build && parallelshell \"npm run watch\" \"npm run serve\"",
     "watch": "npm-watch",
-    "build": "npm run clean-dist && npm run make-dist && npm run make-client && npm run copy-all && npm run build-js",
+    "build": "npm run clean-dist && npm run make-dist && npm run make-client && npm run copy-all && npm run build-js && npm run build-sass",
     "build-js": "node build/transpile-javascript.js",
+    "build-sass": "node build/transpile-sass.js",
     "build-videos": "node build/video/process-videos.js --videos=src/data/videos",
     "release": "npm version patch && npm run build"
   },
   "watch": {
     "build-js": "src/client/**/*.js",
-    "copy-all": "src/**/*.*"
+    "build-sass": {
+      "patterns": "src/client/styles",
+      "extensions": "scss"
+    },
+    "copy-server": "src/server",
+    "copy-views": {
+      "patterns": "src/views",
+      "extensions": ["dust", "css", "js"]
+    },
+    "copy-client": "src/client"
   },
   "author": "Paul Lewis",
   "license": "Apache-2.0",
@@ -31,8 +42,11 @@
     "babel": "^6.5.2",
     "babel-preset-babili": "0.0.10",
     "babel-preset-es2015-rollup": "^3.0.0",
+    "copy": "^0.3.0",
+    "clean-css": "^4.0.2",
     "get-pixels": "^3.3.0",
     "mkdirp": "^0.5.1",
+    "node-sass": "^4.4.0",
     "nodemon": "^1.11.0",
     "npm-watch": "^0.1.7",
     "parallelshell": "^2.0.0",
@@ -43,7 +57,6 @@
   "dependencies": {
     "adaro": "^1.0.4",
     "connect-memcached": "^0.2.0",
-    "copy": "^0.3.0",
     "express": "^4.14.0",
     "express-session": "^1.14.2",
     "passport": "^0.3.2",

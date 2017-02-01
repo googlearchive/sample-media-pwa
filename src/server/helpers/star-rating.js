@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
-* {
-  box-sizing: border-box;
+'use strict';
+
+class StarRating {
+  static init (dust) {
+    dust.helpers.starRating = (chunk, context, bodies, params) => {
+      const rating = params.rating;
+      const scaledRating = Math.round(parseFloat(rating / 5) * 137);
+      return chunk.write(scaledRating);
+    };
+  }
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: 'Roboto', Arial, Helvetica, sans-serif;
-}
+module.exports = StarRating.init;

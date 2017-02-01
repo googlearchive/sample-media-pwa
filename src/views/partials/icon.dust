@@ -1,0 +1,31 @@
+<svg width="100%" height="100%" viewBox="110 32 60 60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <circle id="b" cx="30" cy="30" r="30"/>
+    <path d="M19 20.16v-.006c0-1.19.955-2.154 2.134-2.154.4 0 .775.11 1.095.305l20.314 9.537c.846.286 1.456 1.092 1.456 2.043 0 .784-.416 1.47-1.037 1.848v.007l-.08.04c-.067.035-.135.068-.204.097L22.254 41.68c-.326.203-.71.32-1.12.32-1.18 0-2.135-.964-2.135-2.154V20.16z" id="e"/>
+    <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="d">
+      <feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"/>
+      <feGaussianBlur stdDeviation="1" in="shadowOffsetOuter1" result="shadowBlurOuter1"/>
+      <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0" in="shadowBlurOuter1"/>
+    </filter>
+    <circle id="a" cx="30" cy="30" r="28"/>
+    <mask id="f" x="0" y="0" width="56" height="56" fill="#fff">
+      <use xlink:href="#a"/>
+    </mask>
+  </defs>
+  <g fill="none" fill-rule="evenodd" transform="translate(110 32)">
+    <mask id="c" fill="#fff">
+      <use xlink:href="#b"/>
+    </mask>
+    <use fill="rgb({colors.quaternary.r}, {colors.quaternary.g}, {colors.quaternary.b})" xlink:href="#b"/>
+    <g mask="url(#c)">
+      <path fill="rgb({colors.tertiary.r}, {colors.tertiary.g}, {colors.tertiary.b})" opacity=".7" d="M-13.135 43.293l95.91 7.13 32.86-32.86-58.78-58.78-65.45 65.45"/>
+      <path fill="rgb({colors.secondary.r}, {colors.secondary.g}, {colors.secondary.b})" opacity=".7" d="M-7.86 26.012l87.746 29.164 36.62-28.61-51.18-65.506L-7.61 18.047"/>
+      <path fill="rgb({colors.primary.r}, {colors.primary.g}, {colors.primary.b})" opacity=".742" d="M42.803-65.815l70.468 47.53-47.53 70.47L-4.73 4.653z"/>
+    </g>
+    <g mask="url(#c)">
+      <use fill="#000" filter="url(#d)" xlink:href="#e"/>
+      <use fill="#FFF" xlink:href="#e"/>
+    </g>
+    <use mask="url(#f)" xlink:href="#a" stroke-width="4" stroke="#FFF"/>
+  </g>
+</svg>

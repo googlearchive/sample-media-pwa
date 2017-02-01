@@ -1,14 +1,32 @@
-{>"partials/header" title=title css=inlines.css /}
+{>"partials/header" title=title css=inlines.css colors=featured.items.colors /}
 
-<div>
-<h1>All shows</h1>
+{>"partials/video/player"
+  colors=featured.items.colors
+  showTitle=featured.breadcrumbs[0]
+  episodeTitle=featured.items.title
+  poster=featured.items.poster
+  src=featured.items.sources.dash
+  castSrc=featured.items.sources.full
+  rating=featured.items.rating
+  artworkPath=featured.items.artworkPath /}
 
-<ul>
+<section class="main-content">
+  <div class="content-block home__new-releases">
+    <h2 style="margin: 0;">New Releases</h2>
+  </div>
+</section>
+
+<!--<div>-->
+<!--<h1>All shows</h1>
+
+{featured.items.title}-->
+
+<!--<ul>
 {#shows}
   <li><a href="/{slug}/">{title}</a></li>
 {/shows}
-</ul>
+</ul>-->
 
-</div>
+<!--</div>-->
 
 {>"partials/footer" js=inlines.js /}

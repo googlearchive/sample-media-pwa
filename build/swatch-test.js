@@ -29,7 +29,16 @@ Swatch.load(image)
     .then(pixels => Swatch.quantize(pixels))
     .then(buckets => Swatch.orderByLuminance(buckets))
     .then(swatch => {
-      console.log(swatch);
+      const primary = Swatch.getMostVariantColor(swatch);
+      const colors = {
+        primary,
+        secondary: Swatch.darken(primary, 25),
+        tertiary: Swatch.darken(primary, 50),
+        quaternary: Swatch.darken(primary, 75),
+        primaryLight: Swatch.lighten(primary, 100)
+      };
+
+      console.log(JSON.stringify(colors, null, 2));
 
       // Write out an HTML doc.
       const fs = require('fs');

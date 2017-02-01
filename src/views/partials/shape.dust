@@ -1,0 +1,6 @@
+<svg width="712" height="497" viewBox="627 525 712 497" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" fill-rule="evenodd">
+    <path fill="rgb({colors.tertiary.r}, {colors.tertiary.g}, {colors.tertiary.b})" opacity=".8" d="M628 837.853l491.973 174.172 218.062-127.62-365.633-359.34-293.912 218.13"/>
+    <path fill="rgb({colors.primaryLight.r}, {colors.primaryLight.g}, {colors.primaryLight.b})" opacity=".6" d="M679 742.55l414.343 278.46 231.78-99.73-118.89-362.5-518.762 140.863"/>
+  </g>
+</svg>
