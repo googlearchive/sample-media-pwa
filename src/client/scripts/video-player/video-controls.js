@@ -37,6 +37,7 @@ class VideoControls {
     this._timeTrack = this._videoControls.querySelector('.js-time-track');
     this._timeUsed = this._videoControls.querySelector('.js-time-used');
     this._playhead = this._videoControls.querySelector('.js-playhead');
+    this._duration = this._videoControls.querySelector('.js-duration');
 
     this._pendingHide = undefined;
     this._castConnected = false;
@@ -165,6 +166,22 @@ class VideoControls {
         `translateX(${(normalizedPosition - 1) * 100}%)`;
   }
 
+  _formatDuration (secs) {
+    const lPad = num => {
+      return (num < 10 ? '0' : '') + num.toString();
+    };
+
+    const hours = Math.floor(secs / 3600);
+    secs -= hours * 3600;
+
+    const mins = Math.floor(secs / 60);
+    secs -= mins * 60;
+
+    secs = Math.floor(secs);
+
+    return `${(hours > 0 ? hours + ':' : '')}${lPad(mins)}:${lPad(secs)}`;
+  }
+
   update (state) {
     const pausedBigClass = 'video__controls-big-play-pause--paused';
     const pausedStandardClass = 'video__controls-standard-play-pause--paused';
@@ -175,6 +192,7 @@ class VideoControls {
     this._playPauseStandard.classList.toggle(pausedStandardClass, state.paused);
     this._fullscreen.classList.toggle(fsClass, state.fullscreen);
     this._volume.classList.toggle(volumeClass, state.volume === 1);
+    this._duration.textContent = this._formatDuration(state.duration);
   }
 
   _onClick (evt) {

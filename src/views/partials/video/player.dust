@@ -20,6 +20,7 @@
         <div class="video__controls-standard-time-track-used primary-bg js-time-used"></div>
         <button class="video__controls-standard-time-track-playhead js-playhead"></button>
       </div>
+      <div class="video__controls-standard-video-duration js-duration"></div>
       <button class="video__controls-standard-toggle-volume js-volume" data-type="toggle-volume">Toggle Volume</button>
       <button class="video__controls-standard-toggle-fullscreen js-fullscreen"  data-type="toggle-fullscreen">Toggle FS</button>
       <!--<button class="video__controls-standard-toggle-offline"  data-type="toggle-offline">Toggle Offline</button> -->

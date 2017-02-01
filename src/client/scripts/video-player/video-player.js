@@ -106,6 +106,7 @@ class VideoPlayer {
     this._startTimeTracking = this._startTimeTracking.bind(this);
     this._stopTimeTracking = this._stopTimeTracking.bind(this);
     this._onSeek = this._onSeek.bind(this);
+    this._onVideoEnd = this._onVideoEnd.bind(this);
 
     // Setup.
     this._addEventListeners();
@@ -136,7 +137,7 @@ class VideoPlayer {
 
     this._video.addEventListener('play', this._startTimeTracking);
     this._video.addEventListener('pause', this._stopTimeTracking);
-    this._video.addEventListener('ended', this._stopTimeTracking);
+    this._video.addEventListener('ended', this._onVideoEnd);
 
     if (!VideoPlayer.SUPPORTS_MEDIA_SESSION) {
       return;
@@ -188,6 +189,7 @@ class VideoPlayer {
     return {
       paused: this._video.paused,
       currentTime: this._video.currentTime,
+      duration: this._video.duration,
       volume: this._video.volume,
       fullscreen: VideoPlayer.isFullScreen
     };
@@ -219,6 +221,10 @@ class VideoPlayer {
   }
 
   _onFwd30 () {
+    if (this._video.paused) {
+      return;
+    }
+
     this._video.currentTime =
         Math.min(this._video.currentTime + 30, this._video.duration);
     this._videoControls.update(this._getVideoState());
@@ -227,6 +233,11 @@ class VideoPlayer {
   _onSeek (evt) {
     this._video.currentTime =
         evt.detail.newTime * this._video.duration;
+  }
+
+  _onVideoEnd () {
+    // TODO: put up an end card for rewatching / sharing etc.
+    this._video.classList.add('video--ended');
   }
 
   _onOrientationChanged () {
@@ -328,6 +339,7 @@ class VideoPlayer {
     videoControls.classList.add('video__controls--active');
     videoControls.dataset.title = this._title;
     this._videoControls = new VideoControls(videoControls);
+    this._videoControls.update(this._getVideoState());
   }
 
   _setMediaSessionData () {
