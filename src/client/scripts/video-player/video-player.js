@@ -103,6 +103,9 @@ class VideoPlayer {
     this._onRemoteConnect = this._onRemoteConnect.bind(this);
     this._onRemoteDisconnect = this._onRemoteDisconnect.bind(this);
     this._onTimeUpdate = this._onTimeUpdate.bind(this);
+    this._startTimeTracking = this._startTimeTracking.bind(this);
+    this._stopTimeTracking = this._stopTimeTracking.bind(this);
+    this._onSeek = this._onSeek.bind(this);
 
     // Setup.
     this._addEventListeners();
@@ -120,6 +123,7 @@ class VideoPlayer {
     this._videoContainer.addEventListener('play-pause', this._onPlayPause);
     this._videoContainer.addEventListener('back-30', this._onBack30);
     this._videoContainer.addEventListener('fwd-30', this._onFwd30);
+    this._videoContainer.addEventListener('seek', this._onSeek);
     this._videoContainer.addEventListener('toggle-fullscreen',
         this._onFullScreen);
     this._videoContainer.addEventListener('toggle-chromecast',
@@ -129,6 +133,10 @@ class VideoPlayer {
 
     window.screen.orientation.addEventListener('change',
         this._onOrientationChanged);
+
+    this._video.addEventListener('play', this._startTimeTracking);
+    this._video.addEventListener('pause', this._stopTimeTracking);
+    this._video.addEventListener('ended', this._stopTimeTracking);
 
     if (!VideoPlayer.SUPPORTS_MEDIA_SESSION) {
       return;
@@ -216,6 +224,11 @@ class VideoPlayer {
     this._videoControls.update(this._getVideoState());
   }
 
+  _onSeek (evt) {
+    this._video.currentTime =
+        evt.detail.newTime * this._video.duration;
+  }
+
   _onOrientationChanged () {
     const isLandscape = window.screen.orientation.type.startsWith('landscape');
     if (isLandscape) {
@@ -269,8 +282,6 @@ class VideoPlayer {
     const enterFullScreenFn = this._videoContainer.requestFullscreen ||
         this._videoContainer.webkitRequestFullscreen;
 
-    console.log(this._videoContainer);
-
     enterFullScreenFn.call(this._videoContainer);
   }
 
@@ -300,7 +311,6 @@ class VideoPlayer {
         this._initPlayerControls();
         this._setMediaSessionData();
         this._startChromecastWatch();
-        this._startTimeTracking();
       }, err => {
         console.warn(err.message);
       });

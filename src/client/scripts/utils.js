@@ -63,6 +63,10 @@ const fire = (el, eventName, detail=null, bubbles=true, cancelable=true) => {
   el.dispatchEvent(evt);
 };
 
+const clamp = (value, min, max) => {
+  return Math.max(min, Math.min(max, value));
+}
+
 export default {
-  loadScript, removeElement, preloadImage, fire
+  loadScript, removeElement, preloadImage, fire, clamp
 };

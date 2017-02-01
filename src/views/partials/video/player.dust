@@ -15,7 +15,7 @@
 
     <div class="video__controls-standard">
       <button class="video__controls-standard-play-pause js-play-pause-standard" data-type="play-pause">Play/Pause</button>
-      <div class="video__controls-standard-time js-time-track">
+      <div class="video__controls-standard-time js-time-track" data-time-track="true">
         <div class="video__controls-standard-time-track primary-light-bg"></div>
         <div class="video__controls-standard-time-track-used primary-bg js-time-used"></div>
         <button class="video__controls-standard-time-track-playhead js-playhead"></button>

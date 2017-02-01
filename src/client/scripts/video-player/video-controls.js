@@ -40,6 +40,8 @@ class VideoControls {
 
     this._pendingHide = undefined;
     this._castConnected = false;
+    this._trackDrag = false;
+    this._trackBCR = null;
 
     this.toggleControls = this.toggleControls.bind(this);
     this.showControls = this.showControls.bind(this);
@@ -47,9 +49,12 @@ class VideoControls {
     this.updateTimeTrack = this.updateTimeTrack.bind(this);
 
     this._onClick = this._onClick.bind(this);
-    this._onTouchStart = this._onTouchStart.bind(this);
     this._onFullscreenChange = this._onFullscreenChange.bind(this);
     this._onKeyDown = this._onKeyDown.bind(this);
+    this._onInputDown = this._onInputDown.bind(this);
+    this._onInputMove = this._onInputMove.bind(this);
+    this._onInputUp = this._onInputUp.bind(this);
+    this._onResize = this._onResize.bind(this);
 
     this._addEventListeners();
   }
@@ -83,13 +88,22 @@ class VideoControls {
   _addEventListeners () {
     this._videoControls.addEventListener('mousemove', _ => this.showControls());
     this._videoControls.addEventListener('mouseout', _ => this.hideControls());
+
+    this._videoControls.addEventListener('mousedown', this._onInputDown);
+    this._videoControls.addEventListener('mousemove', this._onInputMove);
+    this._videoControls.addEventListener('mouseup', this._onInputUp);
+    this._videoControls.addEventListener('touchstart', this._onInputDown);
+    this._videoControls.addEventListener('touchmove', this._onInputMove);
+    this._videoControls.addEventListener('touchend', this._onInputUp);
+
     this._videoControls.addEventListener('click', this._onClick);
-    this._videoControls.addEventListener('touchstart', this._onTouchStart);
 
     document.addEventListener('keydown', this._onKeyDown);
     document.addEventListener('fullscreenchange', this._onFullscreenChange);
     document.addEventListener('webkitfullscreenchange',
         this._onFullscreenChange);
+
+    window.addEventListener('resize', this._onResize);
   }
 
   _cancelPendingHide () {
@@ -133,14 +147,22 @@ class VideoControls {
   }
 
   updateTimeTrack (time, duration) {
+    if (this._trackDrag) {
+      return;
+    }
+
     const normalizedTime = time / duration;
+    this._setTimeTrackPosition(normalizedTime);
+  }
+
+  _setTimeTrackPosition (normalizedPosition) {
     this._timeUsed.style.transform = `
       translate(-50%, -50%)
-      scaleX(${normalizedTime})
+      scaleX(${normalizedPosition})
     `;
 
     this._playhead.style.transform =
-        `translateX(${(normalizedTime - 1) * 100}%)`;
+        `translateX(${(normalizedPosition - 1) * 100}%)`;
   }
 
   update (state) {
@@ -153,17 +175,6 @@ class VideoControls {
     this._playPauseStandard.classList.toggle(pausedStandardClass, state.paused);
     this._fullscreen.classList.toggle(fsClass, state.fullscreen);
     this._volume.classList.toggle(volumeClass, state.volume === 1);
-  }
-
-  _onTouchStart (evt) {
-    const controlsVisible =
-        this._videoControls.classList.contains('video__controls--visible');
-
-    if (!controlsVisible) {
-      evt.preventDefault();
-      this.showControls(true);
-      return;
-    }
   }
 
   _onClick (evt) {
@@ -193,6 +204,80 @@ class VideoControls {
     }
 
     this.showControls(true);
+  }
+
+  _onInputDown (evt) {
+    const controlsVisible =
+        this._videoControls.classList.contains('video__controls--visible');
+
+    if (!controlsVisible) {
+      evt.preventDefault();
+      this.showControls();
+      return;
+    }
+
+    this._trackDrag = ('timeTrack' in evt.target.dataset);
+
+    if (!this._trackDrag) {
+      return;
+    }
+
+    if (this._trackBCR) {
+      this._evtToTrackPosition(evt);
+      return;
+    }
+
+    // Get a read on the target element's dimensions.
+    this._trackBCR = evt.target.getBoundingClientRect();
+    this._evtToTrackPosition(evt);
+  }
+
+  _onInputMove (evt) {
+    if (!this._trackDrag) {
+      return;
+    }
+
+    this.showControls(true);
+    this._evtToTrackPosition(evt);
+  }
+
+  _onInputUp (evt) {
+    if (!this._trackDrag) {
+      return;
+    }
+
+    this._trackDrag = false;
+    const newTime = this._evtToTrackPosition(evt);
+
+    Utils.fire(this._videoControls, 'seek', {newTime});
+    this.hideControls();
+  }
+
+  _evtToTrackPosition (evt) {
+    const findCandidate = evt => {
+      if (evt.touches && evt.touches.length) {
+        return evt.touches[0];
+      }
+
+      if (evt.changedTouches && evt.changedTouches.length) {
+        return evt.changedTouches[0];
+      }
+
+      return evt;
+    };
+
+    const absX = findCandidate(evt).pageX;
+    const normalizedPosition = Utils.clamp(
+        (absX - this._trackBCR.left) / this._trackBCR.width,
+        0,
+        1);
+
+    this._setTimeTrackPosition(normalizedPosition);
+    return normalizedPosition;
+  }
+
+  _onResize () {
+    this._trackBCR = null;
   }
 }
 
