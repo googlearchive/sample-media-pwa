@@ -21,7 +21,7 @@ These are files which contain secrets and keys, so you can either
 [create the appropriate values](https://cloud.google.com/nodejs/getting-started/authenticate-users),
 or you can put some placeholder info in:
 
-```json
+```javascript
 // oauth.js
 module.exports = {
   clientID: 'lolztehclientid',
@@ -31,7 +31,7 @@ module.exports = {
 };
 ```
 
-```json
+```javascript
 // session.js
 module.exports = {
   resave: false,
