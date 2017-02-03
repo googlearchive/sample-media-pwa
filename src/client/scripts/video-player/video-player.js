@@ -91,6 +91,7 @@ class VideoPlayer {
     this._onClick = this._onClick.bind(this);
     this._onPlayPause = this._onPlayPause.bind(this);
     this._onPlay = this._onPlay.bind(this);
+    this._onClose = this._onClose.bind(this);
     this._onPause = this._onPause.bind(this);
     this._onBack30 = this._onBack30.bind(this);
     this._onFwd30 = this._onFwd30.bind(this);
@@ -126,6 +127,7 @@ class VideoPlayer {
     this._videoContainer.addEventListener('back-30', this._onBack30);
     this._videoContainer.addEventListener('fwd-30', this._onFwd30);
     this._videoContainer.addEventListener('seek', this._onSeek);
+    this._videoContainer.addEventListener('close', this._onClose);
     this._videoContainer.addEventListener('toggle-fullscreen',
         this._onFullScreen);
     this._videoContainer.addEventListener('toggle-chromecast',
@@ -213,6 +215,13 @@ class VideoPlayer {
   _onPause () {
     this._video.pause();
     this._videoControls.update(this._getVideoState());
+  }
+
+  _onClose () {
+    this._player.destroy().then(_ => {
+      this._video.classList.remove('player__element--active');
+      this._videoControls.enabled = false;
+    });
   }
 
   _onBack30 () {
@@ -337,9 +346,13 @@ class VideoPlayer {
       return;
     }
 
-    videoControls.classList.add('player__controls--active');
     videoControls.dataset.title = this._title;
-    this._videoControls = new VideoControls(videoControls);
+
+    if (!this._videoControls) {
+      this._videoControls = new VideoControls(videoControls);
+    }
+
+    this._videoControls.enabled = true;
     this._videoControls.update(this._getVideoState());
   }
 

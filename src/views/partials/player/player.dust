@@ -15,6 +15,8 @@
       <button class="player__controls-big-fwd-30" data-type="fwd-30">Forward 30s</button>
     </div>
 
+    <button class="player__controls-standard-close js-close" data-type="close">Close video</button>
+
     <div class="player__controls-standard">
       <button class="player__controls-standard-play-pause js-play-pause-standard" data-type="play-pause">Play/Pause</button>
       <div class="player__controls-standard-time js-time-track" data-time-track="true">

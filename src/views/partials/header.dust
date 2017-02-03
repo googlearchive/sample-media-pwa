@@ -26,7 +26,7 @@ limitations under the License.
   {/css}
 
   <style>
-    {css|s}
+    {styles|s}
 
     {#colors}
     .primary-bg {

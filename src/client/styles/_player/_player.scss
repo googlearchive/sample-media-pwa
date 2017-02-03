@@ -50,7 +50,7 @@
     opacity: 1;
     pointer-events: auto;
 
-    animation-name: rotating;
+    animation-name: buffering;
     animation-duration: 1s;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
@@ -104,7 +104,6 @@
     width: 100%;
     height: 100%;
     position: absolute;
-    pointer-events: none;
     background: #111111;
     display: none;
     top: 0;
@@ -245,8 +244,10 @@
     align-items: center;
     transition: opacity 0.35s cubic-bezier(0, 0, 0.4, 1);
     will-change: opacity;
+    pointer-events: none;
 
     &--active {
+      pointer-events: auto;
       z-index: 2;
     }
 
@@ -315,6 +316,7 @@
       justify-content: center;
       align-items: center;
 
+      &-close,
       &-toggle-volume,
       &-toggle-fullscreen,
       &-chromecast,
@@ -374,6 +376,15 @@
           background: url(/static/images/video/ic_cast_connected_white_24px.svg) center center no-repeat;
           background-size: 24px 24px;
         }
+      }
+
+      &-close {
+        position: absolute;
+        top: 12px;
+        left: 4px;
+        z-index: 3;
+        background: url(/static/images/video/ic_close_white_24px.svg) center center no-repeat;
+        background-size: 24px 24px;
       }
 
       &-time {
@@ -471,7 +482,7 @@
   }
 }
 
-@keyframes rotating {
+@keyframes buffering {
   from {
     transform: translate(-50%, -50%) rotate(0deg);
   }
@@ -578,43 +589,45 @@
 
 @media (min-width: 660px) {
   .player {
-    &__controls-big {
-      &-back-30,
-      &-play-pause,
-      &-fwd-30 {
-        width: 88px;
-        height: 88px;
-        border: none;
-        font-size: 0;
-        cursor: pointer;
-        margin: 0 16px;
-        border-radius: 4px;
-        padding: 16px;
-        outline: none;
+    &__controls {
+      &-big {
+        &-back-30,
+        &-play-pause,
+        &-fwd-30 {
+          width: 88px;
+          height: 88px;
+          border: none;
+          font-size: 0;
+          cursor: pointer;
+          margin: 0 16px;
+          border-radius: 4px;
+          padding: 16px;
+          outline: none;
 
-        &:focus {
-          background-color: rgba(255, 255, 255, 0.2);
+          &:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+          }
         }
-      }
 
-      &-back-30 {
-        background: url(/static/images/video/ic_replay_30_white_24px.svg) center center no-repeat;
-        background-size: 72px 72px;
-      }
-
-      &-play-pause {
-        background: url(/static/images/video/ic_pause_white_24px.svg) center center no-repeat;
-        background-size: 72px 72px;
-
-        &--paused {
-          background: url(/static/images/video/ic_play_arrow_white_24px.svg) center center no-repeat;
+        &-back-30 {
+          background: url(/static/images/video/ic_replay_30_white_24px.svg) center center no-repeat;
           background-size: 72px 72px;
         }
-      }
 
-      &-fwd-30 {
-        background: url(/static/images/video/ic_forward_30_white_24px.svg) center center no-repeat;
-        background-size: 72px 72px;
+        &-play-pause {
+          background: url(/static/images/video/ic_pause_white_24px.svg) center center no-repeat;
+          background-size: 72px 72px;
+
+          &--paused {
+            background: url(/static/images/video/ic_play_arrow_white_24px.svg) center center no-repeat;
+            background-size: 72px 72px;
+          }
+        }
+
+        &-fwd-30 {
+          background: url(/static/images/video/ic_forward_30_white_24px.svg) center center no-repeat;
+          background-size: 72px 72px;
+        }
       }
     }
   }

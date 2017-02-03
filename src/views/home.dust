@@ -1,4 +1,4 @@
-{>"partials/header" title=title css=inlines.css colors=featured.items.colors /}
+{>"partials/header" title=title styles=inlines.css colors=featured.items.colors /}
 
 {>"partials/player/player"
   colors=featured.items.colors

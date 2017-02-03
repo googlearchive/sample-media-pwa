@@ -39,6 +39,7 @@ class VideoControls {
     this._playhead = this._videoControls.querySelector('.js-playhead');
     this._duration = this._videoControls.querySelector('.js-duration');
 
+    this._enabled = false;
     this._pendingHide = undefined;
     this._castConnected = false;
     this._trackDrag = false;
@@ -69,6 +70,22 @@ class VideoControls {
 
     this._castConnected = _castConnected;
     this._chromecast.classList.toggle(connectedClass, _castConnected);
+  }
+
+  get enabled () {
+    return this._enabled;
+  }
+
+  set enabled (_enabled) {
+    this._enabled = _enabled;
+
+    if (!this._enabled) {
+      this.hideControls(0);
+      this._videoControls.classList.remove('player__controls--active');
+      return;
+    }
+
+    this._videoControls.classList.add('player__controls--active');
   }
 
   showChromecastButton () {
@@ -118,6 +135,11 @@ class VideoControls {
 
   showControls (cancelHide=false) {
     this._cancelPendingHide();
+
+    if (!this._enabled) {
+      return;
+    }
+
     this._videoControls.classList.add('player__controls--visible');
 
     if (cancelHide) {
@@ -217,11 +239,15 @@ class VideoControls {
   }
 
   _onKeyDown (evt) {
-    if (evt.keyCode !== 9) {
-      return;
-    }
+    switch (evt.keyCode) {
+      case 9:
+        this.showControls(true);
+        return;
 
-    this.showControls(true);
+      case 32:
+        Utils.fire(this._videoControls, 'play-pause');
+        return;
+    }
   }
 
   _onInputDown (evt) {
