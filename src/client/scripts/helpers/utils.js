@@ -40,7 +40,7 @@ const loadScript = url => {
     script.onerror = reject;
     document.body.appendChild(script);
   });
-}
+};
 
 const removeElement = el => {
   el.parentNode.removeChild(el);
@@ -65,7 +65,7 @@ const fire = (el, eventName, detail=null, bubbles=true, cancelable=true) => {
 
 const clamp = (value, min, max) => {
   return Math.max(min, Math.min(max, value));
-}
+};
 
 export default {
   loadScript, removeElement, preloadImage, fire, clamp

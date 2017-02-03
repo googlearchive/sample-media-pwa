@@ -1,12 +1,19 @@
-{>"partials/header" title=title css=inlines.css /}
+{>"partials/header" title=title css=inlines.css colors=item.colors /}
 
-<a href="..">Back</a>
-<div>
+{>"partials/player/player"
+colors=item.colors
+showTitle=item.breadcrumbs[0]
+episodeTitle=item.title
+poster=item.poster
+src=item.sources.dash
+castSrc=item.sources.full
+rating=item.rating
+artworkPath=item.artworkPath /}
 
-  {>"partials/video/player" src=item.sources.dash /}
-
-<h1>{item.title}</h1>
-<p>{item.description}</p>
-</div>
+<section class="video-details main-content">
+  <div class="video-details__info content-block">
+    {item.description}
+  </div>
+</section>
 
 {>"partials/footer" js=inlines.js /}

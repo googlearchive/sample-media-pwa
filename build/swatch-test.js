@@ -18,6 +18,7 @@
 const argv = require('yargs').argv;
 const Swatch = require('./swatch');
 const image = argv.image;
+const write = argv.write;
 
 // Get the folder of videos from the command line.
 if (!image) {
@@ -41,6 +42,10 @@ Swatch.load(image)
       console.log(JSON.stringify(colors, null, 2));
 
       // Write out an HTML doc.
+      if (!write) {
+        return;
+      }
+
       const fs = require('fs');
       const path = require('path');
       swatchHTML = `
@@ -49,9 +54,9 @@ Swatch.load(image)
           <head>
             <title>Swatch for ${image}</title>
             <style>
-               html, body { width: 100%; height: 100%; margin: 0; padding: 0 }
-               body { display: flex; flex-wrap: wrap; }
-               .color { width: 25%; height: 25%; }
+              html, body { width: 100%; height: 100%; margin: 0; padding: 0 }
+              body { display: flex; flex-wrap: wrap; }
+              .color { width: 25%; height: 25%; }
             </style>
           </head>
           <body>

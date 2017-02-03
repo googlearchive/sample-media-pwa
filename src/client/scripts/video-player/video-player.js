@@ -17,7 +17,7 @@
 
 'use strict';
 
-import Utils from '../utils';
+import Utils from '../helpers/utils';
 import VideoControls from './video-controls';
 
 class VideoPlayer {
@@ -114,8 +114,9 @@ class VideoPlayer {
   }
 
   _createPoster (poster) {
-    const posterElement = this._videoContainer.querySelector('.video__poster');
+    const posterElement = this._videoContainer.querySelector('.player__poster');
     posterElement.style.backgroundImage = `url(${poster})`;
+    posterElement.classList.add('image-fade-and-scale-in');
   }
 
   _addEventListeners () {
@@ -169,7 +170,7 @@ class VideoPlayer {
   _onClick (evt) {
     const target = evt.target;
 
-    if (target.classList.contains('video__play-button')) {
+    if (target.classList.contains('player__play-button')) {
       // Pre-approve the video for playback on mobile.
       this._video.play().catch(_ => {
         // The play call will probably be interrupted by Shaka loading,
@@ -317,7 +318,7 @@ class VideoPlayer {
         if (this._video.paused) {
           this._video.play();
           this._video.volume = 1;
-          this._video.classList.add('video__element--active');
+          this._video.classList.add('player__element--active');
         }
         this._initPlayerControls();
         this._setMediaSessionData();
@@ -330,13 +331,13 @@ class VideoPlayer {
 
   _initPlayerControls () {
     const videoControls =
-        this._videoContainer.querySelector('.video__controls');
+        this._videoContainer.querySelector('.player__controls');
     if (!videoControls) {
       console.warn('No video controls. Bailing.');
       return;
     }
 
-    videoControls.classList.add('video__controls--active');
+    videoControls.classList.add('player__controls--active');
     videoControls.dataset.title = this._title;
     this._videoControls = new VideoControls(videoControls);
     this._videoControls.update(this._getVideoState());

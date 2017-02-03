@@ -35,18 +35,15 @@ const intro = `/**
  */
 `;
 
-const path = require('path');
 const rollup = require('rollup');
 const babel = require('rollup-plugin-babel');
 const entries = [
-  'client/scripts/app.js'
+  'client/scripts/app.js',
+  'client/scripts/home.js'
 ];
 
 let cache;
-
 entries.forEach(entry => {
-  const fileName = path.basename(entry, '.js');
-
   rollup.rollup({
     entry: `src/${entry}`,
     cache,

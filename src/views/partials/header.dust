@@ -21,6 +21,10 @@ limitations under the License.
   <link rel="manifest" href="{@hash path="dist/client/manifest.json"}{/hash}">
   <title>{title}</title>
 
+  {#css}
+    <link rel="stylesheet" href="{@hash path=.}{/hash}">
+  {/css}
+
   <style>
     {css|s}
 

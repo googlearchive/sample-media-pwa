@@ -46,8 +46,10 @@ const dustOptions = {
 const defaultViewOptions = {
   title: 'Biograf',
   shows: library.shows,
-  inlines,
-  version
+  version,
+  scripts: [
+    'dist/client/scripts/app.js'
+  ]
 };
 
 if (process.env.NODE_ENV === 'production') {
@@ -63,9 +65,12 @@ dynamic.use(require('../middleware/no-cache.js'));
 
 dynamic.get('/', (req, res) => {
   const viewOptions = Object.assign(defaultViewOptions, {
-    featured: videoLibrary.find(library.shows, library.featured.split('/'))
+    featured: videoLibrary.find(library.shows, library.featured.split('/')),
+    newest: videoLibrary.getNewest(library.shows, 4),
+    inlines
   });
 
+  viewOptions.scripts.push('dist/client/scripts/home.js');
   res.status(200).render('home', viewOptions);
 });
 
@@ -79,7 +84,10 @@ dynamic.get('/*', (req, res) => {
   const search = videoLibrary.find(library.shows, pathParts);
   const viewOptions = Object.assign(defaultViewOptions, {
     title: `Biograf - ${search.title}`,
-    item: search.items
+    item: search.items,
+    css: [
+      'dist/client/styles/biograf.css'
+    ]
   });
 
   if (search.items.length === 0) {

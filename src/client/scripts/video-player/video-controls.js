@@ -17,7 +17,7 @@
 
 'use strict';
 
-import Utils from '../utils';
+import Utils from '../helpers/utils';
 
 class VideoControls {
 
@@ -65,7 +65,7 @@ class VideoControls {
   }
 
   set castConnected (_castConnected) {
-    const connectedClass = 'video__controls-standard-chromecast--connected';
+    const connectedClass = 'player__controls-standard-chromecast--connected';
 
     this._castConnected = _castConnected;
     this._chromecast.classList.toggle(connectedClass, _castConnected);
@@ -81,7 +81,7 @@ class VideoControls {
 
   _toggleChromecastButtonVisibility (isVisible) {
     const chromeCastButton = this._videoControls
-        .querySelector('.video__controls-standard-chromecast');
+        .querySelector('.player__controls-standard-chromecast');
 
     chromeCastButton.hidden = isVisible;
   }
@@ -118,7 +118,7 @@ class VideoControls {
 
   showControls (cancelHide=false) {
     this._cancelPendingHide();
-    this._videoControls.classList.add('video__controls--visible');
+    this._videoControls.classList.add('player__controls--visible');
 
     if (cancelHide) {
       return;
@@ -134,12 +134,12 @@ class VideoControls {
 
     this._cancelPendingHide();
     this._pendingHide = setTimeout(_ => {
-      this._videoControls.classList.remove('video__controls--visible');
+      this._videoControls.classList.remove('player__controls--visible');
     }, timeout);
   }
 
   toggleControls () {
-    if (this._videoControls.classList.contains('video__controls--visible')) {
+    if (this._videoControls.classList.contains('player__controls--visible')) {
       this.hideControls();
       return;
     }
@@ -183,10 +183,10 @@ class VideoControls {
   }
 
   update (state) {
-    const pausedBigClass = 'video__controls-big-play-pause--paused';
-    const pausedStandardClass = 'video__controls-standard-play-pause--paused';
-    const fsClass = 'video__controls-standard-toggle-fullscreen--active';
-    const volumeClass = 'video__controls-standard-toggle-volume--muted';
+    const pausedBigClass = 'player__controls-big-play-pause--paused';
+    const pausedStandardClass = 'player__controls-standard-play-pause--paused';
+    const fsClass = 'player__controls-standard-toggle-fullscreen--active';
+    const volumeClass = 'player__controls-standard-toggle-volume--muted';
 
     this._playPauseBig.classList.toggle(pausedBigClass, state.paused);
     this._playPauseStandard.classList.toggle(pausedStandardClass, state.paused);
@@ -211,7 +211,7 @@ class VideoControls {
   _onFullscreenChange () {
     const isFullscreen = (document.fullscreenElement ||
         document.webkitFullscreenElement);
-    const fsClass = 'video__controls-standard-toggle-fullscreen--active';
+    const fsClass = 'player__controls-standard-toggle-fullscreen--active';
 
     this._fullscreen.classList.toggle(fsClass, isFullscreen);
   }
@@ -226,7 +226,7 @@ class VideoControls {
 
   _onInputDown (evt) {
     const controlsVisible =
-        this._videoControls.classList.contains('video__controls--visible');
+        this._videoControls.classList.contains('player__controls--visible');
 
     if (!controlsVisible) {
       evt.preventDefault();

@@ -17,16 +17,34 @@
 
 'use strict';
 
-import ServiceWorkerInstaller from './helpers/sw-install';
-import VideoPlayer from './video-player/video-player';
+import Utils from './helpers/utils';
 
-class App {
+class Home {
   constructor () {
-    ServiceWorkerInstaller.init();
-    VideoPlayer.init();
+    this.loadNewReleaseImages();
+  }
+
+  loadNewReleaseImages () {
+    const images =
+        document.querySelectorAll('.home__new-releases-list-item-image');
+
+    Array.from(images).forEach(img => {
+      const src = img.dataset.src;
+      Utils.preloadImage(src).then(_ => this._applyImage(img, src));
+    });
+  }
+
+  _applyImage (img, src) {
+    const el = img.querySelector('.home__new-releases-list-item-image-content');
+    if (!el) {
+      return;
+    }
+
+    el.style.backgroundImage = `url(${src})`;
+    el.classList.add('image-fade-in');
   }
 }
 
 window.biograf = window.biograf || {};
-window.biograf.app = window.biograf.app || new App();
+window.biograf.home = window.biograf.home || new Home();
 

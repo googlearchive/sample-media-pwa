@@ -24,6 +24,34 @@ class VideoLibrary {
     return JSON.parse(fs.readFileSync(path, 'utf-8'));
   }
 
+  static getAllEpisodes (library) {
+    const allEpisodes = [];
+    const showNames = Object.keys(library);
+    showNames.forEach(showName => {
+      allEpisodes.push(
+        ...library[showName].episodes.map(e => {
+          const eCopy = Object.assign({}, e);
+          eCopy.title = `${library[showName].title}: ${e.title}`;
+          eCopy.slug = `${library[showName].slug}/${e.slug}`;
+          return eCopy;
+        }));
+    });
+
+    return allEpisodes;
+  }
+
+  static getNewest (library, count) {
+    if (typeof count === 'undefined') {
+      count = 4;
+    }
+
+    return VideoLibrary.getAllEpisodes(library)
+        .sort((a, b) => {
+          return Date.parse(a.released) - Date.parse(b.released);
+        })
+        .slice(0, count);
+  }
+
   static find (library, path) {
     let breadcrumbs = [];
     let items = library;

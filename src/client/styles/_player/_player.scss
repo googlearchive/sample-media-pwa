@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-.video:-webkit-full-screen .video__shape {
+.player:-webkit-full-screen .player__shape {
   display: none;
 }
 
-.video {
+.player {
   /* 16:9 video */
   width: 100vw;
   height: 56.25vw;
@@ -56,11 +56,24 @@
     animation-timing-function: linear;
   }
 
+  &__js-error {
+    width: 100%;
+    height: 100%;
+    color: #FFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
   &__header {
     height: 64px;
     display: flex;
     align-items: center;
     padding: 8px;
+    text-decoration: none;
 
     &-title {
       font-size: 14px;
@@ -154,10 +167,6 @@
     width: 100%;
     height: 100%;
     will-change: opacity;
-    animation-name: fadeIn;
-    animation-duration: 1s;
-    animation-timing-function: cubic-bezier(0, 0, 0.4, 1);
-    animation-fill-mode: forwards;
     position: absolute;
     top: 0;
     left: 0;
@@ -168,6 +177,7 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
+    opacity: 0;
 
     &-episode-info {
       bottom: 0;
@@ -461,16 +471,6 @@
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
 @keyframes rotating {
   from {
     transform: translate(-50%, -50%) rotate(0deg);
@@ -482,7 +482,7 @@
 }
 
 @media (min-width: 440px) {
-  .video {
+  .player {
     &__header {
 
       height: 96px;
@@ -577,7 +577,7 @@
 }
 
 @media (min-width: 660px) {
-  .video {
+  .player {
     &__controls-big {
       &-back-30,
       &-play-pause,
@@ -621,7 +621,7 @@
 }
 
 @media (min-width: 800px) {
-  .video {
+  .player {
     &__header {
 
       height: 128px;
@@ -683,7 +683,7 @@
 }
 
 @media (min-width: 1220px) {
-  .video {
+  .player {
     &__header {
       padding: 32px 0;
     }

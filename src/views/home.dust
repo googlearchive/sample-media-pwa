@@ -1,6 +1,6 @@
 {>"partials/header" title=title css=inlines.css colors=featured.items.colors /}
 
-{>"partials/video/player"
+{>"partials/player/player"
   colors=featured.items.colors
   showTitle=featured.breadcrumbs[0]
   episodeTitle=featured.items.title
@@ -10,22 +10,50 @@
   rating=featured.items.rating
   artworkPath=featured.items.artworkPath /}
 
-<section class="main-content">
-  <div class="content-block home__new-releases">
+<section class="home main-content">
+  <div class="home__new-releases content-block">
+    <h2 class="home__new-releases-title primary-light-col">Newest Releases</h2>
+
+    <ul class="home__new-releases-list">
+      {#newest}
+        <li class="home__new-releases-list-item">
+          <a href="/{slug}/" class="home__new-releases-list-item-link">
+            <div class="home__new-releases-list-item-image"
+                data-src="{poster}">
+
+                <div class="home__new-releases-list-item-image-content"></div>
+
+            <noscript>
+              <div class="home__new-releases-list-item-image--no-script"
+                   style="background-image: url({poster})"></div>
+            </noscript>
+
+            </div>
+            <h3 class="home__new-releases-list-item-title primary-light-col">{title}</h3>
+            <p class="home__new-releases-list-item-description">{description}</p>
+          </a>
+        </li>
+      {/newest}
+    </ul>
+  </div>
+
+  <div class="home__promo">
+    <div class="home__promo-content content-block">
+      <div class="home__promo-text">
+        <h2 class="home__promo-text-title primary-light-col">Watch what you want, whenever you want.</h2>
+        <p>All our content is available on the web, which means you can get
+          access to it whenever you want it. What’s more, if your browser
+          supports the latest technologies, you can save videos to view
+          whenever you’re offline!</p>
+
+        <p>Bye bye buffering, hello video!</p>
+      </div>
+
+      <div class="home__promo-img">
+        {>"partials/shape" colors=featured.items.colors /}
+      </div>
+    </div>
   </div>
 </section>
 
-<!--<div>-->
-<!--<h1>All shows</h1>
-
-{featured.items.title}-->
-
-<!--<ul>
-{#shows}
-  <li><a href="/{slug}/">{title}</a></li>
-{/shows}
-</ul>-->
-
-<!--</div>-->
-
-{>"partials/footer" js=inlines.js /}
+{>"partials/footer" inline=inlines.js scripts=scripts /}
