@@ -2,7 +2,7 @@
     <div class="footer__items content-block">
       <div class="footer__items-copyright">© Google 2016</div>
       <a class="footer__items-privacy" href="https://www.google.com/policies">Google Privacy Policy and Terms of Service</a>
-      <a class="footer__items-source" href="https://www.github.com/GoogleChrome/media-app">See the source code</a>
+      <a class="footer__items-source" href="https://www.github.com/GoogleChrome/sample-media-pwa">See the source code</a>
     </div>
   </footer>
 
