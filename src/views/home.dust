@@ -19,18 +19,18 @@
         <li class="home__new-releases-list-item">
           <a href="/{slug}/" class="home__new-releases-list-item-link">
             <div class="home__new-releases-list-item-image"
-                data-src="{poster}">
+                data-src="{posterSmall}">
 
                 <div class="home__new-releases-list-item-image-content"></div>
 
             <noscript>
               <div class="home__new-releases-list-item-image--no-script"
-                   style="background-image: url({poster})"></div>
+                   style="background-image: url({posterSmall})"></div>
             </noscript>
 
             </div>
             <h3 class="home__new-releases-list-item-title primary-light-col">{title}</h3>
-            <p class="home__new-releases-list-item-description">{description}</p>
+            <p class="home__new-releases-list-item-description">{shortDescription|truncate}</p>
           </a>
         </li>
       {/newest}

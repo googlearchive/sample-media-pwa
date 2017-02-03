@@ -12,7 +12,24 @@ artworkPath=item.artworkPath /}
 
 <section class="video-details main-content">
   <div class="video-details__info content-block">
-    {item.description}
+    <div class="video-details__info-text">
+      <p>{item.description}</p>
+
+      <div class="video-details__info-text-meta">
+        <div class="video-details__info-text-meta-release-date">
+          {item.released|dateFormat}
+        </div>
+
+        <div class="video-details__info-text-meta-duration">
+          {item.duration|timeFormat}
+        </div>
+      </div>
+
+    </div>
+
+    <div class="video-details__controls-and-cast">
+      <!--Cast info-->
+    </div>
   </div>
 </section>
 

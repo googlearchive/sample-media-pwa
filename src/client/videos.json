@@ -9,11 +9,12 @@
         {
           "released": "2017-01-26T16:46:31.376Z",
           "title": "Chrome Channel Trailer",
+          "shortDescription": "The trailer for the Chrome Channel.",
           "description": "The trailer for the Chrome Channel.",
           "slug": "trailer",
           "duration": "155",
           "poster": "/static/videos/chr-trailer/poster.jpg",
-          "posterSmall": "/static/videos/chr-trailer/poster_small.jpg",
+          "posterSmall": "/static/videos/chr-trailer/poster-small.jpg",
           "artworkPath": "/static/videos/chr-trailer",
           "rating": 4.4,
           "sources": {
@@ -60,12 +61,13 @@
         {
           "released": "2017-01-26T16:46:31.376Z",
           "title": "CDS Showreel",
-          "description": "CDS Showreel description.",
+          "shortDescription": "Paul and Jake recap the goings on at CDS 2016.",
+          "description": "Watch all the talks from Chrome Developer Summit 2016 here at: https://goo.gl/TkgXYM. Paul Lewis and Jake Archibald look back over their highlights of the Chrome Developer Summit 2016. Check out the talks that caught their attention and don't miss out on pair donning matching tuxedos!",
           "slug": "showreel",
           "duration": "58",
           "artworkPath": "/static/videos/cds-ep-1/",
           "poster": "/static/videos/cds-ep-1/poster.jpg",
-          "posterSmall": "/static/videos/cds-ep-1/poster_small.jpg",
+          "posterSmall": "/static/videos/cds-ep-1/poster-small.jpg",
           "rating": 4.3,
           "sources": {
             "full": "/static/videos/cds-ep-1/mp4/v-1080p-4500k-libx264.mp4",
@@ -111,12 +113,13 @@
         {
           "released": "2017-02-01T10:00:00.000Z",
           "title": "Progressive Web Apps",
+          "shortDescription": "Matt and Addy talk about PWAs and so on.",
           "description": "Matt and Addy talk about PWAs and so on.",
           "slug": "episode-1",
           "duration": "732",
           "artworkPath": "/static/videos/ttt-ep-1/",
           "poster": "/static/videos/ttt-ep-1/poster.jpg",
-          "posterSmall": "/static/videos/ttt-ep-1/poster_small.jpg",
+          "posterSmall": "/static/videos/ttt-ep-1/poster-small.jpg",
           "rating": 4.3,
           "sources": {
             "full": "/static/videos/ttt-ep-1/mp4/v-1080p-4500k-libx264.mp4",
@@ -125,29 +128,29 @@
           },
           "colors": {
             "primary": {
-              "r": 241,
-              "g": 206,
-              "b": 17
+              "r": 149,
+              "g": 126,
+              "b": 74
             },
             "secondary": {
-              "r": 181,
-              "g": 155,
-              "b": 13
+              "r": 112,
+              "g": 95,
+              "b": 56
             },
             "tertiary": {
-              "r": 121,
-              "g": 103,
-              "b": 9
+              "r": 75,
+              "g": 63,
+              "b": 37
             },
             "quaternary": {
-              "r": 60,
-              "g": 52,
-              "b": 4
+              "r": 37,
+              "g": 32,
+              "b": 19
             },
             "primaryLight": {
               "r": 255,
-              "g": 255,
-              "b": 34
+              "g": 252,
+              "b": 148
             }
           }
         }
@@ -162,12 +165,13 @@
         {
           "released": "2017-02-01T10:00:00.000Z",
           "title": "ES6",
+          "shortDescription": "This week, Paul & Jake talk about the future of JavaScript: ES6 and beyond.",
           "description": "This week, Paul & Jake talk about the future of JavaScript: ES6 and beyond.",
           "slug": "episode-17",
           "duration": "745",
           "artworkPath": "/static/videos/http203-ep-17/",
           "poster": "/static/videos/http203-ep-17/poster.jpg",
-          "posterSmall": "/static/videos/http203-ep-17/poster_small.jpg",
+          "posterSmall": "/static/videos/http203-ep-17/poster-small.jpg",
           "rating": 4.3,
           "sources": {
             "full": "/static/videos/http203-ep-17/mp4/v-1080p-4500k-libx264.mp4",

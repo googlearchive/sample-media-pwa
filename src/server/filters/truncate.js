@@ -15,5 +15,22 @@
  * limitations under the License.
  */
 
-@import 'inline';
-@import '_video-details/_video-details';
+'use strict';
+
+class Truncate {
+  static get MAX_LENGTH () {
+    return 100;
+  }
+
+  static init (dust) {
+    dust.filters.truncate = value => {
+      if (value.length < Truncate.MAX_LENGTH) {
+        return value;
+      }
+
+      return value.substr(0, Truncate.MAX_LENGTH) + '...';
+    };
+  }
+}
+
+module.exports = Truncate.init;

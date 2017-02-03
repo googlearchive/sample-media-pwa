@@ -23,6 +23,7 @@ const fs = require('fs');
 
 const libraryPath = path.join(__dirname, '..', '..', 'client', 'videos.json');
 const helpersPath = path.join(__dirname, '..', 'helpers');
+const filtersPath = path.join(__dirname, '..', 'filters');
 const viewPath = path.join(__dirname, '..', '..', 'views');
 
 const packageReader = require('../utils/package-reader');
@@ -39,7 +40,10 @@ const dustOptions = {
   whitespace: true,
   helpers: [
     require(`${helpersPath}/hash`),
-    require(`${helpersPath}/star-rating`)
+    require(`${helpersPath}/star-rating`),
+    require(`${filtersPath}/date-format`),
+    require(`${filtersPath}/time-format`),
+    require(`${filtersPath}/truncate`)
   ]
 };
 
