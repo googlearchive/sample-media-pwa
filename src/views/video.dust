@@ -13,7 +13,7 @@ artworkPath=item.artworkPath /}
 <section class="video-details main-content">
   <div class="video-details__info content-block">
     <div class="video-details__info-text">
-      <p>{item.description}</p>
+      <p>{item.description|linkify|s}</p>
 
       <div class="video-details__info-text-meta">
         <div class="video-details__info-text-meta-release-date">

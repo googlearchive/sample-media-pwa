@@ -16,11 +16,11 @@
     <mask id="c" fill="#fff">
       <use xlink:href="#b"/>
     </mask>
-    <use fill="rgb({colors.quaternary.r}, {colors.quaternary.g}, {colors.quaternary.b})" xlink:href="#b"/>
+    <use fill="rgb({colors.tertiary.r}, {colors.tertiary.g}, {colors.tertiary.b})" xlink:href="#b"/>
     <g mask="url(#c)">
-      <path fill="rgb({colors.tertiary.r}, {colors.tertiary.g}, {colors.tertiary.b})" opacity=".7" d="M-13.135 43.293l95.91 7.13 32.86-32.86-58.78-58.78-65.45 65.45"/>
-      <path fill="rgb({colors.secondary.r}, {colors.secondary.g}, {colors.secondary.b})" opacity=".7" d="M-7.86 26.012l87.746 29.164 36.62-28.61-51.18-65.506L-7.61 18.047"/>
-      <path fill="rgb({colors.primary.r}, {colors.primary.g}, {colors.primary.b})" opacity=".742" d="M42.803-65.815l70.468 47.53-47.53 70.47L-4.73 4.653z"/>
+      <path fill="rgb({colors.secondary.r}, {colors.secondary.g}, {colors.tertiary.b})" opacity=".7" d="M-13.135 43.293l95.91 7.13 32.86-32.86-58.78-58.78-65.45 65.45"/>
+      <path fill="rgb({colors.primary.r}, {colors.primary.g}, {colors.primary.b})" opacity=".7" d="M-7.86 26.012l87.746 29.164 36.62-28.61-51.18-65.506L-7.61 18.047"/>
+      <path fill="rgb({colors.primaryLight.r}, {colors.primaryLight.g}, {colors.primaryLight.b})" opacity=".742" d="M42.803-65.815l70.468 47.53-47.53 70.47L-4.73 4.653z"/>
     </g>
     <g mask="url(#c)">
       <use fill="#000" filter="url(#d)" xlink:href="#e"/>

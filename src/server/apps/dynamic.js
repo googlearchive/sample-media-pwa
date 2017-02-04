@@ -43,7 +43,8 @@ const dustOptions = {
     require(`${helpersPath}/star-rating`),
     require(`${filtersPath}/date-format`),
     require(`${filtersPath}/time-format`),
-    require(`${filtersPath}/truncate`)
+    require(`${filtersPath}/truncate`),
+    require(`${filtersPath}/linkify`)
   ]
 };
 
@@ -68,7 +69,7 @@ dynamic.set('views', viewPath);
 dynamic.use(require('../middleware/no-cache.js'));
 
 dynamic.get('/', (req, res) => {
-  const viewOptions = Object.assign(defaultViewOptions, {
+  const viewOptions = Object.assign({}, defaultViewOptions, {
     featured: videoLibrary.find(library.shows, library.featured.split('/')),
     newest: videoLibrary.getNewest(library.shows, 4),
     inlines
@@ -86,7 +87,7 @@ dynamic.get('/*', (req, res) => {
 
   const pathParts = pathName.split('/');
   const search = videoLibrary.find(library.shows, pathParts);
-  const viewOptions = Object.assign(defaultViewOptions, {
+  const viewOptions = Object.assign({}, defaultViewOptions, {
     title: `Biograf - ${search.title}`,
     item: search.items,
     css: [

@@ -33,7 +33,7 @@ limitations under the License.
       background: rgb({primary.r}, {primary.g}, {primary.b});
     }
 
-    .primary-col {
+    .primary-col, a {
       color: rgb({primary.r}, {primary.g}, {primary.b});
     }
 
