@@ -173,6 +173,8 @@ class VideoPlayer {
     const target = evt.target;
 
     if (target.classList.contains('player__play-button')) {
+      this._video.classList.add('player__element--active');
+
       // Pre-approve the video for playback on mobile.
       this._video.play().catch(_ => {
         // The play call will probably be interrupted by Shaka loading,
@@ -327,7 +329,6 @@ class VideoPlayer {
         if (this._video.paused) {
           this._video.play();
           this._video.volume = 1;
-          this._video.classList.add('player__element--active');
         }
         this._initPlayerControls();
         this._setMediaSessionData();
