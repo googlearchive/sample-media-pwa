@@ -2,6 +2,8 @@
 
 This is a sample media app to demonstrate media functionality in the context of a Progressive Web App.
 
+![biograf](https://cloud.githubusercontent.com/assets/617438/22658657/ca8feddc-ec92-11e6-988d-368c4e68d8f7.png)
+
 ## Follow along
 
 The build of this site is being cataloged on YouTube as part of the
