@@ -22,7 +22,8 @@ These are files which contain secrets and keys, so you can either
 or you can put some placeholder info in:
 
 ```javascript
-// oauth.js
+// oauth.js - do not use in production!
+// @see https://cloud.google.com/nodejs/getting-started/authenticate-users
 module.exports = {
   clientID: 'lolztehclientid',
   clientSecret: 'suchhiddenmanysecretwow',
@@ -32,7 +33,8 @@ module.exports = {
 ```
 
 ```javascript
-// session.js
+// session.js - do not use in production!
+// @see https://cloud.google.com/nodejs/getting-started/authenticate-users
 module.exports = {
   resave: false,
   saveUninitialized: false,
@@ -44,6 +46,6 @@ module.exports = {
 
 Finally, with that done you should be able to run: `npm run dev`.
 
-The videosare not included in the repo, but rather are served from a Google
+The videos are not included in the repo, but rather are served from a Google
 Cloud Storage bucket. They are served with CORS headers, meaning that
 you will need to run the local copy of the server at port 8080.
