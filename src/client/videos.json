@@ -13,13 +13,13 @@
           "description": "The trailer for the Chrome Channel.",
           "slug": "trailer",
           "duration": "155",
-          "poster": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/chr-trailer/poster.jpg",
-          "posterSmall": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/chr-trailer/poster-small.jpg",
-          "artworkPath": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/chr-trailer",
+          "poster": "https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/poster.jpg",
+          "posterSmall": "https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/poster-small.jpg",
+          "artworkPath": "https://storage.googleapis.com/biograf-video-files/videos/chr-trailer",
           "rating": 4.4,
           "sources": {
-            "full": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/chr-trailer/mp4/v-1080p-4500k-libx264.mp4",
-            "dash": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/chr-trailer/mp4/dash.mpd",
+            "full": "https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/mp4/dash.mpd",
             "hls": ""
           },
           "colors": {
@@ -65,13 +65,13 @@
           "description": "Watch all the talks from Chrome Developer Summit 2016 here at: https://goo.gl/TkgXYM. Paul Lewis and Jake Archibald look back over their highlights of the Chrome Developer Summit 2016. Check out the talks that caught their attention and don't miss out on pair donning matching tuxedos!",
           "slug": "showreel",
           "duration": "58",
-          "artworkPath": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/cds-ep-1/",
-          "poster": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/cds-ep-1/poster.jpg",
-          "posterSmall": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/cds-ep-1/poster-small.jpg",
+          "artworkPath": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/",
+          "poster": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/poster.jpg",
+          "posterSmall": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/poster-small.jpg",
           "rating": 4.3,
           "sources": {
-            "full": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/cds-ep-1/mp4/v-1080p-4500k-libx264.mp4",
-            "dash": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/cds-ep-1/mp4/dash.mpd",
+            "full": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/mp4/dash.mpd",
             "hls": ""
           },
           "colors": {
@@ -117,13 +117,13 @@
           "description": "Matt and Addy talk about PWAs and so on.",
           "slug": "episode-1",
           "duration": "732",
-          "artworkPath": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/ttt-ep-1/",
-          "poster": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/ttt-ep-1/poster.jpg",
-          "posterSmall": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/ttt-ep-1/poster-small.jpg",
+          "artworkPath": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-1/",
+          "poster": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-1/poster.jpg",
+          "posterSmall": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-1/poster-small.jpg",
           "rating": 4.3,
           "sources": {
-            "full": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/ttt-ep-1/mp4/v-1080p-4500k-libx264.mp4",
-            "dash": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/ttt-ep-1/mp4/dash.mpd",
+            "full": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-1/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-1/mp4/dash.mpd",
             "hls": ""
           },
           "colors": {
@@ -169,13 +169,13 @@
           "description": "This week, Paul & Jake talk about the future of JavaScript: ES6 and beyond.",
           "slug": "episode-17",
           "duration": "745",
-          "artworkPath": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/http203-ep-17/",
-          "poster": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/http203-ep-17/poster.jpg",
-          "posterSmall": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/http203-ep-17/poster-small.jpg",
+          "artworkPath": "https://storage.googleapis.com/biograf-video-files/videos/http203-ep-17/",
+          "poster": "https://storage.googleapis.com/biograf-video-files/videos/http203-ep-17/poster.jpg",
+          "posterSmall": "https://storage.googleapis.com/biograf-video-files/videos/http203-ep-17/poster-small.jpg",
           "rating": 4.3,
           "sources": {
-            "full": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/http203-ep-17/mp4/v-1080p-4500k-libx264.mp4",
-            "dash": "https://storage.googleapis.com/us.artifacts.biograf-155113.appspot.com/videos/http203-ep-17/mp4/dash.mpd",
+            "full": "https://storage.googleapis.com/biograf-video-files/videos/http203-ep-17/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "https://storage.googleapis.com/biograf-video-files/videos/http203-ep-17/mp4/dash.mpd",
             "hls": ""
           },
           "colors": {

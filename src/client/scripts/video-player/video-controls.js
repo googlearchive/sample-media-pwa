@@ -215,6 +215,7 @@ class VideoControls {
     this._fullscreen.classList.toggle(fsClass, state.fullscreen);
     this._volume.classList.toggle(volumeClass, state.volume === 1);
     this._duration.textContent = this._formatDuration(state.duration);
+    this.updateTimeTrack(state.currentTime, state.duration);
   }
 
   _onClick (evt) {

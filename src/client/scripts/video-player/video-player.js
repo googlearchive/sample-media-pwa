@@ -108,6 +108,8 @@ class VideoPlayer {
     this._stopTimeTracking = this._stopTimeTracking.bind(this);
     this._onSeek = this._onSeek.bind(this);
     this._onVideoEnd = this._onVideoEnd.bind(this);
+    this._updateVideoControlsWithPlayerState =
+        this._updateVideoControlsWithPlayerState.bind(this);
 
     // Setup.
     this._addEventListeners();
@@ -141,6 +143,8 @@ class VideoPlayer {
     this._video.addEventListener('play', this._startTimeTracking);
     this._video.addEventListener('pause', this._stopTimeTracking);
     this._video.addEventListener('ended', this._onVideoEnd);
+    this._video.addEventListener('durationchange',
+        this._updateVideoControlsWithPlayerState);
 
     if (!VideoPlayer.SUPPORTS_MEDIA_SESSION) {
       return;
@@ -166,7 +170,6 @@ class VideoPlayer {
 
     evt.preventDefault();
     this._onPlayPause();
-    this._videoControls.update(this._getVideoState());
   }
 
   _onClick (evt) {
@@ -190,11 +193,21 @@ class VideoPlayer {
     }
   }
 
+  _updateVideoControlsWithPlayerState () {
+    if (!this._videoControls) {
+      return;
+    }
+
+    this._videoControls.update(this._getVideoState());
+  }
+
   _getVideoState () {
     return {
       paused: this._video.paused,
       currentTime: this._video.currentTime,
-      duration: this._video.duration,
+      duration: (
+          Number.isNaN(this._video.duration) ? 0.1 : this._video.duration
+      ),
       volume: this._video.volume,
       fullscreen: VideoPlayer.isFullScreen
     };
@@ -211,12 +224,12 @@ class VideoPlayer {
 
   _onPlay () {
     this._video.play();
-    this._videoControls.update(this._getVideoState());
+    this._updateVideoControlsWithPlayerState();
   }
 
   _onPause () {
     this._video.pause();
-    this._videoControls.update(this._getVideoState());
+    this._updateVideoControlsWithPlayerState();
   }
 
   _onClose () {
@@ -229,7 +242,7 @@ class VideoPlayer {
   _onBack30 () {
     this._video.currentTime =
         Math.max(this._video.currentTime - 30, 0);
-    this._videoControls.update(this._getVideoState());
+    this._updateVideoControlsWithPlayerState();
   }
 
   _onFwd30 () {
@@ -239,7 +252,7 @@ class VideoPlayer {
 
     this._video.currentTime =
         Math.min(this._video.currentTime + 30, this._video.duration);
-    this._videoControls.update(this._getVideoState());
+    this._updateVideoControlsWithPlayerState();
   }
 
   _onSeek (evt) {
@@ -279,7 +292,7 @@ class VideoPlayer {
 
   _onVolumeToggle () {
     this._video.volume = 1 - this._video.volume;
-    this._videoControls.update(this._getVideoState());
+    this._updateVideoControlsWithPlayerState();
   }
 
   _onChromecast () {
@@ -354,7 +367,7 @@ class VideoPlayer {
     }
 
     this._videoControls.enabled = true;
-    this._videoControls.update(this._getVideoState());
+    this._updateVideoControlsWithPlayerState();
   }
 
   _setMediaSessionData () {

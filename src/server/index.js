@@ -30,6 +30,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // And now the routes.
+app.all('/_ah/health', (req, res) => res.sendStatus(200));
 app.use('/static', require('./apps/static'));
 app.use('/auth', require('./apps/authentication').app);
 app.use('/admin', require('./apps/admin'));

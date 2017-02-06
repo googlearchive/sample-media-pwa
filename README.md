@@ -44,5 +44,6 @@ module.exports = {
 
 Finally, with that done you should be able to run: `npm run dev`.
 
-Fair warning, though: the videos (which can only be described as huge) are not included in the repo,
-so again you'll need to make some placeholder content for those.
+The videosare not included in the repo, but rather are served from a Google
+Cloud Storage bucket. They are served with CORS headers, meaning that
+you will need to run the local copy of the server at port 8080.
