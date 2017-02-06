@@ -2,7 +2,7 @@
 
 This is a sample media app to demonstrate media functionality in the context of a Progressive Web App.
 
-![biograf](https://cloud.githubusercontent.com/assets/617438/22658657/ca8feddc-ec92-11e6-988d-368c4e68d8f7.png)
+![biograf_small](https://cloud.githubusercontent.com/assets/617438/22658834/5f88797c-ec93-11e6-8e9c-b4309c3da1cc.png)
 
 ## Follow along
 
@@ -51,3 +51,7 @@ Finally, with that done you should be able to run: `npm run dev`.
 The videos are not included in the repo, but rather are served from a Google
 Cloud Storage bucket. They are served with CORS headers, meaning that
 you will need to run the local copy of the server at port 8080.
+
+## Misc Notes
+
+* The app currently does not support iOS. HLS support is coming soon, at which point everything should be fine.
