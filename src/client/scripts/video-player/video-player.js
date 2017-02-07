@@ -38,6 +38,18 @@ class VideoPlayer {
     return ('remote' in HTMLMediaElement.prototype);
   }
 
+  static get SUPPORTS_ORIENTATION_LOCK () {
+    if (!('orientation' in window.screen)) {
+      return false;
+    }
+
+    if (!('lock' in window.screen.orientation)) {
+      return false;
+    }
+
+    return true;
+  }
+
   static get isFullScreen () {
     return (document.fullscreenElement || document.webkitFullscreenElement);
   }
@@ -97,7 +109,7 @@ class VideoPlayer {
     this._onPause = this._onPause.bind(this);
     this._onBack30 = this._onBack30.bind(this);
     this._onFwd30 = this._onFwd30.bind(this);
-    this._onFullScreen = this._onFullScreen.bind(this);
+    this._onToggleFullScreen = this._onToggleFullScreen.bind(this);
     this._onChromecast = this._onChromecast.bind(this);
     this._onVolumeToggle = this._onVolumeToggle.bind(this);
     this._onOrientationChanged = this._onOrientationChanged.bind(this);
@@ -106,6 +118,7 @@ class VideoPlayer {
     this._onRemoteConnect = this._onRemoteConnect.bind(this);
     this._onRemoteDisconnect = this._onRemoteDisconnect.bind(this);
     this._onTimeUpdate = this._onTimeUpdate.bind(this);
+    this._onFullScreenChanged = this._onFullScreenChanged.bind(this);
     this._startTimeTracking = this._startTimeTracking.bind(this);
     this._stopTimeTracking = this._stopTimeTracking.bind(this);
     this._onSeek = this._onSeek.bind(this);
@@ -134,7 +147,7 @@ class VideoPlayer {
     this._videoContainer.addEventListener('replay', this._onReplay);
     this._videoContainer.addEventListener('close', this._onClose);
     this._videoContainer.addEventListener('toggle-fullscreen',
-        this._onFullScreen);
+        this._onToggleFullScreen);
     this._videoContainer.addEventListener('toggle-chromecast',
         this._onChromecast);
     this._videoContainer.addEventListener('toggle-volume',
@@ -142,6 +155,10 @@ class VideoPlayer {
 
     window.screen.orientation.addEventListener('change',
         this._onOrientationChanged);
+
+    window.addEventListener('fullscreenchange', this._onFullScreenChanged);
+    window.addEventListener('webkitfullscreenchange',
+        this._onFullScreenChanged);
 
     this._video.addEventListener('play', this._startTimeTracking);
     this._video.addEventListener('pause', this._stopTimeTracking);
@@ -194,6 +211,22 @@ class VideoPlayer {
     if (!this._videoControls) {
       return;
     }
+  }
+
+  _onFullScreenChanged () {
+    if (!VideoPlayer.SUPPORTS_ORIENTATION_LOCK) {
+      return;
+    }
+
+    if (VideoPlayer.isFullScreen) {
+      return window.screen.orientation.lock('landscape').catch(_ => {
+        // Silently swallow errors from attempting to lock the orientation.
+        // This only works in the case of web apps added to home screens, but
+        // we want to call it anyway.
+      });
+    }
+
+    return window.screen.orientation.unlock();
   }
 
   _updateVideoControlsWithPlayerState () {
@@ -301,7 +334,7 @@ class VideoPlayer {
     this._exitFullScreen();
   }
 
-  _onFullScreen () {
+  _onToggleFullScreen () {
     if (VideoPlayer.isFullScreen) {
       this._fsLocked = false;
       this._exitFullScreen();
@@ -342,11 +375,6 @@ class VideoPlayer {
 
     enterFullScreenFn.call(this._videoContainer);
 
-    if (!('lockOrientation' in window.screen)) {
-      return;
-    }
-
-    window.screen.lockOrientation('landscape');
   }
 
   _exitFullScreen () {
@@ -354,12 +382,6 @@ class VideoPlayer {
         document.webkitExitFullscreen;
 
     exitFullScreenFn.call(document);
-
-    if (!('unlockOrientation' in window.screen)) {
-      return;
-    }
-
-    window.screen.unlockOrientation();
   }
 
   _loadVideo () {
