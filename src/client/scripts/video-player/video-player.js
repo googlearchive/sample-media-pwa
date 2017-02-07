@@ -84,6 +84,7 @@ class VideoPlayer {
     this._castVideo = document.createElement('video');
     this._player = null;
     this._fsLocked = false;
+    this._playOnSeekFinished = false;
     this._shakaLoaded = Utils.loadScript(VideoPlayer.SHAKA_PATH);
 
     // Handlers.
@@ -92,6 +93,7 @@ class VideoPlayer {
     this._onPlayPause = this._onPlayPause.bind(this);
     this._onPlay = this._onPlay.bind(this);
     this._onClose = this._onClose.bind(this);
+    this._onReplay = this._onReplay.bind(this);
     this._onPause = this._onPause.bind(this);
     this._onBack30 = this._onBack30.bind(this);
     this._onFwd30 = this._onFwd30.bind(this);
@@ -129,6 +131,7 @@ class VideoPlayer {
     this._videoContainer.addEventListener('back-30', this._onBack30);
     this._videoContainer.addEventListener('fwd-30', this._onFwd30);
     this._videoContainer.addEventListener('seek', this._onSeek);
+    this._videoContainer.addEventListener('replay', this._onReplay);
     this._videoContainer.addEventListener('close', this._onClose);
     this._videoContainer.addEventListener('toggle-fullscreen',
         this._onFullScreen);
@@ -159,7 +162,7 @@ class VideoPlayer {
   }
 
   _onBufferChanged (evt) {
-    const bufferingClass = 'video--buffering';
+    const bufferingClass = 'player--buffering';
     this._videoContainer.classList.toggle(bufferingClass, evt.buffering);
   }
 
@@ -223,8 +226,12 @@ class VideoPlayer {
   }
 
   _onPlay () {
-    this._video.play();
-    this._updateVideoControlsWithPlayerState();
+    this._video.play().then(_ => {
+      console.log('playing...');
+      this._updateVideoControlsWithPlayerState();
+    }, err => {
+      console.warn(err);
+    });
   }
 
   _onPause () {
@@ -236,7 +243,17 @@ class VideoPlayer {
     this._player.destroy().then(_ => {
       this._video.classList.remove('player__element--active');
       this._videoControls.enabled = false;
+      this._exitFullScreen();
     });
+  }
+
+  _onReplay () {
+    this._player.destroy()
+        .then(_ => this._loadVideo())
+        .then(_ => {
+          this._videoContainer.classList.remove('player--ended');
+        });
+    ;
   }
 
   _onBack30 () {
@@ -246,7 +263,7 @@ class VideoPlayer {
   }
 
   _onFwd30 () {
-    if (this._video.paused) {
+    if (this._video.ended) {
       return;
     }
 
@@ -261,11 +278,16 @@ class VideoPlayer {
   }
 
   _onVideoEnd () {
-    // TODO: put up an end card for rewatching / sharing etc.
-    this._video.classList.add('video--ended');
+    this._videoContainer.classList.add('player--ended');
+    this._updateVideoControlsWithPlayerState();
   }
 
   _onOrientationChanged () {
+    // Ignore orientation changes when not playing the video.
+    if (this._video.paused) {
+      return;
+    }
+
     const isLandscape = window.screen.orientation.type.startsWith('landscape');
     if (isLandscape) {
       this._enterFullScreen();
@@ -329,7 +351,7 @@ class VideoPlayer {
   }
 
   _loadVideo () {
-    this._shakaLoaded.then(_ => {
+    return this._shakaLoaded.then(_ => {
       this._player = new shaka.Player(this._video);
       this._player.configure({
         abr: {

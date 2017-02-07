@@ -116,6 +116,7 @@
       margin: -70px auto 0 auto;
       max-width: 711px;
       position: relative;
+      overflow: hidden;
 
       &::after {
         content: '';

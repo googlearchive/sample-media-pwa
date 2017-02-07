@@ -38,6 +38,7 @@ class VideoControls {
     this._timeUsed = this._videoControls.querySelector('.js-time-used');
     this._playhead = this._videoControls.querySelector('.js-playhead');
     this._duration = this._videoControls.querySelector('.js-duration');
+    this._replay = document.querySelector('.js-replay');
 
     this._enabled = false;
     this._pendingHide = undefined;
@@ -115,6 +116,7 @@ class VideoControls {
     this._videoControls.addEventListener('touchend', this._onInputUp);
 
     this._videoControls.addEventListener('click', this._onClick);
+    this._replay.addEventListener('click', this._onClick);
 
     document.addEventListener('keydown', this._onKeyDown);
     document.addEventListener('fullscreenchange', this._onFullscreenChange);
@@ -213,7 +215,7 @@ class VideoControls {
     this._playPauseBig.classList.toggle(pausedBigClass, state.paused);
     this._playPauseStandard.classList.toggle(pausedStandardClass, state.paused);
     this._fullscreen.classList.toggle(fsClass, state.fullscreen);
-    this._volume.classList.toggle(volumeClass, state.volume === 1);
+    this._volume.classList.toggle(volumeClass, state.volume === 0);
     this._duration.textContent = this._formatDuration(state.duration);
     this.updateTimeTrack(state.currentTime, state.duration);
   }

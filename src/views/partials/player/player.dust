@@ -55,6 +55,14 @@
     {>"partials/shape" colors=colors /}
   </div>
 
+  <div class="player__ended-view">
+    <div class="player__ended-view-replay">
+      <button class="player__ended-view-replay-btn js-replay" data-type="replay">
+        <div class="player__ended-view-replay-btn-label">Replay video</div>
+      </button>
+    </div>
+  </div>
+
   <noscript>
     <style> .player__play-button { display: none }</style>
     <div class="player__js-error">
