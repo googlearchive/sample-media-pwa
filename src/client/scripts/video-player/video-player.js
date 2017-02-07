@@ -341,6 +341,12 @@ class VideoPlayer {
         this._videoContainer.webkitRequestFullscreen;
 
     enterFullScreenFn.call(this._videoContainer);
+
+    if (!('lockOrientation' in window.screen)) {
+      return;
+    }
+
+    window.screen.lockOrientation('landscape');
   }
 
   _exitFullScreen () {
@@ -348,6 +354,12 @@ class VideoPlayer {
         document.webkitExitFullscreen;
 
     exitFullScreenFn.call(document);
+
+    if (!('unlockOrientation' in window.screen)) {
+      return;
+    }
+
+    window.screen.unlockOrientation();
   }
 
   _loadVideo () {
