@@ -39,7 +39,7 @@ class VideoPlayer {
   }
 
   static get SUPPORTS_ORIENTATION_LOCK () {
-    if (!('orientation' in window.screen)) {
+    if (!VideoPlayer.SUPPORTS_ORIENTATION) {
       return false;
     }
 
@@ -48,6 +48,10 @@ class VideoPlayer {
     }
 
     return true;
+  }
+
+  static get SUPPORTS_ORIENTATION () {
+    return ('orientation' in window.screen);
   }
 
   static get isFullScreen () {
@@ -153,9 +157,6 @@ class VideoPlayer {
     this._videoContainer.addEventListener('toggle-volume',
         this._onVolumeToggle);
 
-    window.screen.orientation.addEventListener('change',
-        this._onOrientationChanged);
-
     window.addEventListener('fullscreenchange', this._onFullScreenChanged);
     window.addEventListener('webkitfullscreenchange',
         this._onFullScreenChanged);
@@ -165,6 +166,11 @@ class VideoPlayer {
     this._video.addEventListener('ended', this._onVideoEnd);
     this._video.addEventListener('durationchange',
         this._updateVideoControlsWithPlayerState);
+
+    if (VideoPlayer.SUPPORTS_ORIENTATION) {
+      window.screen.orientation.addEventListener('change',
+          this._onOrientationChanged);
+    }
 
     if (!VideoPlayer.SUPPORTS_MEDIA_SESSION) {
       return;
