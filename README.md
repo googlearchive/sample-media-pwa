@@ -53,3 +53,4 @@ you will need to run the local copy of the server at port 8080.
 ## Misc Notes
 
 * The app currently does not support iOS. HLS support is coming soon, at which point everything should be fine.
+* The Service Worker is largely inert, so while it's there the app doesn't yet work offline.
