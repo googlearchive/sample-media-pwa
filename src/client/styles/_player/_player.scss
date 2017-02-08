@@ -38,7 +38,7 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%) translateY(-24px);
+    transform: translate(-50%, -50%) translateY(-32px);
     z-index: 100;
     opacity: 0;
     pointer-events: none;
@@ -295,6 +295,7 @@
   }
 
   &__controls {
+    contain: strict;
     background: rgba(0, 0, 0, 0.15);
     width: 100%;
     height: 100%;
@@ -375,7 +376,7 @@
       position: relative;
       width: 100%;
       height: 30%;
-      max-height: 48px;
+      max-height: 64px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -548,11 +549,11 @@
 
 @keyframes buffering {
   from {
-    transform: translate(-50%, -50%) translateY(-24px) rotate(0deg);
+    transform: translate(-50%, -50%) translateY(-32px) rotate(0deg);
   }
 
   to {
-    transform: translate(-50%, -50%) translateY(-24px) rotate(360deg);
+    transform: translate(-50%, -50%) translateY(-32px) rotate(360deg);
   }
 }
 
