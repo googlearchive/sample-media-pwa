@@ -1,4 +1,4 @@
-**Please note: This app is being developed. There may be bugs, and everything is subject to change**
+**Please note: This app is being developed. There may be bugs, and everything is subject to change.**
 
 # Sample Media (VOD) App
 
@@ -13,7 +13,7 @@ This is a sample media app to demonstrate media functionality in the context of 
 1. `cd sample-media-pwa`
 1. `npm install`
 
-### Setting up some secrets.
+### Setting up some secrets
 
 Once the entire internet has been cloned into your `node_modules` folder you'll need to create
 `src/config`, into which you will need to place a couple of files: `oauth.js` and `session.js`.
