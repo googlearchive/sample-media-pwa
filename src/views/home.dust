@@ -41,10 +41,7 @@
     <div class="home__promo-content content-block">
       <div class="home__promo-text">
         <h2 class="home__promo-text-title primary-light-col">Watch what you want, whenever you want.</h2>
-        <p>All our content is available on the web, which means you can get
-          access to it whenever you want it. What’s more, if your browser
-          supports the latest technologies, you can save videos to view
-          whenever you’re offline!</p>
+        <p>All our content is available on the web, which means you can get access to it whenever you want it. What’s more, if your browser supports the latest technologies, you can save videos to view whenever you’re offline!</p>
 
         <p>Bye bye buffering, hello video!</p>
       </div>
