@@ -1,13 +1,11 @@
+**Please note: This app is being developed. There may be bugs, and everything is subject to change**
+
 # Sample Media (VOD) App
 
-This is a sample media app to demonstrate media functionality in the context of a Progressive Web App.
+This is a sample media app to demonstrate media functionality in the context of a Progressive Web App. The build of this site is being cataloged on YouTube as part of the
+[Chrome Developers Developer Diary](https://www.youtube.com/playlist?list=PLNYkxOF6rcIBykcJ7bvTpqU7vt-oey72J) series.
 
 ![biograf_small](https://cloud.githubusercontent.com/assets/617438/22658834/5f88797c-ec93-11e6-8e9c-b4309c3da1cc.png)
-
-## Follow along
-
-The build of this site is being cataloged on YouTube as part of the
-[Chrome Developers Developer Diary](https://www.youtube.com/playlist?list=PLNYkxOF6rcIBykcJ7bvTpqU7vt-oey72J) series.
 
 ## Running the site locally
 
