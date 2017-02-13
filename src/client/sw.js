@@ -44,6 +44,8 @@ console.log('Totally a Service Worker: {version}!');
 
 // self.analytics.trackingId = 'UA-41980257-1';
 
+importScripts('{@hash path="dist/client/third_party/libs/shaka-player.compiled.js"}{/hash}');
+
 const NAME = 'Biograf';
 const VERSION = '{version}';
 const cacheManifest = [];
@@ -85,10 +87,14 @@ self.onactivate = _ => {
 };
 
 self.onmessage = evt => {
-  if (evt.data === 'version') {
-    evt.source.postMessage({
-      version: VERSION
-    });
+  switch (evt.data) {
+    case 'version':
+      evt.source.postMessage({
+        version: VERSION
+      });
+
+    case 'offline':
+      return;
   }
 };
 

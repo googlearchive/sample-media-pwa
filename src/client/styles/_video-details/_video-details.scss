@@ -26,6 +26,12 @@
       color: #FFFFFF;
       line-height: 1.5;
       max-width: 590px;
+      flex: 1;
+
+      &-paragraph {
+        margin: 0;
+        padding: 0;
+      }
 
       &-meta {
         display: flex;
@@ -54,8 +60,36 @@
       }
     }
 
-    &-controls-and-cast {
-      border: 1px solid red;
+    &-controls {
+      margin-top: 32px;
+      flex: 1;
+
+      &-offline {
+        font-size: 16px;
+        color: #FFF;
+        background: none;
+        border: none;
+        padding: 0;
+        opacity: 0;
+        display: flex;
+        line-height: 24px;
+
+        &::before {
+          width: 24px;
+          height: 24px;
+          background: red;
+          content: '';
+          margin-right: 8px;
+        }
+
+        &::after {
+          content: 'Make available offline';
+        }
+
+        &.offline--available::after {
+          content: 'Remove offline copy'
+        }
+      }
     }
   }
 }
@@ -75,6 +109,12 @@
     &__info {
       padding: 80px 32px 120px 32px;
       font-size: 18px;
+      flex-direction: row;
+
+      &-controls {
+        margin-top: 0;
+        padding-left: 64px;
+      }
     }
   }
 }

@@ -6,7 +6,7 @@
       data-show-title="{showTitle}"
       data-artwork-path="{artworkPath}"
       data-poster="{poster}"
-      data-src="{src}"></video>
+      data-src="{dash}"></video>
 
   <div class="player__controls">
     <div class="player__controls-big">
@@ -27,7 +27,9 @@
       <div class="player__controls-standard-video-duration js-duration"></div>
       <button class="player__controls-standard-toggle-volume js-volume" data-type="toggle-volume">Toggle Volume</button>
       <button class="player__controls-standard-toggle-fullscreen js-fullscreen"  data-type="toggle-fullscreen">Toggle FS</button>
-      <!--<button class="player__controls-standard-toggle-offline"  data-type="toggle-offline">Toggle Offline</button> -->
+      <button class="player__controls-standard-toggle-offline js-offline primary-bg" data-type="toggle-offline">
+        {>"partials/player/offline"/}
+      </button>
       <button class="player__controls-standard-chromecast js-chromecast" data-type="toggle-chromecast">Chromecast</button>
     </div>
   </div>

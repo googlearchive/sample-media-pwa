@@ -41,7 +41,7 @@ class Home {
     }
 
     el.style.backgroundImage = `url(${src})`;
-    el.classList.add('image-fade-in');
+    el.classList.add('fade-in');
   }
 }
 

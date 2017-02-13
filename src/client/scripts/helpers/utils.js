@@ -17,20 +17,9 @@
 
 'use strict';
 
+const _scriptCache = {};
 const loadScript = url => {
-  if (!(/^http?/.test(url))) {
-    url = location.origin + url;
-  }
-
-  const fullScriptURL = new URL(url);
-  const existingScript =
-      document.querySelector(`script[src="${fullScriptURL}"]`);
-
-  if (existingScript) {
-    return Promise.resolve(existingScript);
-  }
-
-  return new Promise((resolve, reject) => {
+  _scriptCache[url] = _scriptCache[url] || new Promise((resolve, reject) => {
     const script = document.createElement('script');
     script.src = url;
     script.async = true;
@@ -40,6 +29,8 @@ const loadScript = url => {
     script.onerror = reject;
     document.body.appendChild(script);
   });
+
+  return _scriptCache[url];
 };
 
 const removeElement = el => {

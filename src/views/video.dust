@@ -5,7 +5,7 @@ colors=item.colors
 showTitle=item.breadcrumbs[0]
 episodeTitle=item.title
 poster=item.poster
-src=item.sources.dash
+dash=item.sources.dash
 castSrc=item.sources.full
 rating=item.rating
 artworkPath=item.artworkPath /}
@@ -13,7 +13,7 @@ artworkPath=item.artworkPath /}
 <section class="video-details main-content">
   <div class="video-details__info content-block">
     <div class="video-details__info-text">
-      <p>{item.description|linkify|s}</p>
+      <p class="video-details__info-text-paragraph">{item.description|linkify|s}</p>
 
       <div class="video-details__info-text-meta">
         <div class="video-details__info-text-meta-release-date">
@@ -27,7 +27,10 @@ artworkPath=item.artworkPath /}
 
     </div>
 
-    <div class="video-details__controls-and-cast">
+    <div class="video-details__info-controls">
+      <button class="video-details__info-controls-offline js-offline"
+          data-dash="{item.sources.dash}"
+          data-type="toggle-offline"></button>
       <!--Cast info-->
     </div>
   </div>

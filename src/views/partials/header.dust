@@ -33,6 +33,10 @@ limitations under the License.
       background: rgb({primary.r}, {primary.g}, {primary.b});
     }
 
+    .primary-fill {
+      fill: rgb({primary.r}, {primary.g}, {primary.b});
+    }
+
     .primary-col, a {
       color: rgb({primary.r}, {primary.g}, {primary.b});
     }
@@ -43,34 +47,6 @@ limitations under the License.
 
     .primary-light-col {
       color: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
-    }
-
-    .secondary-bg {
-      background: rgb({secondary.r}, {secondary.g}, {secondary.b});
-    }
-
-    .secondary-col {
-      color: rgb({secondary.r}, {secondary.g}, {secondary.b});
-    }
-
-    .tertiary-bg {
-      background: rgb({tertiary.r}, {tertiary.g}, {tertiary.b});
-    }
-
-    .tertiary-col {
-      color: rgb({tertiary.r}, {tertiary.g}, {tertiary.b});
-    }
-
-    .tertiary-3px-border {
-      border: 3px solid rgb({tertiary.r}, {tertiary.g}, {tertiary.b});
-    }
-
-    .quaternary-bg {
-      background: rgb({quaternary.r}, {quaternary.g}, {quaternary.b});
-    }
-
-    .quaternary-col {
-      color: rgb({quaternary.r}, {quaternary.g}, {quaternary.b});
     }
     {/colors}
   </style>

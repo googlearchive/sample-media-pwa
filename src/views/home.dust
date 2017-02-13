@@ -5,7 +5,7 @@
   showTitle=featured.breadcrumbs[0]
   episodeTitle=featured.items.title
   poster=featured.items.poster
-  src=featured.items.sources.dash
+  dash=featured.items.sources.dash
   castSrc=featured.items.sources.full
   rating=featured.items.rating
   artworkPath=featured.items.artworkPath /}

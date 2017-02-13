@@ -17,15 +17,10 @@
 
 'use strict';
 
-import ServiceWorkerInstaller from './helpers/sw-install';
-import VideoPlayer from './video-player/video-player';
-
-class App {
-  constructor () {
-    ServiceWorkerInstaller.init();
-    VideoPlayer.init();
+class Paths {
+  static get SHAKA_PATH () {
+    return '/static/third_party/libs/shaka-player.compiled.js';
   }
 }
 
-window.biograf = window.biograf || {};
-window.biograf.app = window.biograf.app || new App();
+export default Paths;

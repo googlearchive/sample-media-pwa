@@ -57,14 +57,14 @@ a {
   }
 }
 
-.image-fade-and-scale-in {
+.fade-and-scale-in {
   animation-name: imageFadeAndScaleIn;
   animation-duration: 1s;
   animation-timing-function: cubic-bezier(0, 0, 0.4, 1);
   animation-fill-mode: forwards;
 }
 
-.image-fade-in {
+.fade-in {
   animation-name: imageFadeIn;
   animation-duration: 0.3s;
   animation-timing-function: cubic-bezier(0, 0, 0.4, 1);

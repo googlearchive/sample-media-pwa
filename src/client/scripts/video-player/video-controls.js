@@ -18,8 +18,13 @@
 'use strict';
 
 import Utils from '../helpers/utils';
+import DownloadProgress from './download-progress';
 
 class VideoControls {
+
+  static get OFFLINE_BUTTON_SELECTOR () {
+    return 'js-offline-button';
+  }
 
   static get HIDE_TIMEOUT () {
     return 500;
@@ -39,12 +44,14 @@ class VideoControls {
     this._playhead = this._videoControls.querySelector('.js-playhead');
     this._duration = this._videoControls.querySelector('.js-duration');
     this._replay = document.querySelector('.js-replay');
+    this._offline = document.querySelectorAll('.js-offline');
 
     this._enabled = false;
     this._pendingHide = undefined;
     this._castConnected = false;
     this._trackDrag = false;
     this._trackBCR = null;
+    this._downloadProgress = new DownloadProgress();
 
     this.toggleControls = this.toggleControls.bind(this);
     this.showControls = this.showControls.bind(this);
@@ -118,6 +125,10 @@ class VideoControls {
     this._videoControls.addEventListener('click', this._onClick);
     this._replay.addEventListener('click', this._onClick);
 
+    Array.from(this._offline).forEach(offline => {
+      offline.addEventListener('click', this._onClick);
+    });
+
     document.addEventListener('keydown', this._onKeyDown);
     document.addEventListener('fullscreenchange', this._onFullscreenChange);
     document.addEventListener('webkitfullscreenchange',
@@ -180,6 +191,38 @@ class VideoControls {
     this._setTimeTrackPosition(normalizedTime);
   }
 
+  updateOfflineProgress (percentage) {
+    Array.from(this._offline).forEach(offline => {
+      this._downloadProgress(offline, percentage);
+    });
+  }
+
+  update (state) {
+    const pausedBigClass = 'player__controls-big-play-pause--paused';
+    const pausedStandardClass = 'player__controls-standard-play-pause--paused';
+    const fsClass = 'player__controls-standard-toggle-fullscreen--active';
+    const volumeClass = 'player__controls-standard-toggle-volume--muted';
+    const offlineClass = 'offline--available';
+
+    this._videoControls.dataset.title = state.title;
+    this._playPauseBig.classList.toggle(pausedBigClass, state.paused);
+    this._playPauseStandard.classList.toggle(pausedStandardClass, state.paused);
+    this._fullscreen.classList.toggle(fsClass, state.fullscreen);
+    this._volume.classList.toggle(volumeClass, state.volume === 0);
+    this._duration.textContent = this._formatDuration(state.duration);
+    this.updateTimeTrack(state.currentTime, state.duration);
+
+    Array.from(this._offline).forEach(offline => {
+      if (!state.offlineSupported) {
+        offline.hidden = true;
+        return;
+      }
+
+      offline.classList.toggle(offlineClass, state.offline);
+      offline.classList.add('fade-in');
+    });
+  }
+
   _setTimeTrackPosition (normalizedPosition) {
     this._timeUsed.style.transform = `
       translate(-50%, -50%)
@@ -206,22 +249,9 @@ class VideoControls {
     return `${(hours > 0 ? hours + ':' : '')}${lPad(mins)}:${lPad(secs)}`;
   }
 
-  update (state) {
-    const pausedBigClass = 'player__controls-big-play-pause--paused';
-    const pausedStandardClass = 'player__controls-standard-play-pause--paused';
-    const fsClass = 'player__controls-standard-toggle-fullscreen--active';
-    const volumeClass = 'player__controls-standard-toggle-volume--muted';
-
-    this._playPauseBig.classList.toggle(pausedBigClass, state.paused);
-    this._playPauseStandard.classList.toggle(pausedStandardClass, state.paused);
-    this._fullscreen.classList.toggle(fsClass, state.fullscreen);
-    this._volume.classList.toggle(volumeClass, state.volume === 0);
-    this._duration.textContent = this._formatDuration(state.duration);
-    this.updateTimeTrack(state.currentTime, state.duration);
-  }
-
   _onClick (evt) {
     const type = evt.target.dataset.type;
+    evt.stopImmediatePropagation();
 
     if (!type) {
       this.showControls();
