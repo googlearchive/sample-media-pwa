@@ -19,29 +19,33 @@
 
 class DownloadProgress {
 
-  static get SIZE () {
-    return 24;
+  static get DEFAULT_RADIUS () {
+    return 12;
   }
 
-  constructor (target, percentage) {
+  static update (target, percentage=0) {
     const START = Math.PI * 0.5;
     const TAU = Math.PI * 2;
-    const RADIUS = 240 * 0.5;
 
     const path = target.querySelector('path.dial');
-    const targetX = RADIUS - Math.cos(START + (percentage * TAU)) * RADIUS;
-    const targetY = RADIUS - Math.sin(START - percentage * TAU) * RADIUS;
+    if (!path) {
+      return;
+    }
+
+    const radius = (path.dataset.radius || DownloadProgress.DEFAULT_RADIUS);
+    const targetX = radius - Math.cos(START + (percentage * TAU)) * radius;
+    const targetY = radius - Math.sin(START - percentage * TAU) * radius;
     const largeArcFlag = percentage > 0.5 ? 1 : 0;
 
     const points = [
       // Top center.
-      `M ${RADIUS} 0`,
+      `M ${radius} 0`,
 
       // Arc round to wherever the percentage implies.
-      `A ${RADIUS} ${RADIUS} 0 ${largeArcFlag} 1 ${targetX} ${targetY}`,
+      `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${targetX} ${targetY}`,
 
       // Back to the center.
-      `L ${RADIUS} ${RADIUS}`
+      `L ${radius} ${radius}`
     ];
 
     path.setAttribute('d', points.join(' '));
@@ -49,3 +53,18 @@ class DownloadProgress {
 }
 
 export default DownloadProgress;
+
+// const t = document
+//       .querySelector('.video-details__info-controls-offline');
+// let x = 0.99;
+// const update = () => {
+//   console.log('update', x);
+//   DownloadProgress.update(t, x);
+//   // x += 0.01;
+//   // x %= 1;
+// };
+// update();
+
+// document.addEventListener('click', _ => {
+//   requestAnimationFrame(update);
+// });

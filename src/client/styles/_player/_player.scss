@@ -303,6 +303,11 @@
     top: 0;
     left: 0;
     opacity: 0;
+
+    // opacity: 1 !important;
+    // z-index: 1000;
+    // pointer-events: auto !important;
+
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -396,6 +401,7 @@
         cursor: pointer;
         border-radius: 2px;
         outline: none;
+
         -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
         &:hover,
@@ -518,13 +524,10 @@
       }
 
       &-toggle-offline {
-        > * {
-          pointer-events: none;
-        }
-
-        &:not(.offline--available) {
-          background: inherit;
-        }
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
       }
     }
 

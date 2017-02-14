@@ -28,9 +28,11 @@ artworkPath=item.artworkPath /}
     </div>
 
     <div class="video-details__info-controls">
-      <button class="video-details__info-controls-offline js-offline"
+      <button class="video-details__info-controls-offline js-offline toggle-offline"
           data-dash="{item.sources.dash}"
-          data-type="toggle-offline"></button>
+          data-type="toggle-offline">
+          {>"partials/offline" /}
+      </button>
       <!--Cast info-->
     </div>
   </div>

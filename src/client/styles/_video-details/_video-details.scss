@@ -73,21 +73,38 @@
         opacity: 0;
         display: flex;
         line-height: 24px;
+        cursor: pointer;
+        position: relative;
+        outline: none;
+
+        > svg {
+          position: relative;
+        }
 
         &::before {
+          content: '';
+          position: absolute;
           width: 24px;
           height: 24px;
-          background: red;
-          content: '';
-          margin-right: 8px;
+          left: 0;
+          top: 0;
+          border-radius: 50%;
+          background: #555;
         }
 
         &::after {
+          margin-left: 8px;
           content: 'Make available offline';
         }
 
-        &.offline--available::after {
-          content: 'Remove offline copy'
+        &.offline--available {
+          &::before {
+            background: none;
+          }
+
+          &::after {
+            content: 'Remove offline copy'
+          }
         }
       }
     }

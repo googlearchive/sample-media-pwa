@@ -45,6 +45,10 @@ limitations under the License.
       background: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
     }
 
+    .primary-light-fill {
+      fill: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
+    }
+
     .primary-light-col {
       color: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
     }

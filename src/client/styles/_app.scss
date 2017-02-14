@@ -91,3 +91,27 @@ a {
     opacity: 1;
   }
 }
+
+.toggle-offline {
+  svg {
+    pointer-events: none;
+  }
+
+  .is-offline {
+    display: none;
+  }
+
+  .is-downloading {
+    display: block;
+  }
+
+  &.offline--available {
+    .is-offline {
+      display: block;
+    }
+
+    .is-downloading {
+      display: none;
+    }
+  }
+}

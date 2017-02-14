@@ -21,6 +21,7 @@ import Utils from '../helpers/utils';
 import Paths from '../helpers/paths';
 import VideoControls from './video-controls';
 import OfflineManager from '../helpers/offline';
+import Toast from '../helpers/toast';
 
 class VideoPlayer {
 
@@ -116,7 +117,7 @@ class VideoPlayer {
     this._onPause = this._onPause.bind(this);
     this._onBack30 = this._onBack30.bind(this);
     this._onFwd30 = this._onFwd30.bind(this);
-    this._onToggleFullScreen = this._onToggleFullScreen.bind(this);
+    this._onFullScreenToggle = this._onFullScreenToggle.bind(this);
     this._onChromecast = this._onChromecast.bind(this);
     this._onVolumeToggle = this._onVolumeToggle.bind(this);
     this._onOrientationChanged = this._onOrientationChanged.bind(this);
@@ -217,7 +218,7 @@ class VideoPlayer {
     this._videoContainer.addEventListener('replay', this._onReplay);
     this._videoContainer.addEventListener('close', this._onClose);
     this._videoContainer.addEventListener('toggle-fullscreen',
-        this._onToggleFullScreen);
+        this._onFullScreenToggle);
     this._videoContainer.addEventListener('toggle-chromecast',
         this._onChromecast);
     this._videoContainer.addEventListener('toggle-volume',
@@ -263,10 +264,6 @@ class VideoPlayer {
 
     this._videoContainer.addEventListener('offlinestatechange',
         this._onOfflineStateChange);
-  }
-
-  _onOfflineStateChange () {
-    this._setManifestPathFromOfflineStatus();
   }
 
   _updateVideoControlsWithPlayerState () {
@@ -401,6 +398,12 @@ class VideoPlayer {
     this._isTrackingTime = false;
   }
 
+  _onOfflineStateChange () {
+    return this._setManifestPathFromOfflineStatus().then(_ => {
+      this._updateVideoControlsWithPlayerState();
+    });
+  }
+
   _onBufferChanged (evt) {
     const bufferingClass = 'player--buffering';
     this._videoContainer.classList.toggle(bufferingClass, evt.buffering);
@@ -432,9 +435,10 @@ class VideoPlayer {
     }
   }
 
-  _onOfflineToggle (manifestPath) {
-    if (!manifestPath) {
-      manifestPath = this._manifest;
+  _onOfflineToggle (evt) {
+    let manifestPath = this._originalManifest;
+    if (evt && evt.target.dataset.dash) {
+      manifestPath = evt.target.dataset.dash;
     }
 
     // Remove a video if the user clicks to do so.
@@ -444,6 +448,7 @@ class VideoPlayer {
         return;
       }
 
+      Toast.create('Deleting video.', {tag: 'offline'});
       return this._offlineManager.remove(manifestPath).then(_ => {
         Utils.fire(this._videoContainer, 'offlinestatechange');
       });
@@ -455,15 +460,40 @@ class VideoPlayer {
       return;
     }
 
+    Toast.create('Caching video for offline.', {tag: 'offline'});
     this._offlineManager.cacheForOffline({
       manifestPath,
-      progressCallback: this._onOfflineProgressCallback
+      progressCallback: this._onOfflineProgressCallback,
+      trackSelectionCallback: this._onTrackSelectionCallback
     });
   }
 
+  _onTrackSelectionCallback (tracks) {
+    // TODO: account for user preferences.
+    const audioTracks = tracks.filter(t => t.type === 'audio');
+    const videoTracks = tracks.filter(t => t.type === 'video');
+    const variantTracks = tracks.filter(t => t.type === 'variant');
+
+    if (variantTracks && variantTracks.length > 0) {
+      variantTracks.sort((t1, t2) => t2.bandwidth - t1.bandwidth);
+      return [variantTracks[0]];
+    }
+
+    audioTracks.sort((t1, t2) => t2.bandwidth - t1.bandwidth);
+    videoTracks.sort((t1, t2) => t2.height - t1.height);
+
+    return [
+      audioTracks[0],
+      videoTracks[0]
+    ];
+  }
+
   _onOfflineProgressCallback (data, percent) {
-    // TODO: Actual readout to the UI.
-    console.log((percent * 100).toFixed(2));
+    if (!this._videoControls) {
+      return;
+    }
+
+    this._videoControls.updateOfflineProgress(percent);
 
     if (percent < 1) {
       return;
@@ -499,7 +529,6 @@ class VideoPlayer {
 
   _onPlay () {
     this._video.play().then(_ => {
-      console.log('playing...');
       this._updateVideoControlsWithPlayerState();
     }, err => {
       console.warn(err);
@@ -574,7 +603,7 @@ class VideoPlayer {
     this._exitFullScreen();
   }
 
-  _onToggleFullScreen () {
+  _onFullScreenToggle () {
     if (VideoPlayer.isFullScreen) {
       this._fsLocked = false;
       this._exitFullScreen();

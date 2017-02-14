@@ -25,26 +25,27 @@ class OfflineManager {
 
   constructor (_player) {
     this._player = _player;
-    this._offline = new shaka.offline.Storage(this._player);
   }
 
-  destroy () {
-    return this._offline.destroy().then(_ => {
-      this._offline = null;
+  _op (cb) {
+    const offline = new shaka.offline.Storage(this._player);
+    return cb(offline).then(value => {
+      return offline.destroy().then(_ => {
+        return value;
+      });
     });
   }
 
   remove (manifestPath) {
-    if (!this._offline) {
-      throw new Error('This OfflineManager has been destroyed.');
-    }
-
     return this.find(manifestPath).then(item => {
       if (!item) {
+        console.warn(`Unable to find item with path ${manifestPath}`);
         return Promise.resolve();
       }
 
-      return this._offline.remove(item);
+      return this._op(offline => {
+        return offline.remove(item);
+      });
     });
   }
 
@@ -55,38 +56,24 @@ class OfflineManager {
   }
 
   list () {
-    if (!this._offline) {
-      throw new Error('This OfflineManager has been destroyed.');
-    }
-
-    return this._offline.list();
-  }
-
-  updateManifestForOfflineIfPossible (manifest) {
-    if (!this._offline) {
-      throw new Error('This OfflineManager has been destroyed.');
-    }
-
-    return this._offline.list().then(offlineContent => {
-      console.log('offline content', offlineContent);
-
-      return manifest;
+    return this._op(offline => {
+      return offline.list();
     });
   }
 
-  cacheForOffline ({manifestPath, progressCallback}={}) {
-    if (!this._offline) {
-      throw new Error('This OfflineManager has been destroyed.');
-    }
+  cacheForOffline ({
+      manifestPath,
+      progressCallback,
+      trackSelectionCallback
+    }={}) {
+    return this._op(offline => {
+      offline.configure({
+        progressCallback,
+        trackSelectionCallback
+      });
 
-    this._offline.configure({
-      progressCallback
+      return offline.store(manifestPath);
     });
-
-    this._offline.store(manifestPath)
-        .then(_ => {
-          this.destroy();
-        });
   }
 };
 

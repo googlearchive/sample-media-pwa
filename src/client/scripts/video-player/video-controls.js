@@ -51,7 +51,6 @@ class VideoControls {
     this._castConnected = false;
     this._trackDrag = false;
     this._trackBCR = null;
-    this._downloadProgress = new DownloadProgress();
 
     this.toggleControls = this.toggleControls.bind(this);
     this.showControls = this.showControls.bind(this);
@@ -193,7 +192,7 @@ class VideoControls {
 
   updateOfflineProgress (percentage) {
     Array.from(this._offline).forEach(offline => {
-      this._downloadProgress(offline, percentage);
+      DownloadProgress.update(offline, percentage);
     });
   }
 
@@ -252,6 +251,8 @@ class VideoControls {
   _onClick (evt) {
     const type = evt.target.dataset.type;
     evt.stopImmediatePropagation();
+
+    console.log(type);
 
     if (!type) {
       this.showControls();
