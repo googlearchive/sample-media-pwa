@@ -207,6 +207,58 @@
           }
         }
       ]
+    },
+
+    {
+      "title": "New in Chrome",
+      "slug": "new-in-chrome",
+      "desciption": "Pete LePage takes you through what's new in each Chrome Release.",
+      "episodes": [
+        {
+          "released": "2017-02-14T10:00:00.000Z",
+          "title": "Chrome 55",
+          "shortDescription": "This week, Paul & Jake talk about the future of JavaScript: ES6 and beyond.",
+          "description": "With Chrome 55, you to write promise-based code as if it were synchronous, using async and await. Pointer events provide a unified way of handling all input events. And persistent storage graduates from it’s origin trial. Pete LePage has all the details on how you can use these new developer features in Chrome 55!",
+          "slug": "episode-55",
+          "duration": "201",
+          "artworkPath": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-55/",
+          "poster": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-55/poster.jpg",
+          "posterSmall": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-55/poster-small.jpg",
+          "rating": 4.3,
+          "sources": {
+            "full": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-55/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-55/mp4/dash.mpd",
+            "hls": ""
+          },
+          "colors": {
+            "primary": {
+              "r": 94,
+              "g": 47,
+              "b": 39
+            },
+            "secondary": {
+              "r": 71,
+              "g": 35,
+              "b": 29
+            },
+            "tertiary": {
+              "r": 47,
+              "g": 24,
+              "b": 20
+            },
+            "quaternary": {
+              "r": 24,
+              "g": 12,
+              "b": 10
+            },
+            "primaryLight": {
+              "r": 188,
+              "g": 94,
+              "b": 78
+            }
+          }
+        }
+      ]
     }
   ]
 }
