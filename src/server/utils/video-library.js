@@ -47,7 +47,7 @@ class VideoLibrary {
 
     return VideoLibrary.getAllEpisodes(library)
         .sort((a, b) => {
-          return Date.parse(a.released) - Date.parse(b.released);
+          return Date.parse(b.released) - Date.parse(a.released);
         })
         .slice(0, count);
   }
