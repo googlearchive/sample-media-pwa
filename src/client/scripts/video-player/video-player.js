@@ -25,6 +25,14 @@ import Toast from '../helpers/toast';
 
 class VideoPlayer {
 
+  static get OFFLINE_STATES () {
+    return {
+      IDLE: 1,
+      REMOVING: 2,
+      ADDING: 3
+    };
+  }
+
   static get DEFAULT_BANDWIDTH () {
     return 5000000;
   }
@@ -106,6 +114,7 @@ class VideoPlayer {
     this._offlineManager = null;
     this._fsLocked = false;
     this._playOnSeekFinished = false;
+    this._offlineState = VideoPlayer.OFFLINE_STATES.IDLE;
 
     // Handlers.
     this._onKeyDown = this._onKeyDown.bind(this);
@@ -266,6 +275,19 @@ class VideoPlayer {
         this._onOfflineStateChange);
   }
 
+  _exitToggleWithUserToast () {
+    switch (this._offlineState) {
+      case VideoPlayer.OFFLINE_STATES.ADDING:
+          // TODO: allow the user to cancel the download.
+          Toast.create('Downloading file. Please wait.', {tag: 'offline'});
+          return;
+
+      case VideoPlayer.OFFLINE_STATES.REMOVING:
+          Toast.create('Removing file. Please wait.', {tag: 'offline'});
+          return;
+    }
+  }
+
   _updateVideoControlsWithPlayerState () {
     if (!this._videoControls) {
       return;
@@ -279,7 +301,7 @@ class VideoPlayer {
       paused: this._video.paused,
       currentTime: this._video.currentTime,
       duration: (
-          Number.isNaN(this._video.duration) ? 0.1 : this._video.duration
+          Number.isNaN(this._video.dura2tion) ? 0.1 : this._video.duration
       ),
       volume: this._video.volume,
       fullscreen: VideoPlayer.isFullScreen,
@@ -333,6 +355,32 @@ class VideoPlayer {
   _enablePlayerControls () {
     this._videoControls.enabled = true;
     this._updateVideoControlsWithPlayerState();
+  }
+
+  _addOfflineFiles (manifestPath) {
+    this._offlineState = VideoPlayer.OFFLINE_STATES.ADDING;
+    Toast.create('Caching video for offline.', {tag: 'offline'});
+    return this._offlineManager.cacheForOffline({
+      manifestPath,
+      progressCallback: this._onOfflineProgressCallback,
+      trackSelectionCallback: this._onTrackSelectionCallback
+    }).catch(_ => {
+      Toast.create('Unable to cache video.', {tag: 'offline'});
+      this._onOfflineProgressCallback(null, 0);
+    });
+  }
+
+  _removeOfflineFiles (manifestPath) {
+    // TODO: prompt the user to confirm removal properly.
+    if (!confirm('Are you sure you wish to remove this video?')) {
+      return Promise.reject();
+    }
+
+    this._offlineState = VideoPlayer.OFFLINE_STATES.REMOVING;
+    Toast.create('Deleting video.', {tag: 'offline'});
+    return this._offlineManager.remove(manifestPath).then(_ => {
+      Utils.fire(this._videoContainer, 'offlinestatechange');
+    });
   }
 
   _setMediaSessionData () {
@@ -400,6 +448,7 @@ class VideoPlayer {
 
   _onOfflineStateChange () {
     return this._setManifestPathFromOfflineStatus().then(_ => {
+      this._isChangingOfflineState = false;
       this._updateVideoControlsWithPlayerState();
     });
   }
@@ -436,36 +485,21 @@ class VideoPlayer {
   }
 
   _onOfflineToggle (evt) {
+    if (this._offlineState !== VideoPlayer.OFFLINE_STATES.IDLE) {
+      this._exitToggleWithUserToast();
+      return;
+    }
+
     let manifestPath = this._originalManifest;
     if (evt && evt.target.dataset.dash) {
       manifestPath = evt.target.dataset.dash;
     }
 
-    // Remove a video if the user clicks to do so.
     if (this._videoIsAvailableOffline) {
-      // TODO: prompt the user to confirm removal.
-      if (!confirm('Are you sure you wish to remove this video?')) {
-        return;
-      }
-
-      Toast.create('Deleting video.', {tag: 'offline'});
-      return this._offlineManager.remove(manifestPath).then(_ => {
-        Utils.fire(this._videoContainer, 'offlinestatechange');
-      });
+      return this._removeOfflineFiles(manifestPath);
     }
 
-    // Download for offline.
-    if (!manifestPath) {
-      console.warn('Offline button does not have a manifest.');
-      return;
-    }
-
-    Toast.create('Caching video for offline.', {tag: 'offline'});
-    this._offlineManager.cacheForOffline({
-      manifestPath,
-      progressCallback: this._onOfflineProgressCallback,
-      trackSelectionCallback: this._onTrackSelectionCallback
-    });
+    return this._addOfflineFiles(manifestPath);
   }
 
   _onTrackSelectionCallback (tracks) {

@@ -39,7 +39,7 @@
 
     <div class="content-block player__poster-episode-info">
       <div class="player__poster-star-rating">
-        {>"partials/star-rating" colors=colors rating=rating /}
+        {>"partials/star-rating" ratingColors=colors rating=rating /}
       </div>
       <h2 class="player__poster-show-title">{showTitle}</h2>
       <h3 class="player__poster-episode-title">{episodeTitle}</h3>

@@ -186,6 +186,10 @@ class VideoControls {
       return;
     }
 
+    if (Number.isNaN(duration)) {
+      duration = 1;
+    }
+
     const normalizedTime = time / duration;
     this._setTimeTrackPosition(normalizedTime);
   }
@@ -233,6 +237,10 @@ class VideoControls {
   }
 
   _formatDuration (secs) {
+    if (Number.isNaN(secs)) {
+      return '00:00';
+    }
+
     const lPad = num => {
       return (num < 10 ? '0' : '') + num.toString();
     };
@@ -251,8 +259,6 @@ class VideoControls {
   _onClick (evt) {
     const type = evt.target.dataset.type;
     evt.stopImmediatePropagation();
-
-    console.log(type);
 
     if (!type) {
       this.showControls();

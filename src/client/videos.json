@@ -68,7 +68,7 @@
           "artworkPath": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/",
           "poster": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/poster.jpg",
           "posterSmall": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/poster-small.jpg",
-          "rating": 4.3,
+          "rating": 3.0,
           "sources": {
             "full": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/mp4/v-1080p-4500k-libx264.mp4",
             "dash": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/mp4/dash.mpd",
@@ -120,7 +120,7 @@
           "artworkPath": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-1/",
           "poster": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-1/poster.jpg",
           "posterSmall": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-1/poster-small.jpg",
-          "rating": 4.3,
+          "rating": 4.1,
           "sources": {
             "full": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-1/mp4/v-1080p-4500k-libx264.mp4",
             "dash": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-1/mp4/dash.mpd",
@@ -172,7 +172,7 @@
           "artworkPath": "https://storage.googleapis.com/biograf-video-files/videos/http203-ep-17/",
           "poster": "https://storage.googleapis.com/biograf-video-files/videos/http203-ep-17/poster.jpg",
           "posterSmall": "https://storage.googleapis.com/biograf-video-files/videos/http203-ep-17/poster-small.jpg",
-          "rating": 4.3,
+          "rating": 3.6,
           "sources": {
             "full": "https://storage.googleapis.com/biograf-video-files/videos/http203-ep-17/mp4/v-1080p-4500k-libx264.mp4",
             "dash": "https://storage.googleapis.com/biograf-video-files/videos/http203-ep-17/mp4/dash.mpd",
@@ -224,7 +224,7 @@
           "artworkPath": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-55/",
           "poster": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-55/poster.jpg",
           "posterSmall": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-55/poster-small.jpg",
-          "rating": 4.3,
+          "rating": 3.9,
           "sources": {
             "full": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-55/mp4/v-1080p-4500k-libx264.mp4",
             "dash": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-55/mp4/dash.mpd",

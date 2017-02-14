@@ -31,6 +31,16 @@
             </div>
             <h3 class="home__new-releases-list-item-title primary-light-col">{title}</h3>
             <p class="home__new-releases-list-item-description">{shortDescription|truncate}</p>
+
+            <div class="home__new-releases-list-item-meta">
+              <div class="home__new-releases-list-item-meta-duration">
+                {duration|timeFormat}
+              </div>
+
+              <div class="home__new-releases-list-item-meta-star-rating">
+                {>"partials/star-rating" ratingColors=featured.items.colors rating=rating /}
+              </div>
+            </div>
           </a>
         </li>
       {/newest}

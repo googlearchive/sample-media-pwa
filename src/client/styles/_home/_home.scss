@@ -83,6 +83,10 @@
           margin: 8px 0 8px 0;
           display: none;
         }
+
+        &-meta {
+          display: none;
+        }
       }
     }
   }
@@ -153,6 +157,33 @@
 
       &-description {
         display: block;
+      }
+
+      &-meta {
+        display: flex;
+
+        &-duration {
+          margin-right: 8px;
+          color: rgba(255, 255, 255, 0.6);
+          font-size: 13px;
+          white-space: nowrap;
+          margin-right: 16px;
+          display: flex;
+          line-height: 36px;
+
+          &::before {
+            opacity: 0.6;
+            content: '';
+            width: 24px;
+            height: 100%;
+            margin-right: 8px;
+            background: url(/static/images/video/ic_timelapse_white_24px.svg) 0 5px no-repeat;
+          }
+        }
+
+        &-star-rating {
+          max-width: 60px;
+        }
       }
     }
   }
