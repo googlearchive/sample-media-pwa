@@ -92,7 +92,10 @@ dynamic.get('/*', (req, res) => {
     item: search.items,
     css: [
       'dist/client/styles/biograf.css'
-    ]
+    ],
+    inlines: {
+      js: inlines.js
+    }
   });
 
   if (search.items.length === 0) {

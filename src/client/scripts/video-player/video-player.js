@@ -21,17 +21,8 @@ import Utils from '../helpers/utils';
 import Paths from '../helpers/paths';
 import VideoControls from './video-controls';
 import OfflineManager from '../helpers/offline';
-import Toast from '../helpers/toast';
 
 class VideoPlayer {
-
-  static get OFFLINE_STATES () {
-    return {
-      IDLE: 1,
-      REMOVING: 2,
-      ADDING: 3
-    };
-  }
 
   static get DEFAULT_BANDWIDTH () {
     return 5000000;
@@ -69,18 +60,11 @@ class VideoPlayer {
     return (document.fullscreenElement || document.webkitFullscreenElement);
   }
 
-  static init () {
-    const video = document.querySelector('video');
-
+  constructor (video) {
     if (!video) {
-      console.log('No video here.');
-      return;
+      throw new Error('No video element provided.');
     }
 
-    new VideoPlayer(video);
-  }
-
-  constructor (video) {
     const title = video.dataset.title;
     const manifest = video.dataset.src;
     const poster = video.dataset.poster;
@@ -114,7 +98,7 @@ class VideoPlayer {
     this._offlineManager = null;
     this._fsLocked = false;
     this._playOnSeekFinished = false;
-    this._offlineState = VideoPlayer.OFFLINE_STATES.IDLE;
+    this._videoIsAvailableOffline = false;
 
     // Handlers.
     this._onKeyDown = this._onKeyDown.bind(this);
@@ -138,32 +122,64 @@ class VideoPlayer {
     this._onFullScreenChanged = this._onFullScreenChanged.bind(this);
     this._startTimeTracking = this._startTimeTracking.bind(this);
     this._stopTimeTracking = this._stopTimeTracking.bind(this);
-    this._onOfflineStateChange = this._onOfflineStateChange.bind(this);
-    this._onOfflineToggle = this._onOfflineToggle.bind(this);
     this._onOfflineProgressCallback =
         this._onOfflineProgressCallback.bind(this);
     this._onSeek = this._onSeek.bind(this);
     this._onVideoEnd = this._onVideoEnd.bind(this);
     this._updateVideoControlsWithPlayerState =
         this._updateVideoControlsWithPlayerState.bind(this);
-
-    // Setup.
-    Utils.loadScript(Paths.SHAKA_PATH)
-      .then(_ => this._initPlayer())
-      .then(_ => this._setManifestPathFromOfflineStatus())
-      .then(_ => {
-        this._addEventListeners();
-        this._initPlayerControls();
-        this._updateVideoControlsWithPlayerState();
-      });
-
-    Utils.preloadImage(poster).then(_ => this._createPoster(poster));
   }
 
-  get _videoIsAvailableOffline () {
-    // Assumes a change in manifest path means it was updated to the offline
-    // version's path.
-    return this._manifest !== this._originalManifest;
+  isAvailableOffline (manifestPath) {
+    return this._offlineManager.find(manifestPath).then(item => !!item);
+  }
+
+  init () {
+    Utils.preloadImage(this._poster)
+        .then(_ => this._createPoster(this._poster));
+
+    return Utils.loadScript(Paths.SHAKA_PATH)
+        .then(_ => this._initPlayer())
+        .then(_ => {
+          this._addEventListeners();
+          this._initPlayerControls();
+        });
+  }
+
+  addOfflineFiles (manifestPath) {
+    return this._offlineManager.cacheForOffline({
+      manifestPath,
+      progressCallback: this._onOfflineProgressCallback,
+      trackSelectionCallback: this._onTrackSelectionCallback
+    });
+  }
+
+  removeOfflineFiles (manifestPath) {
+    return this._offlineManager.remove(manifestPath);
+  }
+
+  cancelOfflineFiles (manifestPath) {
+    this._onOfflineProgressCallback(null, 0);
+    return this._offlineManager.cancel(manifestPath);
+  }
+
+  setManifestPathFromOfflineStatus () {
+    return this._offlineManager.find(this._originalManifest).then(item => {
+      if (!item) {
+        this._videoIsAvailableOffline = false;
+        this._manifest = this._originalManifest;
+        return;
+      }
+
+      this._videoIsAvailableOffline = true;
+      this._manifest = item.offlineUri;
+    });
+  }
+
+  update () {
+    return this.setManifestPathFromOfflineStatus().then(_ => {
+      this._updateVideoControlsWithPlayerState();
+    });
   }
 
   _initPlayer () {
@@ -185,17 +201,6 @@ class VideoPlayer {
     });
   }
 
-  _setManifestPathFromOfflineStatus () {
-    return this._offlineManager.find(this._originalManifest).then(item => {
-      if (!item) {
-        this._manifest = this._originalManifest;
-        return;
-      }
-
-      this._manifest = item.offlineUri;
-    });
-  }
-
   _createPoster (poster) {
     const posterElement = this._videoContainer.querySelector('.player__poster');
     posterElement.style.backgroundImage = `url(${poster})`;
@@ -208,7 +213,6 @@ class VideoPlayer {
     this._addOrientationEventListeners();
     this._addFullscreenEventListeners();
     this._addRemotePlaybackEventListeners();
-    this._addOfflineEventListeners();
   }
 
   _addFullscreenEventListeners () {
@@ -232,8 +236,6 @@ class VideoPlayer {
         this._onChromecast);
     this._videoContainer.addEventListener('toggle-volume',
         this._onVolumeToggle);
-    this._videoContainer.addEventListener('toggle-offline',
-        this._onOfflineToggle);
   }
 
   _addVideoStateEventListeners () {
@@ -264,28 +266,6 @@ class VideoPlayer {
         .addEventListener('connect', this._onRemoteConnect);
     this._castVideo.remote
         .addEventListener('disconnect', this._onRemoteDisconnect);
-  }
-
-  _addOfflineEventListeners () {
-    if (!VideoPlayer.SUPPORTS_OFFLINE) {
-      return;
-    }
-
-    this._videoContainer.addEventListener('offlinestatechange',
-        this._onOfflineStateChange);
-  }
-
-  _exitToggleWithUserToast () {
-    switch (this._offlineState) {
-      case VideoPlayer.OFFLINE_STATES.ADDING:
-          // TODO: allow the user to cancel the download.
-          Toast.create('Downloading file. Please wait.', {tag: 'offline'});
-          return;
-
-      case VideoPlayer.OFFLINE_STATES.REMOVING:
-          Toast.create('Removing file. Please wait.', {tag: 'offline'});
-          return;
-    }
   }
 
   _updateVideoControlsWithPlayerState () {
@@ -357,32 +337,6 @@ class VideoPlayer {
     this._updateVideoControlsWithPlayerState();
   }
 
-  _addOfflineFiles (manifestPath) {
-    this._offlineState = VideoPlayer.OFFLINE_STATES.ADDING;
-    Toast.create('Caching video for offline.', {tag: 'offline'});
-    return this._offlineManager.cacheForOffline({
-      manifestPath,
-      progressCallback: this._onOfflineProgressCallback,
-      trackSelectionCallback: this._onTrackSelectionCallback
-    }).catch(_ => {
-      Toast.create('Unable to cache video.', {tag: 'offline'});
-      this._onOfflineProgressCallback(null, 0);
-    });
-  }
-
-  _removeOfflineFiles (manifestPath) {
-    // TODO: prompt the user to confirm removal properly.
-    if (!confirm('Are you sure you wish to remove this video?')) {
-      return Promise.reject();
-    }
-
-    this._offlineState = VideoPlayer.OFFLINE_STATES.REMOVING;
-    Toast.create('Deleting video.', {tag: 'offline'});
-    return this._offlineManager.remove(manifestPath).then(_ => {
-      Utils.fire(this._videoContainer, 'offlinestatechange');
-    });
-  }
-
   _setMediaSessionData () {
     if (!VideoPlayer.SUPPORTS_MEDIA_SESSION) {
       return;
@@ -446,13 +400,6 @@ class VideoPlayer {
     this._isTrackingTime = false;
   }
 
-  _onOfflineStateChange () {
-    return this._setManifestPathFromOfflineStatus().then(_ => {
-      this._isChangingOfflineState = false;
-      this._updateVideoControlsWithPlayerState();
-    });
-  }
-
   _onBufferChanged (evt) {
     const bufferingClass = 'player--buffering';
     this._videoContainer.classList.toggle(bufferingClass, evt.buffering);
@@ -484,24 +431,6 @@ class VideoPlayer {
     }
   }
 
-  _onOfflineToggle (evt) {
-    if (this._offlineState !== VideoPlayer.OFFLINE_STATES.IDLE) {
-      this._exitToggleWithUserToast();
-      return;
-    }
-
-    let manifestPath = this._originalManifest;
-    if (evt && evt.target.dataset.dash) {
-      manifestPath = evt.target.dataset.dash;
-    }
-
-    if (this._videoIsAvailableOffline) {
-      return this._removeOfflineFiles(manifestPath);
-    }
-
-    return this._addOfflineFiles(manifestPath);
-  }
-
   _onTrackSelectionCallback (tracks) {
     // TODO: account for user preferences.
     const audioTracks = tracks.filter(t => t.type === 'audio');
@@ -528,12 +457,6 @@ class VideoPlayer {
     }
 
     this._videoControls.updateOfflineProgress(percent);
-
-    if (percent < 1) {
-      return;
-    }
-
-    Utils.fire(this._videoContainer, 'offlinestatechange');
   }
 
   _onFullScreenChanged () {
@@ -579,6 +502,9 @@ class VideoPlayer {
       this._video.classList.remove('player__element--active');
       this._videoControls.enabled = false;
       this._exitFullScreen();
+
+      // Reboot the player.
+      return this._initPlayer();
     });
   }
 

@@ -29,7 +29,7 @@ artworkPath=item.artworkPath /}
 
     <div class="video-details__info-controls">
       <button class="video-details__info-controls-offline js-offline toggle-offline"
-          data-dash="{item.sources.dash}"
+          data-detail="{item.sources.dash}"
           data-type="toggle-offline">
           {>"partials/offline" /}
       </button>
@@ -38,4 +38,4 @@ artworkPath=item.artworkPath /}
   </div>
 </section>
 
-{>"partials/footer" js=inlines.js /}
+{>"partials/footer" inline=inlines.js scripts=scripts /}

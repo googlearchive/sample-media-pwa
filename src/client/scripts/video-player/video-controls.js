@@ -258,7 +258,10 @@ class VideoControls {
 
   _onClick (evt) {
     const type = evt.target.dataset.type;
+    const detail = evt.target.dataset.detail;
     evt.stopImmediatePropagation();
+
+    console.log(type, detail);
 
     if (!type) {
       this.showControls();
@@ -267,7 +270,7 @@ class VideoControls {
 
     // Fire off whatever the button says as a custom event, which the player
     // can pick up and use to control the playback.
-    Utils.fire(this._videoControls, type);
+    Utils.fire(this._videoControls, type, detail);
   }
 
   _onFullscreenChange () {

@@ -25,15 +25,39 @@ class OfflineManager {
 
   constructor (_player) {
     this._player = _player;
+    this._inflight = new Map();
   }
 
-  _op (cb) {
+  _op (cb, tag) {
     const offline = new shaka.offline.Storage(this._player);
+
+    if (tag) {
+      this._inflight.set(tag, offline);
+    }
+
     return cb(offline).then(value => {
       return offline.destroy().then(_ => {
+        this._inflight.delete(tag);
         return value;
       });
     });
+  }
+
+  destroy () {
+    const jobs = [];
+    for (const key of this._inflight.keys()) {
+      jobs.push(this._inflight.get(key).destroy());
+    }
+
+    return Promise.all(jobs);
+  }
+
+  cancel (manifestPath) {
+    if (!this._inflight.has(manifestPath)) {
+      return Promise.resolve();
+    }
+
+    return this._inflight.get(manifestPath).destroy();
   }
 
   remove (manifestPath) {
@@ -45,7 +69,7 @@ class OfflineManager {
 
       return this._op(offline => {
         return offline.remove(item);
-      });
+      }, manifestPath);
     });
   }
 
@@ -73,7 +97,7 @@ class OfflineManager {
       });
 
       return offline.store(manifestPath);
-    });
+    }, manifestPath);
   }
 };
 

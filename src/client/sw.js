@@ -103,12 +103,13 @@ self.onfetch = evt => {
   const request = evt.request;
 
   evt.respondWith(
-    caches.match(request, {~lb}cacheName{~rb})
-        .then(response => {
-          if (response) {
-            return response;
-          }
-          return fetch(evt.request);
-        })
+    caches.match(request, {
+      cacheName: cacheName
+    }).then(response => {
+      if (response) {
+        return response;
+      }
+      return fetch(evt.request);
+    })
   );
 };

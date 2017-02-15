@@ -58,20 +58,27 @@ a {
 }
 
 .fade-and-scale-in {
-  animation-name: imageFadeAndScaleIn;
+  animation-name: fadeAndScaleIn;
   animation-duration: 1s;
   animation-timing-function: cubic-bezier(0, 0, 0.4, 1);
   animation-fill-mode: forwards;
 }
 
+.fade-and-scale-in-centered {
+  animation-name: fadeAndScaleInCentered;
+  animation-duration: 0.7s;
+  animation-timing-function: cubic-bezier(0, 0, 0.4, 1);
+  animation-fill-mode: forwards;
+}
+
 .fade-in {
-  animation-name: imageFadeIn;
+  animation-name: fadeIn;
   animation-duration: 0.3s;
   animation-timing-function: cubic-bezier(0, 0, 0.4, 1);
   animation-fill-mode: forwards;
 }
 
-@keyframes imageFadeAndScaleIn {
+@keyframes fadeAndScaleIn {
   from {
     transform: scale(0.98);
     opacity: 0;
@@ -82,7 +89,19 @@ a {
   }
 }
 
-@keyframes imageFadeIn {
+@keyframes fadeAndScaleInCentered {
+  from {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
   from {
     opacity: 0;
   }

@@ -216,8 +216,53 @@
       "episodes": [
         {
           "released": "2017-02-14T10:00:00.000Z",
+          "title": "Chrome 56",
+          "shortDescription": "Pete LePage has all the details and how you can use these new developer features in Chrome 56!",
+          "description": "With Chrome 56, web apps can now communicate with nearby Bluetooth Low Energy devices using the Web Bluetooth API, position sticky is back - making it easy to create elements that scroll normally until sticking to the top of the viewport. And HTML5 by Default is enabled for all users.",
+          "slug": "episode-56",
+          "duration": "400",
+          "artworkPath": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-56/",
+          "poster": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-56/poster.jpg",
+          "posterSmall": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-56/poster-small.jpg",
+          "rating": 3.9,
+          "sources": {
+            "full": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-56/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-56/mp4/dash.mpd",
+            "hls": ""
+          },
+          "colors": {
+            "primary": {
+              "r": 120,
+              "g": 73,
+              "b": 41
+            },
+            "secondary": {
+              "r": 90,
+              "g": 55,
+              "b": 31
+            },
+            "tertiary": {
+              "r": 60,
+              "g": 37,
+              "b": 21
+            },
+            "quaternary": {
+              "r": 30,
+              "g": 18,
+              "b": 10
+            },
+            "primaryLight": {
+              "r": 240,
+              "g": 146,
+              "b": 82
+            }
+          }
+        },
+
+        {
+          "released": "2017-01-14T10:00:00.000Z",
           "title": "Chrome 55",
-          "shortDescription": "This week, Paul & Jake talk about the future of JavaScript: ES6 and beyond.",
+          "shortDescription": "Pete LePage has all the details and how you can use these new developer features in Chrome 55!",
           "description": "With Chrome 55, you to write promise-based code as if it were synchronous, using async and await. Pointer events provide a unified way of handling all input events. And persistent storage graduates from it’s origin trial. Pete LePage has all the details on how you can use these new developer features in Chrome 55!",
           "slug": "episode-55",
           "duration": "201",
