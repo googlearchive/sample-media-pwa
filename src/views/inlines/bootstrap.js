@@ -1,6 +1,5 @@
 (function () {
   var play = document.querySelector('.player__play-button');
-  console.log(play);
   if (!play) {
     return;
   }

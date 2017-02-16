@@ -70,7 +70,7 @@ class VideoPlayer {
     const poster = video.dataset.poster;
     const showTitle = video.dataset.showTitle;
     const castSrc = video.dataset.castSrc;
-    const artworkPath = video.dataset.artworkPath;
+    const assetPath = video.dataset.assetPath;
 
     if (!manifest) {
       console.log('Video without manifest. Bailing.');
@@ -89,7 +89,7 @@ class VideoPlayer {
     this._castSrc = castSrc;
     this._title = title;
     this._showTitle = showTitle;
-    this._artworkPath = artworkPath;
+    this._assetPath = assetPath;
     this._video = video;
     this._videoContainer = this._video.parentNode;
     this._videoControls = null;
@@ -342,8 +342,8 @@ class VideoPlayer {
       return;
     }
 
-    const artworkPath256 = this._artworkPath + 'artwork@256.jpg';
-    const artworkPath512 = this._artworkPath + 'artwork@512.jpg';
+    const artworkPath256 = this._assetPath + 'artwork@256.jpg';
+    const artworkPath512 = this._assetPath + 'artwork@512.jpg';
 
     navigator.mediaSession.metadata = new MediaMetadata({
       title: this._title,

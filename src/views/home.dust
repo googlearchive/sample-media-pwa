@@ -4,11 +4,11 @@
   colors=featured.items.colors
   showTitle=featured.breadcrumbs[0]
   episodeTitle=featured.items.title
-  poster=featured.items.poster
   dash=featured.items.sources.dash
   castSrc=featured.items.sources.full
   rating=featured.items.rating
-  artworkPath=featured.items.artworkPath /}
+  assetPath=featured.items.assetPath
+  href=featured.items.href /}
 
 <section class="home main-content">
   <div class="home__new-releases content-block">
@@ -17,15 +17,15 @@
     <ul class="home__new-releases-list">
       {#newest}
         <li class="home__new-releases-list-item">
-          <a href="/{slug}/" class="home__new-releases-list-item-link">
-            <div class="home__new-releases-list-item-image"
-                data-src="{posterSmall}">
+          <a href="/{slug}/" class="home__new-releases-list-item-link js-item-link">
+            <div class="home__new-releases-list-item-image js-lazy-image item--disabled__unclickable item--disabled__desaturated item--disabled__faded"
+                data-src="{assetPath}/poster-small.jpg">
 
-                <div class="home__new-releases-list-item-image-content"></div>
+                <div class="home__new-releases-list-item-image-content js-lazy-image-content"></div>
 
             <noscript>
               <div class="home__new-releases-list-item-image--no-script"
-                   style="background-image: url({posterSmall})"></div>
+                   style="background-image: url({assetPath}/poster-small.jpg)"></div>
             </noscript>
 
             </div>
@@ -61,6 +61,36 @@
       </div>
     </div>
   </div>
+
+  {@gt key=watchMore.length value=0}
+  <div class="home__watch-more">
+    <div class="home__watch-more-content content-block">
+      <h2 class="home__watch-more-title primary-light-col">Watch more</h2>
+
+      <ul class="home__watch-more-list video-grid">
+      {#watchMore}
+        <li class="video-grid__item">
+          <a href="/{slug}/" class="home__watch-more-list-item-link js-item-link">
+            <div class="home__watch-more-list-item-image js-lazy-image video-grid__item-image"
+                data-src="{assetPath}/poster-small.jpg">
+
+                <div class="home__watch-more-list-item-image-content js-lazy-image-content video-grid__item-image-content"></div>
+
+            <noscript>
+              <div class="home__watch-more-list-item-image--no-script"
+                    style="background-image: url({assetPath}/poster-small.jpg)"></div>
+            </noscript>
+
+            </div>
+          </a>
+
+        </li>
+      {/watchMore}
+      </ul>
+    </div>
+  </div>
+  {/gt}
+
 </section>
 
 {>"partials/footer" inline=inlines.js scripts=scripts /}

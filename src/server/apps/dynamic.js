@@ -44,7 +44,10 @@ const dustOptions = {
     require(`${filtersPath}/date-format`),
     require(`${filtersPath}/time-format`),
     require(`${filtersPath}/truncate`),
-    require(`${filtersPath}/linkify`)
+    require(`${filtersPath}/linkify`),
+    dust => {
+      dust.helpers.gt = require('dustjs-helpers').helpers.gt;
+    }
   ]
 };
 
@@ -69,23 +72,33 @@ dynamic.set('views', viewPath);
 dynamic.use(require('../middleware/no-cache.js'));
 
 dynamic.get('/', (req, res) => {
+  // The cut-off for when new releases becomes more
+  const NEW_VS_MORE = 4;
+  const MAX_WATCH_MORE = 18;
   const viewOptions = Object.assign({}, defaultViewOptions, {
     featured: videoLibrary.find(library.shows, library.featured.split('/')),
-    newest: videoLibrary.getNewest(library.shows, 4),
+    newest: videoLibrary.getNewest(library.shows, {
+      count: NEW_VS_MORE,
+      ignore: library.featured
+    }),
+    watchMore: videoLibrary.getMoreEpisodes(library.shows, {
+      count: NEW_VS_MORE,
+      limit: MAX_WATCH_MORE,
+      ignore: library.featured
+    }),
     inlines
   });
 
-  viewOptions.scripts.push('dist/client/scripts/home.js');
   res.status(200).render('home', viewOptions);
 });
 
 dynamic.get('/*', (req, res) => {
   // Strip off start and end slashes from the requested URL.
-  const pathName = req.url
+  const fullPath = req.url
       .replace(/(^\/|\/$)/ig, '')
       .replace(/[^a-z0-9\-\.\/]/ig, '');
 
-  const pathParts = pathName.split('/');
+  const pathParts = fullPath.split('/');
   const search = videoLibrary.find(library.shows, pathParts);
   const viewOptions = Object.assign({}, defaultViewOptions, {
     title: `Biograf - ${search.title}`,
@@ -95,7 +108,8 @@ dynamic.get('/*', (req, res) => {
     ],
     inlines: {
       js: inlines.js
-    }
+    },
+    fullPath
   });
 
   if (search.items.length === 0) {

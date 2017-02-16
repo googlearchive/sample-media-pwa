@@ -258,14 +258,30 @@ class VideoControls {
 
   _onClick (evt) {
     const type = evt.target.dataset.type;
-    const detail = evt.target.dataset.detail;
-    evt.stopImmediatePropagation();
+    const detail = {};
 
-    console.log(type, detail);
+    evt.stopImmediatePropagation();
 
     if (!type) {
       this.showControls();
       return;
+    }
+
+    for (const data in evt.target.dataset) {
+      if (!data.startsWith('detail')) {
+        continue;
+      }
+
+      if (data === 'detail') {
+        detail.value = evt.target.dataset.detail;
+        continue;
+      }
+
+      let detailName = data.replace(/^detail/, '');
+      detailName = detailName.substr(0, 1).toLowerCase() +
+          detailName.substr(1);
+
+      detail[detailName] = evt.target.dataset[data];
     }
 
     // Fire off whatever the button says as a custom event, which the player

@@ -20,10 +20,19 @@
 import ServiceWorkerInstaller from './helpers/sw-install';
 import VideoPlayer from './video-player/video-player';
 import Toast from './helpers/toast';
+import LazyLoadImages from './helpers/lazy-load-images';
+import OfflineCache from './helpers/offline-cache';
 
 class App {
 
-  static get OFFLINE_STATES () {
+  static get CONNECTIVITY_STATES () {
+    return {
+      ONLINE: 1,
+      OFFLINE: 2
+    };
+  }
+
+  static get VIDEO_DOWNLOAD_STATES () {
     return {
       IDLE: 1,
       REMOVING: 2,
@@ -34,8 +43,13 @@ class App {
   constructor () {
     ServiceWorkerInstaller.init();
 
+    // TODO: Restore the user preference here.
+    this._appConnectivityState = navigator.onLine ?
+        App.CONNECTIVITY_STATES.ONLINE :
+        App.CONNECTIVITY_STATES.OFFLINE;
+    this._offlineCache = new OfflineCache();
     this._videoPlayer = new VideoPlayer(document.querySelector('video'));
-    this._offlineDownloadState = App.OFFLINE_STATES.IDLE;
+    this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.IDLE;
     this._onOnline = this._onOnline.bind(this);
     this._onOffline = this._onOffline.bind(this);
     this._onOfflineToggle = this._onOfflineToggle.bind(this);
@@ -44,6 +58,58 @@ class App {
       this._videoPlayer.update();
       this._addEventListeners();
     });
+
+    this._toggleLinkStates().then(_ => {
+      LazyLoadImages.init();
+    });
+  }
+
+  _toggleLinkStates () {
+    switch (this._appConnectivityState) {
+      case App.CONNECTIVITY_STATES.ONLINE:
+        return this._enableAllLinks();
+
+      case App.CONNECTIVITY_STATES.OFFLINE:
+        return this._disableUnavailableLinks();
+    }
+  }
+
+  _enableAllLinks () {
+    const links = document.querySelectorAll('.js-item-link');
+
+    Array.from(links).forEach(link => {
+      link.classList.remove('item--disabled');
+      link.removeEventListener('click', this._cancel);
+    });
+
+    return Promise.resolve();
+  }
+
+  _disableUnavailableLinks () {
+    const links = document.querySelectorAll('.js-item-link');
+
+    return Promise.all(Array.from(links).map(link => {
+      const root = window.location.origin.toString();
+      const href = (link.href || link.dataset.href).toString();
+      const path = href
+          .replace(`${root}/`, '')
+          .replace(/\/$/, '')
+          .replace(/\//, '-');
+
+      return this._offlineCache.has(path).then(isCached => {
+        link.classList.toggle('item--disabled', !isCached);
+        if (isCached) {
+          return;
+        }
+
+        link.addEventListener('click', this._cancel);
+      });
+    }));
+  }
+
+  _cancel (evt) {
+    evt.stopImmediatePropagation();
+    evt.preventDefault();
   }
 
   _addEventListeners () {
@@ -63,10 +129,6 @@ class App {
     });
   }
 
-  _addOfflineFiles () {
-    return Promise.resolve();
-  }
-
   _addOfflineToggleListeners () {
     if (!VideoPlayer.SUPPORTS_OFFLINE) {
       return;
@@ -84,16 +146,18 @@ class App {
     });
   }
 
-  _removeOfflineFiles () {
-    return Promise.resolve();
-  }
-
   _onOnline () {
-    console.log('Is online.');
+    // TODO: Hide banner;
+    this._appConnectivityState = App.CONNECTIVITY_STATES.ONLINE;
+    console.log('Online');
+    this._toggleLinkStates();
   }
 
   _onOffline () {
-    console.log('Is offline.');
+    // TODO: Show banner;
+    this._appConnectivityState = App.CONNECTIVITY_STATES.OFFLINE;
+    console.log('Offline');
+    this._toggleLinkStates();
   }
 
   _onOfflineToggle (evt) {
@@ -102,15 +166,19 @@ class App {
       return;
     }
 
-    const manifestPath = evt.detail;
-    if (this._offlineDownloadState === App.OFFLINE_STATES.ADDING) {
+    const pagePath = `/${evt.detail.pagePath}`;
+    const name = evt.detail.pagePath.replace(/\//, '-');
+    const assetPath = evt.detail.assetPath;
+    const manifestPath = `${assetPath}/mp4/dash.mpd`;
+
+    if (this._offlineDownloadState === App.VIDEO_DOWNLOAD_STATES.ADDING) {
       if (confirm('Do you want to cancel this download?')) {
         return this._videoPlayer.cancelOfflineFiles(manifestPath);
       }
       return;
     }
 
-    if (this._offlineDownloadState === App.OFFLINE_STATES.REMOVING) {
+    if (this._offlineDownloadState === App.VIDEO_DOWNLOAD_STATES.REMOVING) {
       Toast.create('Removing file. Please wait.', {tag: 'offline'});
       return;
     }
@@ -126,37 +194,37 @@ class App {
           return;
         }
 
-        this._offlineDownloadState = App.OFFLINE_STATES.REMOVING;
+        this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.REMOVING;
         Toast.create('Deleting video.', {tag: 'offline'});
         job = job.then(_ => Promise.all([
-          this._removeOfflineFiles(),
+          this._offlineCache.remove(name),
           this._videoPlayer.removeOfflineFiles(manifestPath)
         ]));
       } else {
-        this._offlineDownloadState = App.OFFLINE_STATES.ADDING;
+        this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.ADDING;
         Toast.create('Caching video for offline.', {tag: 'offline'});
         job = job.then(_ => Promise.all([
-          this._addOfflineFiles(),
+          this._offlineCache.add(name, assetPath, pagePath),
           this._videoPlayer.addOfflineFiles(manifestPath)
         ]));
       }
 
       return job.then(_ => {
         switch (this._offlineDownloadState) {
-          case App.OFFLINE_STATES.ADDING:
+          case App.VIDEO_DOWNLOAD_STATES.ADDING:
               Toast.create('Downloaded file.', {tag: 'offline'});
               break;
 
-          case App.OFFLINE_STATES.REMOVING:
+          case App.VIDEO_DOWNLOAD_STATES.REMOVING:
               Toast.create('Removed file.', {tag: 'offline'});
               break;
         }
 
-        this._offlineDownloadState = App.OFFLINE_STATES.IDLE;
+        this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.IDLE;
         this._videoPlayer.update();
       }).catch(_ => {
         Toast.create('Cancelled download.', {tag: 'offline'});
-        this._offlineDownloadState = App.OFFLINE_STATES.IDLE;
+        this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.IDLE;
       });
     });
   }

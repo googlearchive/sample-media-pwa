@@ -1,11 +1,11 @@
-<div class="player primary-light-col">
+<div class="player primary-light-col js-item-link" data-href="{href}">
 
   <video class="player__element" preload="metadata"
       data-cast-src="{castSrc}"
       data-title="{episodeTitle}"
       data-show-title="{showTitle}"
-      data-artwork-path="{artworkPath}"
-      data-poster="{poster}"
+      data-asset-path="{assetPath}"
+      data-poster="{assetPath}/poster.jpg"
       data-src="{dash}"></video>
 
   <div class="player__controls">
@@ -28,16 +28,16 @@
       <button class="player__controls-standard-toggle-volume js-volume" data-type="toggle-volume">Toggle Volume</button>
       <button class="player__controls-standard-toggle-fullscreen js-fullscreen"  data-type="toggle-fullscreen">Toggle FS</button>
       <button class="player__controls-standard-toggle-offline toggle-offline js-offline" data-type="toggle-offline"
-      data-detail="{dash}">
+      data-detail="{assetPath}">
         {>"partials/offline"/}
       </button>
       <button class="player__controls-standard-chromecast js-chromecast" data-type="toggle-chromecast">Chromecast</button>
     </div>
   </div>
 
-  <button class="player__play-button">Play Video</button>
+  <button class="player__play-button item--disabled__unclickable">Play Video</button>
 
-  <div class="player__poster">
+  <div class="player__poster item--disabled__desaturated">
 
     <div class="content-block player__poster-episode-info">
       <div class="player__poster-star-rating">

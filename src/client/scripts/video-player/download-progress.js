@@ -53,18 +53,3 @@ class DownloadProgress {
 }
 
 export default DownloadProgress;
-
-// const t = document
-//       .querySelector('.video-details__info-controls-offline');
-// let x = 0.99;
-// const update = () => {
-//   console.log('update', x);
-//   DownloadProgress.update(t, x);
-//   // x += 0.01;
-//   // x %= 1;
-// };
-// update();
-
-// document.addEventListener('click', _ => {
-//   requestAnimationFrame(update);
-// });

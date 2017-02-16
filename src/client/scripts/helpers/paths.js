@@ -19,7 +19,7 @@
 
 class Paths {
   static get SHAKA_PATH () {
-    return '/static/third_party/libs/shaka-player.compiled.js';
+    return '{@hash path="dist/client/third_party/libs/shaka-player.compiled.js"}{/hash}';
   }
 }
 

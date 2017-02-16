@@ -93,7 +93,7 @@
 
   &__promo {
     border-top: 1px solid rgba(255,255,255,0.2);
-    padding-bottom: 140px;
+    padding-bottom: 60px;
 
     &-content {
       display: flex;
@@ -120,7 +120,6 @@
       margin: -70px auto 0 auto;
       max-width: 711px;
       position: relative;
-      overflow: hidden;
 
       &::after {
         content: '';
@@ -133,6 +132,16 @@
         background: url(/static/images/home/home-promo.png) center center no-repeat;
         background-size: contain;
       }
+    }
+  }
+
+  &__watch-more {
+    padding: 0 0 140px 0;
+
+    &-title {
+      font-size: 16px;
+      margin: 0 0 8px 0;
+      font-weight: 700;
     }
   }
 }

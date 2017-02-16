@@ -8,7 +8,8 @@ poster=item.poster
 dash=item.sources.dash
 castSrc=item.sources.full
 rating=item.rating
-artworkPath=item.artworkPath /}
+assetPath=item.assetPath
+href=item.href /}
 
 <section class="video-details main-content">
   <div class="video-details__info content-block">
@@ -29,7 +30,8 @@ artworkPath=item.artworkPath /}
 
     <div class="video-details__info-controls">
       <button class="video-details__info-controls-offline js-offline toggle-offline"
-          data-detail="{item.sources.dash}"
+          data-detail-page-path="{fullPath}"
+          data-detail-asset-Path="{item.assetPath}"
           data-type="toggle-offline">
           {>"partials/offline" /}
       </button>
