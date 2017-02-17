@@ -28,8 +28,28 @@ class OfflineCache {
       'artwork@256.jpg',
       'artwork@512.jpg',
       'poster-small.jpg',
-      'poster.jpg'
+      'poster.jpg',
+      {
+        // TODO: Make this based on user preference.
+        src: 'mp4/offline-720p.mpd',
+        dest: 'mp4/dash.mpd'
+      },
+      // TODO: Make this based on browser support.
+      'mp4/v-0720p-2500k-libx264.mp4',
+      'mp4/a-eng-0128k-aac.mp4'
     ];
+  }
+
+  static has (name) {
+    name = this.convertPathToName(name);
+    return caches.has(name);
+  }
+
+  static convertPathToName (path) {
+    return path
+        .replace(/^\//, '')
+        .replace(/\/$/, '')
+        .replace(/\//, '-');
   }
 
   constructor () {
@@ -37,7 +57,8 @@ class OfflineCache {
   }
 
   cancel (name) {
-    return caches.has(name).then(hasCache => {
+    name = OfflineCache.convertPathToName(name);
+    return this.has(name).then(hasCache => {
       // Can't cancel if the item is already cached.
       if (hasCache) {
         return Promise.reject();
@@ -47,44 +68,92 @@ class OfflineCache {
     });
   }
 
-  add (name, assetPath, pagePath) {
+  add (name, assetPath, pagePath, callbacks) {
     if (!OfflineCache.SUPPORTS_CACHING) {
       return;
     }
 
-    // Get all the individual assets for this video.
-    const requests = OfflineCache.ASSET_LIST.map(asset => {
-      return fetch(`${assetPath}/${asset}`, {mode: 'cors'});
+    name = OfflineCache.convertPathToName(name);
+    const assets = [];
+
+    // The meta assets.
+    OfflineCache.ASSET_LIST.forEach(asset => {
+      const src = asset.src || asset;
+      const dest = asset.dest || asset;
+
+      assets.push({
+        request: `${assetPath}/${dest}`,
+        response: fetch(`${assetPath}/${src}`, {mode: 'cors'})
+      });
     });
 
     // And the page itself.
-    requests.push(fetch(pagePath));
+    assets.push({
+      request: pagePath,
+      response: fetch(pagePath)
+    });
 
-    return Promise.all(requests).then(responses => {
-      // Create a cache for this item
+    const downloads = Promise.all(assets.map(r => r.response));
+    return downloads.then(responses => {
+      // TODO: Tee the fetch stream so that we can do progress downloads.
+      this.trackDownload(responses, callbacks);
+
       return caches.open(name).then(cache => {
         if (this._cancel.has(name)) {
           this._cancel.delete(name);
           return Promise.reject();
         }
 
-        return Promise.all(responses.map(response => {
-          cache.put(response.url, response);
+        return Promise.all(assets.map(asset => {
+          return asset.response.then(r => {
+            cache.put(asset.request, r);
+          });
         }));
       });
     });
   }
 
+  trackDownload (responses, {
+    onProgressCallback,
+    onCompleteCallback
+  }={
+    onProgressCallback () {},
+    onCompleteCallback () {}
+  }) {
+    let byteCount = 0;
+    const byteTotal = responses.reduce((byteTotal, r) => {
+      return byteTotal + parseInt(r.headers.get('Content-Length'), 10);
+    }, 0);
+
+    responses.forEach(response => {
+      const clone = response.clone();
+      const onStreamData = result => {
+        if (result.done) {
+          if (byteCount !== byteTotal) {
+            return;
+          }
+
+          onCompleteCallback(byteTotal);
+          return;
+        }
+
+        byteCount += result.value.length;
+        onProgressCallback(byteCount, byteTotal);
+        return reader.read().then(onStreamData);
+      };
+
+      const reader = clone.body.getReader();
+      reader.read().then(onStreamData);
+    });
+  }
+
   remove (name) {
+    name = OfflineCache.convertPathToName(name);
     if (this._cancel.has(name)) {
-        this._cancel.delete(name);
+      this._cancel.delete(name);
     }
 
     return caches.delete(name);
-  }
-
-  has (name) {
-    return caches.has(name);
   }
 }
 

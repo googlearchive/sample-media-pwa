@@ -82,7 +82,7 @@ class LazyLoadImages {
   }
 
   _loadImagesImmediately (images) {
-    Array.from(images).forEach(image => _preloadImage(image));
+    Array.from(images).forEach(image => this._preloadImage(image));
   }
 
   _applyImage (img, src) {

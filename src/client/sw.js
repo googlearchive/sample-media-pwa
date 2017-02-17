@@ -92,6 +92,7 @@ self.onfetch = evt => {
     caches.match(request)
         .then(response => {
           if (response) {
+            console.log('Cache hit!', request.url);
             return response;
           }
           return fetch(evt.request);

@@ -25,6 +25,10 @@ import OfflineCache from './helpers/offline-cache';
 
 class App {
 
+  static get SUPPORTS_OFFLINE () {
+    return ('caches' in window);
+  }
+
   static get CONNECTIVITY_STATES () {
     return {
       ONLINE: 1,
@@ -48,11 +52,15 @@ class App {
         App.CONNECTIVITY_STATES.ONLINE :
         App.CONNECTIVITY_STATES.OFFLINE;
     this._offlineCache = new OfflineCache();
-    this._videoPlayer = new VideoPlayer(document.querySelector('video'));
+    this._videoPlayer = new VideoPlayer(document.querySelector('video'), {
+      offlineSupported: App.SUPPORTS_OFFLINE
+    });
     this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.IDLE;
     this._onOnline = this._onOnline.bind(this);
     this._onOffline = this._onOffline.bind(this);
     this._onOfflineToggle = this._onOfflineToggle.bind(this);
+    this._onProgressCallback = this._onProgressCallback.bind(this);
+    this._onCompleteCallback = this._onCompleteCallback.bind(this);
 
     this._videoPlayer.init().then(_ => {
       this._videoPlayer.update();
@@ -91,12 +99,9 @@ class App {
     return Promise.all(Array.from(links).map(link => {
       const root = window.location.origin.toString();
       const href = (link.href || link.dataset.href).toString();
-      const path = href
-          .replace(`${root}/`, '')
-          .replace(/\/$/, '')
-          .replace(/\//, '-');
+      const path = href.replace(`${root}/`, '');
 
-      return this._offlineCache.has(path).then(isCached => {
+      return OfflineCache.has(path).then(isCached => {
         link.classList.toggle('item--disabled', !isCached);
         if (isCached) {
           return;
@@ -130,26 +135,17 @@ class App {
   }
 
   _addOfflineToggleListeners () {
-    if (!VideoPlayer.SUPPORTS_OFFLINE) {
+    if (!App.SUPPORTS_OFFLINE) {
+      console.warn('Unable to support offline.');
       return;
     }
 
     document.addEventListener('toggle-offline', this._onOfflineToggle);
   }
 
-  _checkForOffline ({manifestPath}={}) {
-    return Promise.all([
-      this._videoPlayer.isAvailableOffline(manifestPath),
-      Promise.resolve(true)
-    ]).then(values => {
-      return values.every(v => v);
-    });
-  }
-
   _onOnline () {
     // TODO: Hide banner;
     this._appConnectivityState = App.CONNECTIVITY_STATES.ONLINE;
-    console.log('Online');
     this._toggleLinkStates();
   }
 
@@ -160,6 +156,25 @@ class App {
     this._toggleLinkStates();
   }
 
+  _onProgressCallback (bytesLoaded, bytesTotal) {
+    this._videoPlayer.updateOfflineProgress(bytesLoaded / bytesTotal);
+  }
+
+  _onCompleteCallback () {
+    switch (this._offlineDownloadState) {
+      case App.VIDEO_DOWNLOAD_STATES.ADDING:
+          Toast.create('Downloaded video.', {tag: 'offline'});
+          break;
+
+      case App.VIDEO_DOWNLOAD_STATES.REMOVING:
+          Toast.create('Removed video.', {tag: 'offline'});
+          break;
+    }
+
+    this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.IDLE;
+    this._videoPlayer.update();
+  }
+
   _onOfflineToggle (evt) {
     if (!(evt && evt.detail)) {
       console.warn('Unable to locate file to remove');
@@ -167,13 +182,13 @@ class App {
     }
 
     const pagePath = `/${evt.detail.pagePath}/`;
-    const name = evt.detail.pagePath.replace(/\//, '-');
+    const name = evt.detail.pagePath;
     const assetPath = evt.detail.assetPath;
     const manifestPath = `${assetPath}/mp4/dash.mpd`;
 
     if (this._offlineDownloadState === App.VIDEO_DOWNLOAD_STATES.ADDING) {
       if (confirm('Do you want to cancel this download?')) {
-        return this._videoPlayer.cancelOfflineFiles(manifestPath);
+        return this._offlineCache.cancel(manifestPath);
       }
       return;
     }
@@ -183,11 +198,7 @@ class App {
       return;
     }
 
-    this._checkForOffline({
-      // TODO: check for HTML & other assets.
-      manifestPath
-    }).then(videoIsAvailableOffline => {
-      let job = Promise.resolve();
+    OfflineCache.has(name).then(videoIsAvailableOffline => {
       if (videoIsAvailableOffline) {
         // TODO: prompt the user to confirm removal properly.
         if (!confirm('Are you sure you wish to remove this video?')) {
@@ -196,37 +207,26 @@ class App {
 
         this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.REMOVING;
         Toast.create('Deleting video.', {tag: 'offline'});
-        job = job.then(_ => Promise.all([
+        return Promise.all([
           this._offlineCache.remove(name),
-          this._videoPlayer.removeOfflineFiles(manifestPath),
           this._videoPlayer.stop()
-        ]));
+        ]).then(_ => {
+          this._onCompleteCallback();
+        });
       } else {
         this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.ADDING;
         Toast.create('Caching video for offline.', {tag: 'offline'});
-        job = job.then(_ => Promise.all([
-          this._offlineCache.add(name, assetPath, pagePath),
-          this._videoPlayer.addOfflineFiles(manifestPath)
-        ]));
+        return this._offlineCache.add(
+          name, assetPath, pagePath, {
+            onProgressCallback: this._onProgressCallback,
+            onCompleteCallback: this._onCompleteCallback
+          }
+        ).catch(_ => {
+          console.error(_);
+          Toast.create('Cancelled download.', {tag: 'offline'});
+          this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.IDLE;
+        });
       }
-
-      return job.then(_ => {
-        switch (this._offlineDownloadState) {
-          case App.VIDEO_DOWNLOAD_STATES.ADDING:
-              Toast.create('Downloaded video.', {tag: 'offline'});
-              break;
-
-          case App.VIDEO_DOWNLOAD_STATES.REMOVING:
-              Toast.create('Removed video.', {tag: 'offline'});
-              break;
-        }
-
-        this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.IDLE;
-        this._videoPlayer.update();
-      }).catch(_ => {
-        Toast.create('Cancelled download.', {tag: 'offline'});
-        this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.IDLE;
-      });
     });
   }
 }

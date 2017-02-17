@@ -20,7 +20,7 @@
 import Utils from '../helpers/utils';
 import Paths from '../helpers/paths';
 import VideoControls from './video-controls';
-import OfflineManager from '../helpers/offline';
+import OfflineCache from '../helpers/offline-cache';
 
 class VideoPlayer {
 
@@ -52,15 +52,11 @@ class VideoPlayer {
     return ('orientation' in window.screen);
   }
 
-  static get SUPPORTS_OFFLINE () {
-    return OfflineManager.OFFLINE_SUPPORTED;
-  }
-
   static get isFullScreen () {
     return (document.fullscreenElement || document.webkitFullscreenElement);
   }
 
-  constructor (video) {
+  constructor (video, {offlineSupported}={}) {
     if (!video) {
       throw new Error('No video element provided.');
     }
@@ -95,10 +91,11 @@ class VideoPlayer {
     this._videoControls = null;
     this._castVideo = document.createElement('video');
     this._player = null;
-    this._offlineManager = null;
     this._fsLocked = false;
     this._playOnSeekFinished = false;
     this._videoIsAvailableOffline = false;
+    this._offlineSupported = offlineSupported;
+    this._href = this._videoContainer.dataset.href;
 
     // Handlers.
     this._onKeyDown = this._onKeyDown.bind(this);
@@ -122,16 +119,10 @@ class VideoPlayer {
     this._onFullScreenChanged = this._onFullScreenChanged.bind(this);
     this._startTimeTracking = this._startTimeTracking.bind(this);
     this._stopTimeTracking = this._stopTimeTracking.bind(this);
-    this._onOfflineProgressCallback =
-        this._onOfflineProgressCallback.bind(this);
     this._onSeek = this._onSeek.bind(this);
     this._onVideoEnd = this._onVideoEnd.bind(this);
     this._updateVideoControlsWithPlayerState =
         this._updateVideoControlsWithPlayerState.bind(this);
-  }
-
-  isAvailableOffline (manifestPath) {
-    return this._offlineManager.find(manifestPath).then(item => !!item);
   }
 
   init () {
@@ -143,66 +134,40 @@ class VideoPlayer {
         .then(_ => {
           this._addEventListeners();
           this._initPlayerControls();
+
+          return this.update();
         });
   }
 
-  addOfflineFiles (manifestPath) {
-    return this._offlineManager.cacheForOffline({
-      manifestPath,
-      progressCallback: this._onOfflineProgressCallback,
-      trackSelectionCallback: this._onTrackSelectionCallback
-    });
-  }
-
-  removeOfflineFiles (manifestPath) {
-    return this._offlineManager.remove(manifestPath);
-  }
-
-  cancelOfflineFiles (manifestPath) {
-    this._onOfflineProgressCallback(null, 0);
-    return this._offlineManager.cancel(manifestPath);
-  }
-
-  setManifestPathFromOfflineStatus () {
-    return this._offlineManager.find(this._originalManifest).then(item => {
-      if (!item) {
-        this._videoIsAvailableOffline = false;
-        this._manifest = this._originalManifest;
-        return;
-      }
-
-      this._videoIsAvailableOffline = true;
-      this._manifest = item.offlineUri;
-    });
-  }
-
   update () {
-    return this.setManifestPathFromOfflineStatus().then(_ => {
-      this._updateVideoControlsWithPlayerState();
+    return OfflineCache.has(this._href).then(exists => {
+      this._videoIsAvailableOffline = exists;
+      return this._updateVideoControlsWithPlayerState();
     });
+  }
+
+  updateOfflineProgress (percentage) {
+    if (!this._videoControls) {
+      return;
+    }
+
+    this._videoControls.updateOfflineProgress(percentage);
   }
 
   stop () {
-    this._onClose();
+    return this._onClose();
   }
 
   _initPlayer () {
-    let prerequisites = [Promise.resolve()];
-    if (this._offlineManager) {
-      prerequisites.push(this._offlineManager.destroy());
-    }
-
-    return Promise.all(prerequisites).then(_ => {
-      this._player = new shaka.Player(this._video);
-      this._player.configure({
-        abr: {
-          defaultBandwidthEstimate: VideoPlayer.DEFAULT_BANDWIDTH
-        }
-      });
-
-      this._player.addEventListener('buffering', this._onBufferChanged);
-      this._offlineManager = new OfflineManager(this._player);
+    this._player = new shaka.Player(this._video);
+    this._player.configure({
+      abr: {
+        defaultBandwidthEstimate: VideoPlayer.DEFAULT_BANDWIDTH
+      }
     });
+
+    this._player.addEventListener('buffering', this._onBufferChanged);
+    return Promise.resolve();
   }
 
   _createPoster (poster) {
@@ -285,12 +250,12 @@ class VideoPlayer {
       paused: this._video.paused,
       currentTime: this._video.currentTime,
       duration: (
-          Number.isNaN(this._video.dura2tion) ? 0.1 : this._video.duration
+          Number.isNaN(this._video.duration) ? 0.1 : this._video.duration
       ),
       volume: this._video.volume,
       fullscreen: VideoPlayer.isFullScreen,
       offline: this._videoIsAvailableOffline,
-      offlineSupported: VideoPlayer.SUPPORTS_OFFLINE,
+      offlineSupported: this._offlineSupported,
       title: this._title
     };
   }
@@ -433,34 +398,6 @@ class VideoPlayer {
       // ... then load it.
       return this._loadAndPlayVideo();
     }
-  }
-
-  _onTrackSelectionCallback (tracks) {
-    // TODO: account for user preferences.
-    const audioTracks = tracks.filter(t => t.type === 'audio');
-    const videoTracks = tracks.filter(t => t.type === 'video');
-    const variantTracks = tracks.filter(t => t.type === 'variant');
-
-    if (variantTracks && variantTracks.length > 0) {
-      variantTracks.sort((t1, t2) => t2.bandwidth - t1.bandwidth);
-      return [variantTracks[0]];
-    }
-
-    audioTracks.sort((t1, t2) => t2.bandwidth - t1.bandwidth);
-    videoTracks.sort((t1, t2) => t2.height - t1.height);
-
-    return [
-      audioTracks[0],
-      videoTracks[0]
-    ];
-  }
-
-  _onOfflineProgressCallback (data, percent) {
-    if (!this._videoControls) {
-      return;
-    }
-
-    this._videoControls.updateOfflineProgress(percent);
   }
 
   _onFullScreenChanged () {
