@@ -27,8 +27,10 @@
       <div class="player__controls-standard-video-duration js-duration"></div>
       <button class="player__controls-standard-toggle-volume js-volume" data-type="toggle-volume">Toggle Volume</button>
       <button class="player__controls-standard-toggle-fullscreen js-fullscreen"  data-type="toggle-fullscreen">Toggle FS</button>
-      <button class="player__controls-standard-toggle-offline toggle-offline js-offline" data-type="toggle-offline"
-      data-detail="{assetPath}">
+      <button class="player__controls-standard-toggle-offline toggle-offline js-offline"
+          data-type="toggle-offline"
+          data-detail-page-path="{href}"
+          data-detail-asset-Path="{assetPath}">
         {>"partials/offline"/}
       </button>
       <button class="player__controls-standard-chromecast js-chromecast" data-type="toggle-chromecast">Chromecast</button>

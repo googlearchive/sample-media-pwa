@@ -182,6 +182,10 @@ class VideoPlayer {
     });
   }
 
+  stop () {
+    this._onClose();
+  }
+
   _initPlayer () {
     let prerequisites = [Promise.resolve()];
     if (this._offlineManager) {
@@ -342,8 +346,8 @@ class VideoPlayer {
       return;
     }
 
-    const artworkPath256 = this._assetPath + 'artwork@256.jpg';
-    const artworkPath512 = this._assetPath + 'artwork@512.jpg';
+    const artworkPath256 = this._assetPath + '/artwork@256.jpg';
+    const artworkPath512 = this._assetPath + '/artwork@512.jpg';
 
     navigator.mediaSession.metadata = new MediaMetadata({
       title: this._title,

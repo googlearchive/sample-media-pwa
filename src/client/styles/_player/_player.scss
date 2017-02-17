@@ -48,7 +48,7 @@
 
   &--ended {
     .player__ended-view {
-      animation-name: imageFadeIn;
+      animation-name: fadeIn;
       animation-duration: 0.3s;
       animation-timing-function: cubic-bezier(0, 0, 0.4, 1);
       animation-fill-mode: forwards;

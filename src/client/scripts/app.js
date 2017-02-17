@@ -166,7 +166,7 @@ class App {
       return;
     }
 
-    const pagePath = `/${evt.detail.pagePath}`;
+    const pagePath = `/${evt.detail.pagePath}/`;
     const name = evt.detail.pagePath.replace(/\//, '-');
     const assetPath = evt.detail.assetPath;
     const manifestPath = `${assetPath}/mp4/dash.mpd`;
@@ -179,7 +179,7 @@ class App {
     }
 
     if (this._offlineDownloadState === App.VIDEO_DOWNLOAD_STATES.REMOVING) {
-      Toast.create('Removing file. Please wait.', {tag: 'offline'});
+      Toast.create('Removing video. Please wait.', {tag: 'offline'});
       return;
     }
 
@@ -198,7 +198,8 @@ class App {
         Toast.create('Deleting video.', {tag: 'offline'});
         job = job.then(_ => Promise.all([
           this._offlineCache.remove(name),
-          this._videoPlayer.removeOfflineFiles(manifestPath)
+          this._videoPlayer.removeOfflineFiles(manifestPath),
+          this._videoPlayer.stop()
         ]));
       } else {
         this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.ADDING;
@@ -212,11 +213,11 @@ class App {
       return job.then(_ => {
         switch (this._offlineDownloadState) {
           case App.VIDEO_DOWNLOAD_STATES.ADDING:
-              Toast.create('Downloaded file.', {tag: 'offline'});
+              Toast.create('Downloaded video.', {tag: 'offline'});
               break;
 
           case App.VIDEO_DOWNLOAD_STATES.REMOVING:
-              Toast.create('Removed file.', {tag: 'offline'});
+              Toast.create('Removed video.', {tag: 'offline'});
               break;
         }
 
