@@ -39,7 +39,8 @@ const rollup = require('rollup');
 const hash = require('./plugins/hash').findHashes;
 const babel = require('rollup-plugin-babel');
 const entries = [
-  'client/scripts/app.js'
+  'client/scripts/app.js',
+  'client/scripts/ranged-response.js'
 ];
 
 let cache;

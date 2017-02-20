@@ -23,6 +23,7 @@
 
 importScripts('{@hash path="dist/client/cache-manifest.js"}{/hash}');
 importScripts('{@hash path="dist/client/third_party/libs/shaka-player.compiled.js"}{/hash}');
+importScripts('{@hash path="dist/client/scripts/ranged-response.js"}{/hash}');
 
 const NAME = 'Biograf';
 const VERSION = '{version}';
@@ -89,13 +90,21 @@ self.onfetch = evt => {
   const request = evt.request;
 
   evt.respondWith(
-    caches.match(request)
+    RangedResponse.canHandle(request).then(canHandleRequest => {
+      if (canHandleRequest) {
+        return RangedResponse.create(request);
+      }
+
+      // Not a range request that can be handled, so try a normal cache lookup
+      // followed by falling back to fetching.
+      return caches.match(request)
         .then(response => {
           if (response) {
-            console.log('Cache hit!', request.url);
             return response;
           }
+
           return fetch(evt.request);
-        })
+        });
+    })
   );
 };

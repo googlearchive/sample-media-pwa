@@ -52,10 +52,6 @@ class VideoPlayer {
     return ('orientation' in window.screen);
   }
 
-  static get isFullScreen () {
-    return (document.fullscreenElement || document.webkitFullscreenElement);
-  }
-
   constructor (video, {offlineSupported}={}) {
     if (!video) {
       throw new Error('No video element provided.');
@@ -63,6 +59,7 @@ class VideoPlayer {
 
     const title = video.dataset.title;
     const manifest = video.dataset.src;
+    const hls = video.dataset.hls;
     const poster = video.dataset.poster;
     const showTitle = video.dataset.showTitle;
     const castSrc = video.dataset.castSrc;
@@ -80,7 +77,8 @@ class VideoPlayer {
 
     // Refs to keep.
     this._manifest = manifest;
-    this._originalManifest = manifest;
+    this._hls = hls;
+    this._usingHLS = false;
     this._poster = poster;
     this._castSrc = castSrc;
     this._title = title;
@@ -125,6 +123,11 @@ class VideoPlayer {
         this._updateVideoControlsWithPlayerState.bind(this);
   }
 
+  get isFullScreen () {
+    return (document.fullscreenElement ||
+        this._video.webkitDisplayingFullscreen);
+  }
+
   init () {
     Utils.preloadImage(this._poster)
         .then(_ => this._createPoster(this._poster));
@@ -158,7 +161,22 @@ class VideoPlayer {
     return this._onClose();
   }
 
+  _fallbackToHLS () {
+    this._player = {
+      destroy () {
+        return Promise.resolve();
+      }
+    };
+    this._usingHLS = true;
+    this._video.src = this._hls;
+    return Promise.resolve();
+  }
+
   _initPlayer () {
+    if (!shaka.Player.isBrowserSupported()) {
+      return this._fallbackToHLS();
+    }
+
     this._player = new shaka.Player(this._video);
     this._player.configure({
       abr: {
@@ -186,8 +204,8 @@ class VideoPlayer {
 
   _addFullscreenEventListeners () {
     window.addEventListener('fullscreenchange', this._onFullScreenChanged);
-    window.addEventListener('webkitfullscreenchange',
-        this._onFullScreenChanged);
+    this._video.addEventListener('webkitfullscreenchange',
+        this._updateVideoControlsWithPlayerState);
   }
 
   _addVideoPlaybackEventListeners () {
@@ -253,7 +271,7 @@ class VideoPlayer {
           Number.isNaN(this._video.duration) ? 0.1 : this._video.duration
       ),
       volume: this._video.volume,
-      fullscreen: VideoPlayer.isFullScreen,
+      fullscreen: this.isFullScreen,
       offline: this._videoIsAvailableOffline,
       offlineSupported: this._offlineSupported,
       title: this._title
@@ -261,21 +279,28 @@ class VideoPlayer {
   }
 
   _enterFullScreen () {
-    const enterFullScreenFn = this._videoContainer.requestFullscreen ||
-        this._videoContainer.webkitRequestFullscreen;
+    if (this._videoContainer.requestFullscreen) {
+      return this._videoContainer.requestFullscreen();
+    }
 
-    enterFullScreenFn.call(this._videoContainer);
+    this._video.webkitEnterFullscreen();
   }
 
   _exitFullScreen () {
-    const exitFullScreenFn = document.exitFullscreen ||
-        document.webkitExitFullscreen;
+    if (document.exitFullscreen) {
+      return document.exitFullscreen();
+    }
 
-    exitFullScreenFn.call(document);
+    this._video.webkitExitFullscreen();
   }
 
   _loadAndPlayVideo () {
-    return this._player.load(this._manifest).then(_ => {
+    let boot = Promise.resolve();
+    if (!this._usingHLS) {
+      boot = boot.then(_ => this._player.load(this._manifest));
+    }
+
+    return boot.then(_ => {
       if (this._video.paused) {
         this._video.play();
         this._video.volume = 1;
@@ -367,6 +392,7 @@ class VideoPlayer {
 
   _stopTimeTracking () {
     this._isTrackingTime = false;
+    this._updateVideoControlsWithPlayerState();
   }
 
   _onBufferChanged (evt) {
@@ -405,7 +431,7 @@ class VideoPlayer {
       return;
     }
 
-    if (VideoPlayer.isFullScreen) {
+    if (this.isFullScreen) {
       return window.screen.orientation.lock('landscape').catch(_ => {
         // Silently swallow errors from attempting to lock the orientation.
         // This only works in the case of web apps added to home screens, but
@@ -505,7 +531,7 @@ class VideoPlayer {
   }
 
   _onFullScreenToggle () {
-    if (VideoPlayer.isFullScreen) {
+    if (this.isFullScreen) {
       this._fsLocked = false;
       this._exitFullScreen();
       return;

@@ -65,6 +65,8 @@ class App {
     this._videoPlayer.init().then(_ => {
       this._videoPlayer.update();
       this._addEventListeners();
+    }, err => {
+      console.log(err);
     });
 
     this._toggleLinkStates().then(_ => {
@@ -207,10 +209,7 @@ class App {
 
         this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.REMOVING;
         Toast.create('Deleting video.', {tag: 'offline'});
-        return Promise.all([
-          this._offlineCache.remove(name),
-          this._videoPlayer.stop()
-        ]).then(_ => {
+        return this._offlineCache.remove(name).then(_ => {
           this._onCompleteCallback();
         });
       } else {

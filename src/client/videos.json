@@ -18,7 +18,7 @@
           "sources": {
             "full": "https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/mp4/v-1080p-4500k-libx264.mp4",
             "dash": "https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/mp4/dash.mpd",
-            "hls": ""
+            "hls": "https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/hls/all.m3u8"
           },
           "colors": {
             "primary": {

@@ -6,7 +6,8 @@
       data-show-title="{showTitle}"
       data-asset-path="{assetPath}"
       data-poster="{assetPath}/poster.jpg"
-      data-src="{dash}"></video>
+      data-src="{dash}"
+      data-hls="{hls}"></video>
 
   <div class="player__controls">
     <div class="player__controls-big">

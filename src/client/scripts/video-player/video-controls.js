@@ -117,9 +117,15 @@ class VideoControls {
     this._videoControls.addEventListener('mousedown', this._onInputDown);
     this._videoControls.addEventListener('mousemove', this._onInputMove);
     this._videoControls.addEventListener('mouseup', this._onInputUp);
-    this._videoControls.addEventListener('touchstart', this._onInputDown);
-    this._videoControls.addEventListener('touchmove', this._onInputMove);
-    this._videoControls.addEventListener('touchend', this._onInputUp);
+    this._videoControls.addEventListener('touchstart', this._onInputDown, {
+      passive: false
+    });
+    this._videoControls.addEventListener('touchmove', this._onInputMove, {
+      passive: false
+    });
+    this._videoControls.addEventListener('touchend', this._onInputUp, {
+      passive: false
+    });
 
     this._videoControls.addEventListener('click', this._onClick);
     this._replay.addEventListener('click', this._onClick);
@@ -205,6 +211,8 @@ class VideoControls {
     const pausedStandardClass = 'player__controls-standard-play-pause--paused';
     const fsClass = 'player__controls-standard-toggle-fullscreen--active';
     const volumeClass = 'player__controls-standard-toggle-volume--muted';
+    const offlineHiddenClass =
+        'player__controls-standard-toggle-offline--hidden';
     const offlineClass = 'offline--available';
 
     this._videoControls.dataset.title = state.title;
@@ -217,7 +225,7 @@ class VideoControls {
 
     Array.from(this._offline).forEach(offline => {
       if (!state.offlineSupported) {
-        offline.hidden = true;
+        offline.classList.add(offlineHiddenClass);
         return;
       }
 
@@ -340,6 +348,7 @@ class VideoControls {
       return;
     }
 
+    evt.preventDefault();
     this.showControls(true);
     this._evtToTrackPosition(evt);
   }

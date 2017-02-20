@@ -6,6 +6,7 @@ showTitle=item.breadcrumbs[0]
 episodeTitle=item.title
 poster=item.poster
 dash=item.sources.dash
+hls=item.sources.hls
 castSrc=item.sources.full
 rating=item.rating
 assetPath=item.assetPath

@@ -19,6 +19,11 @@
 
 class OfflineCache {
 
+  static get CHUNK_SIZE () {
+    // Half a meg chunks.
+    return 1024 * 512;
+  }
+
   static get SUPPORTS_CACHING () {
     return ('caches' in window);
   }
@@ -35,12 +40,22 @@ class OfflineCache {
         dest: 'mp4/dash.mpd'
       },
       // TODO: Make this based on browser support.
-      'mp4/v-0720p-2500k-libx264.mp4',
-      'mp4/a-eng-0128k-aac.mp4'
+      {
+        src: 'mp4/v-0720p-2500k-libx264.mp4',
+        chunk: true
+      },
+      {
+        src: 'mp4/a-eng-0128k-aac.mp4',
+        chunk: true
+      }
     ];
   }
 
   static has (name) {
+    if (!OfflineCache.SUPPORTS_CACHING) {
+      return Promise.resolve(false);
+    }
+
     name = this.convertPathToName(name);
     return caches.has(name);
   }
@@ -79,18 +94,20 @@ class OfflineCache {
     // The meta assets.
     OfflineCache.ASSET_LIST.forEach(asset => {
       const src = asset.src || asset;
-      const dest = asset.dest || asset;
+      const dest = asset.dest || asset.src || asset;
+      const chunk = asset.chunk || false;
 
       assets.push({
         request: `${assetPath}/${dest}`,
-        response: fetch(`${assetPath}/${src}`, {mode: 'cors'})
+        response: fetch(`${assetPath}/${src}`, {mode: 'cors'}),
+        chunk
       });
     });
 
     // And the page itself.
     assets.push({
       request: pagePath,
-      response: fetch(pagePath)
+      response: fetch(pagePath),
     });
 
     const downloads = Promise.all(assets.map(r => r.response));
@@ -105,12 +122,63 @@ class OfflineCache {
         }
 
         return Promise.all(assets.map(asset => {
-          return asset.response.then(r => {
-            cache.put(asset.request, r);
+          return asset.response.then(response => {
+            if (!asset.chunk) {
+              return cache.put(asset.request, response);
+            }
+
+            return this._cacheInChunks(cache, response);
           });
         }));
       });
     });
+  }
+
+  _cacheInChunks (cache, response) {
+    const clone = response.clone();
+    const reader = clone.body.getReader();
+
+    let total = parseInt(response.headers.get('Content-Length'), 10);
+    let i = 0;
+    let buffer = new Uint8Array(Math.min(total, OfflineCache.CHUNK_SIZE));
+    let bufferId = 0;
+
+    const commitBuffer = bufferOut => {
+      const cacheId = clone.url + '_' + bufferId;
+      const chunkResponse = new Response(bufferOut, {
+        headers: response.headers
+      });
+
+      cache.put(cacheId, chunkResponse);
+    };
+
+    const onStreamData = result => {
+      if (result.done) {
+        commitBuffer(buffer, bufferId);
+        return;
+      }
+
+      // Copy the bytes over.
+      for (let b = 0; b < result.value.length; b++) {
+        buffer[i++] = result.value[b];
+
+        if (i === OfflineCache.CHUNK_SIZE) {
+          // Commit this buffer.
+          commitBuffer(buffer, bufferId);
+
+          // Reduce the expected amount, and go again.
+          total -= OfflineCache.CHUNK_SIZE;
+          i = 0;
+          buffer = new Uint8Array(Math.min(total, OfflineCache.CHUNK_SIZE));
+          bufferId++;
+        }
+      }
+
+      // Get the next chunk.
+      return reader.read().then(onStreamData);
+    };
+
+    reader.read().then(onStreamData);
   }
 
   trackDownload (responses, {
