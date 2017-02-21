@@ -17,16 +17,9 @@
 
 'use strict';
 
+import Constants from '../constants/constants';
+
 class OfflineCache {
-
-  static get CHUNK_SIZE () {
-    // Half a meg chunks.
-    return 1024 * 512;
-  }
-
-  static get SUPPORTS_CACHING () {
-    return ('caches' in window);
-  }
 
   static get ASSET_LIST () {
     return [
@@ -52,7 +45,7 @@ class OfflineCache {
   }
 
   static has (name) {
-    if (!OfflineCache.SUPPORTS_CACHING) {
+    if (!Constants.SUPPORTS_CACHING) {
       return Promise.resolve(false);
     }
 
@@ -84,11 +77,10 @@ class OfflineCache {
   }
 
   add (name, assetPath, pagePath, callbacks) {
-    if (!OfflineCache.SUPPORTS_CACHING) {
+    if (!Constants.SUPPORTS_CACHING) {
       return;
     }
 
-    name = OfflineCache.convertPathToName(name);
     const assets = [];
 
     // The meta assets.
@@ -110,10 +102,72 @@ class OfflineCache {
       response: fetch(pagePath),
     });
 
-    const downloads = Promise.all(assets.map(r => r.response));
+    return download(name, assets, callbacks);
+  }
+
+  prefetch (manifestPath, prefetchLimit=30) {
+    return this._getManifest(manifestPath)
+        .then(manifest => this._getRanges(manifestPath, manifest))
+        .then(ranges => {
+          return Promise.all([
+            this._getFileSegments(ranges.audio),
+            this._getFileSegments(ranges.video)
+          ]).then(segments => {
+            return [
+              segments[0].filter(s => s.endTime < prefetchLimit),
+              segments[1].filter(s => s.endTime < prefetchLimit)
+            ];
+          })
+          .then(filteredSegments => {
+            // One fetch for audio, another for video.
+            const fetches = filteredSegments.map((segments, idx) => {
+              const {start, end} = segments.reduce((prev, s) => {
+                prev.start = Math.min(prev.start, s.startByte);
+                prev.end = Math.max(prev.end, s.endByte);
+
+                return prev;
+              },
+              {
+                start: Number.POSITIVE_INFINITY,
+                end: Number.NEGATIVE_INFINITY
+              });
+
+              // Create a fetch for the particular byte range we want to use.
+              const path = idx === 0 ? ranges.audio.path : ranges.video.path;
+              const chunk = true;
+              const headers = new Headers();
+              headers.set('range', `bytes=${start}-${end}`);
+              const response = fetch(path, {
+                headers
+              });
+
+              console.log(path, headers.get('range'));
+
+              return {
+                request: path,
+                response,
+                chunk
+              };
+            });
+
+            return this.download('prefetch', fetches, {
+              onProgressCallback () {},
+              onCompleteCallback () {
+                console.log(`Prefetched ${prefetchLimit}s.`);
+              }
+            }).catch(_ => {
+              console.log('Unable to prefetch video.');
+            });
+          });
+        });
+  }
+
+  download (name, fetches, callbacks) {
+    name = OfflineCache.convertPathToName(name);
+
+    const downloads = Promise.all(fetches.map(r => r.response));
     return downloads.then(responses => {
-      // TODO: Tee the fetch stream so that we can do progress downloads.
-      this.trackDownload(responses, callbacks);
+      this._trackDownload(responses, callbacks);
 
       return caches.open(name).then(cache => {
         if (this._cancel.has(name)) {
@@ -121,7 +175,7 @@ class OfflineCache {
           return Promise.reject();
         }
 
-        return Promise.all(assets.map(asset => {
+        return Promise.all(fetches.map(asset => {
           return asset.response.then(response => {
             if (!asset.chunk) {
               return cache.put(asset.request, response);
@@ -134,13 +188,95 @@ class OfflineCache {
     });
   }
 
+  _getManifest (manifestPath) {
+    return fetch(manifestPath).then(r => r.text()).then(dashManifest => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(dashManifest, 'application/xml');
+
+      if (doc.querySelector('parsererror')) {
+        return Promise.reject('Unable to parse manifest.');
+      }
+
+      return doc;
+    });
+  }
+
+  _getFileSegments (file) {
+    const headers = new Headers();
+    headers.set('range', `bytes=${file.bytes.start}-${file.bytes.end}`);
+
+    return fetch(file.path, {headers})
+        .then(r => r.arrayBuffer())
+        .then(sidx => {
+          const refs = shaka.media.Mp4SegmentIndexParser(sidx, 0, [], 0);
+          refs.forEach(ref => {
+            ref.startByte += file.bytes.start;
+            ref.endByte += file.bytes.start;
+          });
+
+          refs.push({
+            startByte: 0,
+            endByte: file.bytes.start - 1,
+            startTime: 0,
+            endTime: 0
+          });
+
+          return refs;
+        });
+  }
+
+  _getRanges (manifestPath, doc) {
+    const manifestParentPath = manifestPath.replace(/\/[^\/]*$/, '');
+    const ranges = {
+      video: {
+        path: null,
+        bytes: {
+          start: null,
+          end: null
+        }
+      },
+      audio: {
+        path: null,
+        bytes: {
+          start: null,
+          end: null
+        }
+      }
+    };
+
+    Array.from(doc.querySelectorAll('AdaptationSet')).forEach(adaptation => {
+      const segment = adaptation.querySelector('SegmentBase');
+      const baseURL = adaptation.querySelector('BaseURL');
+      const type = adaptation.getAttribute('contentType');
+
+      if (!(segment && baseURL)) {
+        return;
+      }
+
+      const path = baseURL.textContent;
+      const range = segment.getAttribute('indexRange');
+
+      if (!range) {
+        return;
+      }
+
+      const rangeVals = range.split('-');
+
+      ranges[type].path = `${manifestParentPath}/${path}`;
+      ranges[type].bytes.start = parseInt(rangeVals[0], 10);
+      ranges[type].bytes.end = parseInt(rangeVals[1], 10);
+    });
+
+    return ranges;
+  }
+
   _cacheInChunks (cache, response) {
     const clone = response.clone();
     const reader = clone.body.getReader();
 
     let total = parseInt(response.headers.get('Content-Length'), 10);
     let i = 0;
-    let buffer = new Uint8Array(Math.min(total, OfflineCache.CHUNK_SIZE));
+    let buffer = new Uint8Array(Math.min(total, Constants.CHUNK_SIZE));
     let bufferId = 0;
 
     const commitBuffer = bufferOut => {
@@ -162,14 +298,14 @@ class OfflineCache {
       for (let b = 0; b < result.value.length; b++) {
         buffer[i++] = result.value[b];
 
-        if (i === OfflineCache.CHUNK_SIZE) {
+        if (i === Constants.CHUNK_SIZE) {
           // Commit this buffer.
           commitBuffer(buffer, bufferId);
 
           // Reduce the expected amount, and go again.
-          total -= OfflineCache.CHUNK_SIZE;
+          total -= Constants.CHUNK_SIZE;
           i = 0;
-          buffer = new Uint8Array(Math.min(total, OfflineCache.CHUNK_SIZE));
+          buffer = new Uint8Array(Math.min(total, Constants.CHUNK_SIZE));
           bufferId++;
         }
       }
@@ -181,7 +317,7 @@ class OfflineCache {
     reader.read().then(onStreamData);
   }
 
-  trackDownload (responses, {
+  _trackDownload (responses, {
     onProgressCallback,
     onCompleteCallback
   }={

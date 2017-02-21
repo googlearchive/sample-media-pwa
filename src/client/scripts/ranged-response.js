@@ -17,7 +17,7 @@
 
 'use strict';
 
-import OfflineCache from './helpers/offline-cache';
+import Constants from './constants/constants';
 
 /**
  * Thanks to Jake Archibald for the code that became this helper.
@@ -142,9 +142,9 @@ class RangedResponse {
       const header = request.headers.get('Range');
       const rangeHeader = header.trim().toLowerCase();
       const {start, end} = RangedResponse._getStartAndEnd(rangeHeader);
-      const startIndex = Math.floor(start / OfflineCache.CHUNK_SIZE);
-      const endIndex = Math.floor(end / OfflineCache.CHUNK_SIZE);
-      const offset = startIndex * OfflineCache.CHUNK_SIZE;
+      const startIndex = Math.floor(start / Constants.CHUNK_SIZE);
+      const endIndex = Math.floor(end / Constants.CHUNK_SIZE);
+      const offset = startIndex * Constants.CHUNK_SIZE;
 
       // If the start and end come from the same chunk then pull that chunk
       // from the cache and use it directly.
@@ -158,7 +158,7 @@ class RangedResponse {
             });
       }
 
-      const bufferSize = (endIndex - startIndex + 1) * OfflineCache.CHUNK_SIZE;
+      const bufferSize = (endIndex - startIndex + 1) * Constants.CHUNK_SIZE;
       const responseBuffer = new ArrayBuffer(bufferSize);
       const responseView = new Uint8Array(responseBuffer);
       const cachedResponses = [];

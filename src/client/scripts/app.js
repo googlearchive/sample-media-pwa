@@ -65,6 +65,24 @@ class App {
     this._videoPlayer.init().then(_ => {
       this._videoPlayer.update();
       this._addEventListeners();
+
+      // const path = 'https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/mp4/offline-720p.mpd';
+      // this._offlineCache.prefetch(path);
+
+      // console.log('Getting for offline.');
+      // const off = new shaka.offline.Storage(new shaka.Player(document.createElement('video')));
+      // off.configure({
+      //   trackSelectionCallback: function (tracks) {
+      //     return tracks;
+      //   }
+      // });
+      // off.generateSegments(path).then(segments => {
+      //   console.log('MWAH!');
+      //   segments.audio.forEach(segment => {
+      //     console.log('Offset: ' + segment.startByte + ', size: ' +
+      //         (segment.endByte - segment.startByte));
+      //   });
+      // });
     }, err => {
       console.log(err);
     });
