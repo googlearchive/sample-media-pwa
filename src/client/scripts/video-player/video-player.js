@@ -179,12 +179,6 @@ class VideoPlayer {
     }
 
     this._player = new shaka.Player(this._video);
-    this._player.configure({
-      abr: {
-        defaultBandwidthEstimate: VideoPlayer.DEFAULT_BANDWIDTH
-      }
-    });
-
     this._player.addEventListener('buffering', this._onBufferChanged);
     return Promise.resolve();
   }
@@ -317,13 +311,7 @@ class VideoPlayer {
 
             // Lock the player to the offline stream.
             const tracks = this._player.getTracks().filter(t => {
-              switch (t.type) {
-                case 'video':
-                  return t.height === Constants.OFFLINE_VIDEO_HEIGHT;
-
-                case 'audio':
-                  return t.codecs.indexOf(Constants.OFFLINE_AUDIO_TYPE) === 0;
-              }
+              return t.height === Constants.OFFLINE_VIDEO_HEIGHT;
             });
 
             tracks.forEach(track => {
@@ -331,7 +319,37 @@ class VideoPlayer {
               // ignored for the time being. Later, when we run out of
               // prefetched footage we will enable ABR again with a config.
               this._player.selectTrack(track, true);
-              console.log('Locked track: ', track);
+              this._player.configure({
+                abr: {
+                  defaultBandwidthEstimate: track.bandwidth
+                }
+              });
+              console.log(`Selected track: ${track.width}x${track.height}`);
+            });
+
+            // Watch for the point at which the prefetched content has been
+            // exhausted. At that point reset the player to use the network.
+            // TODO: Instruct the OfflineCache to remove the prefetched content.
+            const netEngine = this._player.getNetworkingEngine();
+            netEngine.registerResponseFilter((_, response) => {
+              const isOfflineVideoResponse = response.uri
+                  .indexOf(`${Constants.OFFLINE_VIDEO_HEIGHT}p`) > 0;
+              if (!isOfflineVideoResponse) {
+                return;
+              }
+
+              const isFromCache =
+                  response.headers.find(h => (h === 'x-from-cache: true'));
+
+              if (isFromCache) {
+                console.log('Using prefetched content.');
+                return;
+              }
+
+              console.log('Switching back to adaptive.');
+              netEngine.clearAllResponseFilters();
+              this._player.resetConfiguration();
+              console.log(this._player.getConfiguration());
             });
           });
     }
@@ -347,6 +365,10 @@ class VideoPlayer {
     }, err => {
       console.warn(err.message);
     });
+  }
+
+  _onNetworkResponse (response) {
+    console.log(response);
   }
 
   _initPlayerControls () {

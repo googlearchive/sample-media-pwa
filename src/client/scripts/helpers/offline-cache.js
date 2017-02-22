@@ -69,9 +69,25 @@ class OfflineCache {
     }
 
     const assets = [];
+    const assetsToCache = [
+      // The meta asssets.
+      ...Constants.OFFLINE_ASSET_LIST,
+
+      // The video.
+      {
+        src: Constants.OFFLINE_VIDEO_PATH,
+        chunk: true
+      },
+
+      // The audio.
+      {
+        src: Constants.OFFLINE_AUDIO_PATH,
+        chunk: true
+      }
+    ];
 
     // The meta assets.
-    Constants.OFFLINE_ASSET_LIST.forEach(asset => {
+    assetsToCache.forEach(asset => {
       const src = asset.src || asset;
       const dest = asset.dest || asset.src || asset;
       const chunk = asset.chunk || false;
@@ -83,10 +99,9 @@ class OfflineCache {
       });
     });
 
-    // And the page itself.
     assets.push({
       request: pagePath,
-      response: fetch(pagePath),
+      response: fetch(pagePath)
     });
 
     return this._download(name, assets, callbacks);
