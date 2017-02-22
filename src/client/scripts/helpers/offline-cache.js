@@ -21,29 +21,6 @@ import Constants from '../constants/constants';
 
 class OfflineCache {
 
-  static get ASSET_LIST () {
-    return [
-      'artwork@256.jpg',
-      'artwork@512.jpg',
-      'poster-small.jpg',
-      'poster.jpg',
-      {
-        // TODO: Make this based on user preference.
-        src: 'mp4/offline-720p.mpd',
-        dest: 'mp4/dash.mpd'
-      },
-      // TODO: Make this based on browser support.
-      {
-        src: 'mp4/v-0720p-2500k-libx264.mp4',
-        chunk: true
-      },
-      {
-        src: 'mp4/a-eng-0128k-aac.mp4',
-        chunk: true
-      }
-    ];
-  }
-
   static has (name) {
     if (!Constants.SUPPORTS_CACHING) {
       return Promise.resolve(false);
@@ -51,6 +28,16 @@ class OfflineCache {
 
     name = this.convertPathToName(name);
     return caches.has(name);
+  }
+
+  static hasPrefetched (assetPath) {
+    if (!Constants.SUPPORTS_CACHING) {
+      return Promise.resolve(false);
+    }
+
+    return caches.open('prefetch').then(cache => {
+      return cache.match(`${assetPath}/${Constants.OFFLINE_VIDEO_PATH}_0`);
+    });
   }
 
   static convertPathToName (path) {
@@ -84,7 +71,7 @@ class OfflineCache {
     const assets = [];
 
     // The meta assets.
-    OfflineCache.ASSET_LIST.forEach(asset => {
+    Constants.OFFLINE_ASSET_LIST.forEach(asset => {
       const src = asset.src || asset;
       const dest = asset.dest || asset.src || asset;
       const chunk = asset.chunk || false;
@@ -102,7 +89,7 @@ class OfflineCache {
       response: fetch(pagePath),
     });
 
-    return download(name, assets, callbacks);
+    return this._download(name, assets, callbacks);
   }
 
   prefetch (manifestPath, prefetchLimit=30) {
@@ -138,10 +125,9 @@ class OfflineCache {
               const headers = new Headers();
               headers.set('range', `bytes=${start}-${end}`);
               const response = fetch(path, {
+                mode: 'cors',
                 headers
               });
-
-              console.log(path, headers.get('range'));
 
               return {
                 request: path,
@@ -150,7 +136,7 @@ class OfflineCache {
               };
             });
 
-            return this.download('prefetch', fetches, {
+            return this._download('prefetch', fetches, {
               onProgressCallback () {},
               onCompleteCallback () {
                 console.log(`Prefetched ${prefetchLimit}s.`);
@@ -162,7 +148,7 @@ class OfflineCache {
         });
   }
 
-  download (name, fetches, callbacks) {
+  _download (name, fetches, callbacks) {
     name = OfflineCache.convertPathToName(name);
 
     const downloads = Promise.all(fetches.map(r => r.response));
@@ -273,18 +259,30 @@ class OfflineCache {
   _cacheInChunks (cache, response) {
     const clone = response.clone();
     const reader = clone.body.getReader();
+    const contentRange = clone.headers.get('content-range');
+    const headers = new Headers(clone.headers);
 
-    let total = parseInt(response.headers.get('Content-Length'), 10);
+    // If we've made a range request we will now need to check the full
+    // length of the video file, and update the header accordingly. This
+    // will be for the case where we're prefetching the video, and we need
+    // to pretend that the entire file is available despite only part
+    // requesting the file.
+    if (contentRange) {
+      headers.set('Content-Length',
+          parseInt(contentRange.split('/')[1], 10));
+    }
+
+    let total = parseInt(response.headers.get('content-length'), 10);
     let i = 0;
     let buffer = new Uint8Array(Math.min(total, Constants.CHUNK_SIZE));
     let bufferId = 0;
 
     const commitBuffer = bufferOut => {
+      headers.set('x-chunk-size', bufferOut.byteLength);
       const cacheId = clone.url + '_' + bufferId;
       const chunkResponse = new Response(bufferOut, {
-        headers: response.headers
+        headers
       });
-
       cache.put(cacheId, chunkResponse);
     };
 

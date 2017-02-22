@@ -44,10 +44,49 @@ class RangedResponse {
       return Promise.resolve(false);
     }
 
-    return Promise.all([
-      caches.match(request.url),
-      caches.match(request.url + '_0')
-    ]).then(v => v.some(r => r));
+    // First check for the entire file in cache storage.
+    return caches.match(request.url)
+        .then(response => {
+          if (response) {
+            return true;
+          }
+
+          // Failing that, look up the chunks that would be needeed, and assume
+          // that if we need -- say -- chunks 1 to 10, that checking for 1 & 10
+          // is sufficient for success.
+          const header = request.headers.get('Range');
+          const rangeHeader = header.trim().toLowerCase();
+          const {start, end} = this._getStartAndEnd(rangeHeader);
+          const startIndex = Math.floor(start / Constants.CHUNK_SIZE);
+          const endIndex = Math.floor(end / Constants.CHUNK_SIZE);
+
+          return Promise.all([
+            caches.match(`${request.url}_${startIndex}`),
+            caches.match(`${request.url}_${endIndex}`)
+          ]).then(v => {
+            // Start by checking that there are at least two responses.
+            let hasData = v.every(r => !!r);
+
+            if (!hasData) {
+              return false;
+            }
+
+            // If both chunks exist, we need to refine the query further by
+            // ensuring that the endIndex chunk has actually got sufficient
+            // bytes to respond.
+            const chunkSize = parseInt(v[1].headers.get('x-chunk-size'), 10);
+            const finalByteInEndChunk =
+                endIndex * Constants.CHUNK_SIZE + chunkSize;
+
+            if (finalByteInEndChunk < end) {
+              console.log(`Cannot handle range request because unable to find
+                  final chunk byte is at ${finalByteInEndChunk}, but end
+                  requires ${end}.`);
+            }
+
+            return finalByteInEndChunk > end;
+          });
+        });
   }
 
   static isOpaqueOrError (response) {

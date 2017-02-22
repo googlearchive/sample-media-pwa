@@ -17,6 +17,7 @@
 
 'use strict';
 
+import Constants from '../constants/constants';
 import Utils from '../helpers/utils';
 import Paths from '../helpers/paths';
 import VideoControls from './video-controls';
@@ -297,7 +298,42 @@ class VideoPlayer {
   _loadAndPlayVideo () {
     let boot = Promise.resolve();
     if (!this._usingHLS) {
-      boot = boot.then(_ => this._player.load(this._manifest));
+      boot = boot
+          .then(_ => this._player.load(this._manifest))
+          .then(_ => {
+            return Promise.all([
+              // Either this is a "full fat" offline video...
+              OfflineCache.has(this._href),
+
+              // Or we've prefetched a chunk of it.
+              OfflineCache.hasPrefetched(this._assetPath)
+            ]).then(c => c.some(v => v));
+          })
+          .then(isAvailableOffline => {
+            // If we have nothing in any cache, then this is all for nought.
+            if (!isAvailableOffline) {
+              return;
+            }
+
+            // Lock the player to the offline stream.
+            const tracks = this._player.getTracks().filter(t => {
+              switch (t.type) {
+                case 'video':
+                  return t.height === Constants.OFFLINE_VIDEO_HEIGHT;
+
+                case 'audio':
+                  return t.codecs.indexOf(Constants.OFFLINE_AUDIO_TYPE) === 0;
+              }
+            });
+
+            tracks.forEach(track => {
+              // This will disable ABR, so effectively bandwidth will be
+              // ignored for the time being. Later, when we run out of
+              // prefetched footage we will enable ABR again with a config.
+              this._player.selectTrack(track, true);
+              console.log('Locked track: ', track);
+            });
+          });
     }
 
     return boot.then(_ => {
