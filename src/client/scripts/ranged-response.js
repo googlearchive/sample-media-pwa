@@ -24,7 +24,7 @@ import Constants from './constants/constants';
  * @see https://github.com/jakearchibald/range-request-test/blob/master/static/sw.js
  */
 class RangedResponse {
-  static isRangeRequest (request) {
+  static _isRangeRequest (request) {
     const header = request.headers.get('Range');
     if (!header) {
       return false;
@@ -40,7 +40,7 @@ class RangedResponse {
   }
 
   static canHandle (request) {
-    if (!RangedResponse.isRangeRequest(request)) {
+    if (!RangedResponse._isRangeRequest(request)) {
       return Promise.resolve(false);
     }
 
@@ -89,7 +89,7 @@ class RangedResponse {
         });
   }
 
-  static isOpaqueOrError (response) {
+  static _isOpaqueOrError (response) {
     if (response.status != 200) {
       return response;
     }
@@ -142,22 +142,22 @@ class RangedResponse {
   }
 
   static create (request) {
-    if (!RangedResponse.isRangeRequest(request)) {
+    if (!RangedResponse._isRangeRequest(request)) {
       return response;
     }
 
     return caches.match(request.url + '_0').then(chunkedResponse => {
       if (chunkedResponse) {
-        return RangedResponse.createFromChunks(request);
+        return RangedResponse._createFromChunks(request);
       }
 
-      return RangedResponse.createFromEntireBuffer(request);
+      return RangedResponse._createFromEntireBuffer(request);
     });
   }
 
-  static createFromEntireBuffer (request) {
+  static _createFromEntireBuffer (request) {
     return caches.match(request).then(response => {
-      if (RangedResponse.isOpaqueOrError(response)) {
+      if (RangedResponse._isOpaqueOrError(response)) {
         return response;
       }
 
@@ -176,7 +176,7 @@ class RangedResponse {
     });
   }
 
-  static createFromChunks (request) {
+  static _createFromChunks (request) {
     try {
       const header = request.headers.get('Range');
       const rangeHeader = header.trim().toLowerCase();
