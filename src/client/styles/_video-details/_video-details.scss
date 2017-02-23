@@ -48,14 +48,6 @@
 
         &-duration {
           display: flex;
-          &::before {
-            opacity: 0.6;
-            content: '';
-            width: 24px;
-            height: 100%;
-            margin-right: 8px;
-            background: url(/static/images/video/ic_timelapse_white_24px.svg) 0 5px no-repeat;
-          }
         }
       }
     }

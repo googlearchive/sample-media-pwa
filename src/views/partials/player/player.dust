@@ -51,13 +51,6 @@
     </div>
   </div>
 
-  <a href="/"class="content-block player__header">
-    <div class="player__header-icon">
-      {>"partials/icon" colors=colors /}
-    </div>
-    <h1 class="player__header-title">Biograf</h1>
-  </a>
-
   <div class="player__shape">
     {>"partials/shape" colors=colors /}
   </div>

@@ -26,8 +26,6 @@ limitations under the License.
   {/css}
 
   <style>
-    {styles|s}
-
     {#colors}
     .primary-bg {
       background: rgb({primary.r}, {primary.g}, {primary.b});
@@ -42,7 +40,7 @@ limitations under the License.
     }
 
     .primary-light-bg {
-      background: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
+      background-color: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
     }
 
     .primary-light-fill {
@@ -53,7 +51,16 @@ limitations under the License.
       color: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
     }
     {/colors}
+
+    {styles|s}
   </style>
 </head>
 <!-- Version {version} -->
 <body>
+  <header class="app__header">
+    <div class="app__header-content">
+      <a href="/" class="app__header-content-link">
+        <h1 class="app__header-content-link-title">Biograf</h1>
+      </a>
+    </div>
+  </header>

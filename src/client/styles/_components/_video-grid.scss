@@ -83,6 +83,35 @@
   }
 }
 
+@media (min-width: 1080px) {
+  .video-grid {
+    &__item-image {
+      &::before {
+        content: '';
+        width: 100%;
+        height: 100%;
+        background: #000;
+        top: 0;
+        left: 0;
+        position: absolute;
+        box-shadow: 0 0 8px 4px rgba(0, 0, 0, 1);
+        transition: opacity 0.2s cubic-bezier(0, 0, 0.4, 1),
+            transform 0.2s cubic-bezier(0, 0, 0.4, 1);
+        opacity: 0;
+      }
+
+      &:hover::before {
+        transform: translateY(10px) scale(1.04);
+        opacity: 0.4;
+      }
+
+      &-content:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+}
+
 @media (min-width: 1180px) {
   .video-grid {
     padding: 4px;
