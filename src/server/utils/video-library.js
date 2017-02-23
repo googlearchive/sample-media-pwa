@@ -24,7 +24,7 @@ class VideoLibrary {
     return JSON.parse(fs.readFileSync(path, 'utf-8'));
   }
 
-  static getAllEpisodes (library) {
+  static getAllEpisodes (library, sorted, ignore) {
     const allEpisodes = [];
     const showNames = Object.keys(library);
     showNames.forEach(showName => {
@@ -37,19 +37,53 @@ class VideoLibrary {
         }));
     });
 
+    if (sorted) {
+      allEpisodes.sort((a, b) => {
+        return Date.parse(b.released) - Date.parse(a.released);
+      });
+    }
+
+    if (ignore) {
+      allEpisodes.splice(allEpisodes.findIndex(e => {
+        return e.slug === ignore;
+      }), 1);
+    }
+
     return allEpisodes;
   }
 
-  static getNewest (library, count) {
+  static getNewest (library, options) {
+    let count = options.count;
+    let ignore = options.ignore;
+
     if (typeof count === 'undefined') {
       count = 4;
     }
 
-    return VideoLibrary.getAllEpisodes(library)
-        .sort((a, b) => {
-          return Date.parse(a.released) - Date.parse(b.released);
-        })
-        .slice(0, count);
+    return VideoLibrary.getAllEpisodes(library, true, ignore).slice(0, count);
+  }
+
+  static getMoreEpisodes (library, options) {
+    let start = options.start;
+    let limit = options.limit;
+    let ignore = options.ignore;
+
+    if (typeof start === 'undefined') {
+      start = 4;
+    }
+
+    if (typeof limit === 'undefined') {
+      limit = library.length - start;
+    }
+
+    return VideoLibrary
+        .getAllEpisodes(library, true, ignore)
+        .slice(start, limit + start);
+  }
+
+  static getOtherTitlesInShow (library, showName) {
+    const showNames = Object.keys(library);
+    return null;
   }
 
   static find (library, path) {
@@ -76,6 +110,7 @@ class VideoLibrary {
         };
       }
 
+      item.href = path.join('/');
       title = item.title;
       items = item.episodes || item;
       breadcrumbs.push(title);

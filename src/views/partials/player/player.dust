@@ -1,12 +1,13 @@
-<div class="player primary-light-col">
+<div class="player primary-light-col js-item-link" data-href="{href}">
 
   <video class="player__element" preload="metadata"
       data-cast-src="{castSrc}"
       data-title="{episodeTitle}"
       data-show-title="{showTitle}"
-      data-artwork-path="{artworkPath}"
-      data-poster="{poster}"
-      data-src="{src}"></video>
+      data-asset-path="{assetPath}"
+      data-poster="{assetPath}/poster.jpg"
+      data-src="{dash}"
+      data-hls="{hls}"></video>
 
   <div class="player__controls">
     <div class="player__controls-big">
@@ -27,29 +28,28 @@
       <div class="player__controls-standard-video-duration js-duration"></div>
       <button class="player__controls-standard-toggle-volume js-volume" data-type="toggle-volume">Toggle Volume</button>
       <button class="player__controls-standard-toggle-fullscreen js-fullscreen"  data-type="toggle-fullscreen">Toggle FS</button>
-      <!--<button class="player__controls-standard-toggle-offline"  data-type="toggle-offline">Toggle Offline</button> -->
+      <button class="player__controls-standard-toggle-offline toggle-offline js-offline"
+          data-type="toggle-offline"
+          data-detail-page-path="{href}"
+          data-detail-asset-Path="{assetPath}">
+        {>"partials/offline"/}
+      </button>
       <button class="player__controls-standard-chromecast js-chromecast" data-type="toggle-chromecast">Chromecast</button>
     </div>
   </div>
 
-  <div class="player__poster">
-    <button class="player__play-button">Play Video</button>
+  <button class="player__play-button item--disabled__unclickable">Play Video</button>
+
+  <div class="player__poster item--disabled__desaturated">
 
     <div class="content-block player__poster-episode-info">
       <div class="player__poster-star-rating">
-        {>"partials/star-rating" colors=colors rating=rating /}
+        {>"partials/star-rating" ratingColors=colors rating=rating /}
       </div>
       <h2 class="player__poster-show-title">{showTitle}</h2>
       <h3 class="player__poster-episode-title">{episodeTitle}</h3>
     </div>
   </div>
-
-  <a href="/"class="content-block player__header">
-    <div class="player__header-icon">
-      {>"partials/icon" colors=colors /}
-    </div>
-    <h1 class="player__header-title">Biograf</h1>
-  </a>
 
   <div class="player__shape">
     {>"partials/shape" colors=colors /}

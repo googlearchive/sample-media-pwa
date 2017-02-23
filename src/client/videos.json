@@ -13,14 +13,12 @@
           "description": "The trailer for the Chrome Channel.",
           "slug": "trailer",
           "duration": "155",
-          "poster": "https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/poster.jpg",
-          "posterSmall": "https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/poster-small.jpg",
-          "artworkPath": "https://storage.googleapis.com/biograf-video-files/videos/chr-trailer",
+          "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/chr-trailer",
           "rating": 4.4,
           "sources": {
             "full": "https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/mp4/v-1080p-4500k-libx264.mp4",
             "dash": "https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/mp4/dash.mpd",
-            "hls": ""
+            "hls": "https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/hls/all.m3u8"
           },
           "colors": {
             "primary": {
@@ -65,10 +63,8 @@
           "description": "Watch all the talks from Chrome Developer Summit 2016 here at: https://goo.gl/TkgXYM. Paul Lewis and Jake Archibald look back over their highlights of the Chrome Developer Summit 2016. Check out the talks that caught their attention and don't miss out on pair donning matching tuxedos!",
           "slug": "showreel",
           "duration": "58",
-          "artworkPath": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/",
-          "poster": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/poster.jpg",
-          "posterSmall": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/poster-small.jpg",
-          "rating": 4.3,
+          "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1",
+          "rating": 3.0,
           "sources": {
             "full": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/mp4/v-1080p-4500k-libx264.mp4",
             "dash": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/mp4/dash.mpd",
@@ -117,10 +113,8 @@
           "description": "Matt and Addy talk about PWAs and so on.",
           "slug": "episode-1",
           "duration": "732",
-          "artworkPath": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-1/",
-          "poster": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-1/poster.jpg",
-          "posterSmall": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-1/poster-small.jpg",
-          "rating": 4.3,
+          "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-1",
+          "rating": 4.1,
           "sources": {
             "full": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-1/mp4/v-1080p-4500k-libx264.mp4",
             "dash": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-1/mp4/dash.mpd",
@@ -169,10 +163,8 @@
           "description": "This week, Paul & Jake talk about the future of JavaScript: ES6 and beyond.",
           "slug": "episode-17",
           "duration": "372",
-          "artworkPath": "https://storage.googleapis.com/biograf-video-files/videos/http203-ep-17/",
-          "poster": "https://storage.googleapis.com/biograf-video-files/videos/http203-ep-17/poster.jpg",
-          "posterSmall": "https://storage.googleapis.com/biograf-video-files/videos/http203-ep-17/poster-small.jpg",
-          "rating": 4.3,
+          "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/http203-ep-17",
+          "rating": 3.6,
           "sources": {
             "full": "https://storage.googleapis.com/biograf-video-files/videos/http203-ep-17/mp4/v-1080p-4500k-libx264.mp4",
             "dash": "https://storage.googleapis.com/biograf-video-files/videos/http203-ep-17/mp4/dash.mpd",
@@ -203,6 +195,99 @@
               "r": 255,
               "g": 182,
               "b": 154
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "title": "New in Chrome",
+      "slug": "new-in-chrome",
+      "desciption": "Pete LePage takes you through what's new in each Chrome Release.",
+      "episodes": [
+        {
+          "released": "2017-02-14T10:00:00.000Z",
+          "title": "Chrome 56",
+          "shortDescription": "Pete LePage has all the details and how you can use these new developer features in Chrome 56!",
+          "description": "With Chrome 56, web apps can now communicate with nearby Bluetooth Low Energy devices using the Web Bluetooth API, position sticky is back - making it easy to create elements that scroll normally until sticking to the top of the viewport. And HTML5 by Default is enabled for all users.",
+          "slug": "episode-56",
+          "duration": "400",
+          "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-56",
+          "rating": 3.9,
+          "sources": {
+            "full": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-56/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-56/mp4/dash.mpd",
+            "hls": ""
+          },
+          "colors": {
+            "primary": {
+              "r": 120,
+              "g": 73,
+              "b": 41
+            },
+            "secondary": {
+              "r": 90,
+              "g": 55,
+              "b": 31
+            },
+            "tertiary": {
+              "r": 60,
+              "g": 37,
+              "b": 21
+            },
+            "quaternary": {
+              "r": 30,
+              "g": 18,
+              "b": 10
+            },
+            "primaryLight": {
+              "r": 240,
+              "g": 146,
+              "b": 82
+            }
+          }
+        },
+
+        {
+          "released": "2017-01-14T10:00:00.000Z",
+          "title": "Chrome 55",
+          "shortDescription": "Pete LePage has all the details and how you can use these new developer features in Chrome 55!",
+          "description": "With Chrome 55, you to write promise-based code as if it were synchronous, using async and await. Pointer events provide a unified way of handling all input events. And persistent storage graduates from it’s origin trial. Pete LePage has all the details on how you can use these new developer features in Chrome 55!",
+          "slug": "episode-55",
+          "duration": "201",
+          "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-55",
+          "rating": 3.9,
+          "sources": {
+            "full": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-55/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "https://storage.googleapis.com/biograf-video-files/videos/nic-ep-55/mp4/dash.mpd",
+            "hls": ""
+          },
+          "colors": {
+            "primary": {
+              "r": 94,
+              "g": 47,
+              "b": 39
+            },
+            "secondary": {
+              "r": 71,
+              "g": 35,
+              "b": 29
+            },
+            "tertiary": {
+              "r": 47,
+              "g": 24,
+              "b": 20
+            },
+            "quaternary": {
+              "r": 24,
+              "g": 12,
+              "b": 10
+            },
+            "primaryLight": {
+              "r": 188,
+              "g": 94,
+              "b": 78
             }
           }
         }

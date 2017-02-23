@@ -15,10 +15,12 @@
  * limitations under the License.
  */
 
-@import '_app';
-@import '_player/_player';
-@import '_home/_home';
-@import '_footer/_footer';
-@import '_components/_toast';
-@import '_components/_video-grid';
-@import '_modifiers';
+'use strict';
+
+class Paths {
+  static get SHAKA_PATH () {
+    return '{@hash path="dist/client/third_party/libs/shaka-player.compiled.js"}{/hash}';
+  }
+}
+
+export default Paths;

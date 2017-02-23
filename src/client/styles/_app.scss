@@ -29,10 +29,56 @@ body {
   background: #1D2227;
   color: #FFF;
   height: 100%;
+  padding-top: 48px;
 }
 
 a {
   color: #19D5B9;
+}
+
+.app {
+  &__header {
+    position: fixed;
+    background: lighten(#1D2227, 5%);
+    top: 0;
+    width: 100%;
+    height: 48px;
+    padding: 0 8px;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+
+    &-content {
+      display: flex;
+      height: 100%;
+      align-items: center;
+
+      &-link {
+        display: flex;
+        height: 100%;
+        align-items: center;
+        text-decoration: none;
+
+        &-icon {
+          width: 24px;
+          height: 24px;
+          margin-right: 8px;
+        }
+
+        &-title {
+          font-size: 16px;
+          color: #FFF;
+          opacity: 0.8;
+          font-weight: 400;
+          margin: 0;
+
+          &:hover {
+            transition: opacity 0.2s ease-out;
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
 }
 
 .content-block {
@@ -57,21 +103,81 @@ a {
   }
 }
 
-.image-fade-and-scale-in {
-  animation-name: imageFadeAndScaleIn;
+.toggle-offline {
+  svg {
+    pointer-events: none;
+  }
+
+  .is-offline {
+    display: none;
+  }
+
+  .is-downloading {
+    display: block;
+  }
+
+  &.offline--available {
+    .is-offline {
+      display: block;
+    }
+
+    .is-downloading {
+      display: none;
+    }
+  }
+}
+
+@media (min-width: 800px) {
+  body {
+    padding-top: 56px;
+  }
+
+  .app__header {
+    height: 56px;
+
+    &-content-link-title {
+      font-size: 18px;
+    }
+  }
+}
+
+@media (min-width: 1180px) {
+  body {
+    padding-top: 64px;
+  }
+
+  .app__header {
+    height: 64px;
+    padding: 0 16px;
+
+    &-content-link-title {
+      font-size: 20px;
+    }
+  }
+}
+
+.fade-and-scale-in {
+  animation-name: fadeAndScaleIn;
   animation-duration: 1s;
   animation-timing-function: cubic-bezier(0, 0, 0.4, 1);
   animation-fill-mode: forwards;
 }
 
-.image-fade-in {
-  animation-name: imageFadeIn;
+.fade-and-scale-in-centered {
+  animation-name: fadeAndScaleInCentered;
+  animation-duration: 0.7s;
+  animation-timing-function: cubic-bezier(0, 0, 0.4, 1);
+  animation-fill-mode: forwards;
+}
+
+.fade-in {
+  animation-name: fadeIn;
   animation-duration: 0.3s;
   animation-timing-function: cubic-bezier(0, 0, 0.4, 1);
   animation-fill-mode: forwards;
 }
 
-@keyframes imageFadeAndScaleIn {
+@keyframes fadeAndScaleIn {
   from {
     transform: scale(0.98);
     opacity: 0;
@@ -82,7 +188,19 @@ a {
   }
 }
 
-@keyframes imageFadeIn {
+@keyframes fadeAndScaleInCentered {
+  from {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
   from {
     opacity: 0;
   }

@@ -15,6 +15,10 @@
  * limitations under the License.
  */
 
+video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+}
+
 .player:-webkit-full-screen .player__shape {
   display: none;
 }
@@ -38,7 +42,7 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%) translateY(-32px);
+    transform: translate(-50%, -50%);
     z-index: 100;
     opacity: 0;
     pointer-events: none;
@@ -48,7 +52,7 @@
 
   &--ended {
     .player__ended-view {
-      animation-name: imageFadeIn;
+      animation-name: fadeIn;
       animation-duration: 0.3s;
       animation-timing-function: cubic-bezier(0, 0, 0.4, 1);
       animation-fill-mode: forwards;
@@ -57,8 +61,7 @@
     }
   }
 
-  &__ended-view
-  {
+  &__ended-view {
     contain: strict;
     background: rgba(0, 0, 0, 0.9);
     position: absolute;
@@ -158,7 +161,7 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: 50%;
+      height: 20%;
       background-image: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
       pointer-events: none;
     }
@@ -175,7 +178,7 @@
 
     &--active {
       display: block;
-      z-index: 1;
+      z-index: 2;
     }
   }
 
@@ -190,11 +193,20 @@
     border-radius: 50%;
     background: none;
     cursor: pointer;
-    position: relative;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    pointer-events: none;
+    opacity: 0;
     z-index: 1;
     box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 1),
         0 3px 3px rgba(0, 0, 0, 0.4);
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    transform: translate(-50%, -50%);
+
+    &--active {
+      pointer-events: auto;
+    }
 
     &::before {
       content: '';
@@ -253,6 +265,7 @@
       flex-direction: column;
       justify-content: flex-end;
       z-index: 1;
+      pointer-events: none;
     }
 
     &-star-rating {
@@ -287,7 +300,7 @@
       content: '';
       width: 100%;
       height: 100%;
-      background-image: linear-gradient(195deg, rgba(21,22,25,0.00) 30%, #2C333B 86%);
+      background-image: linear-gradient(195deg, rgba(21,22,25,0.00) 40%, #2C333B 86%);
       position: absolute;
       left: 0;
       top: 0;
@@ -321,10 +334,10 @@
     }
 
     &-big {
-      position: relative;
+      position: absolute;
       max-width: 1180px;
       width: 100%;
-      flex: 1;
+      height: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -373,7 +386,8 @@
     &-standard {
       max-width: 1180px;
       margin: 0 auto;
-      position: relative;
+      position: absolute;
+      bottom: 0;
       width: 100%;
       height: 30%;
       max-height: 64px;
@@ -385,7 +399,8 @@
       &-toggle-volume,
       &-toggle-fullscreen,
       &-chromecast,
-      &-play-pause {
+      &-play-pause,
+      &-toggle-offline {
         width: 40px;
         height: 40px;
         background: none;
@@ -401,6 +416,10 @@
         &:focus {
           background-color: rgba(255, 255, 255, 0.2);
         }
+
+        &--hidden {
+          display: none;
+        }
       }
 
       &-toggle-fullscreen {
@@ -414,6 +433,7 @@
       }
 
       &-toggle-volume {
+        display: none;
         background: url(/static/images/video/ic_volume_up_white_24px.svg) center center no-repeat;
         background-size: 24px 24px;
 
@@ -424,6 +444,7 @@
       }
 
       &-play-pause {
+        display: none;
         background: url(/static/images/video/ic_pause_white_24px.svg) center center no-repeat;
         background-size: 24px 24px;
 
@@ -515,6 +536,17 @@
         color: #FFF;
         margin-right: 16px;
       }
+
+      &-toggle-offline {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+
+        &--hidden {
+          display: none;
+        }
+      }
     }
 
     &::after {
@@ -549,11 +581,11 @@
 
 @keyframes buffering {
   from {
-    transform: translate(-50%, -50%) translateY(-32px) rotate(0deg);
+    transform: translate(-50%, -50%) rotate(0deg);
   }
 
   to {
-    transform: translate(-50%, -50%) translateY(-32px) rotate(360deg);
+    transform: translate(-50%, -50%) rotate(360deg);
   }
 }
 
@@ -692,6 +724,12 @@
         &-fwd-30 {
           background: url(/static/images/video/ic_forward_30_white_24px.svg) center center no-repeat;
           background-size: 72px 72px;
+        }
+      }
+
+      &-standard {
+        &-play-pause {
+          display: block;
         }
       }
     }

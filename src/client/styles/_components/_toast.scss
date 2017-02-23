@@ -15,10 +15,23 @@
  * limitations under the License.
  */
 
-@import '_app';
-@import '_player/_player';
-@import '_home/_home';
-@import '_footer/_footer';
-@import '_components/_toast';
-@import '_components/_video-grid';
-@import '_modifiers';
+.toast-container {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+}
+
+.toast {
+  background: #FFF;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.4);
+  padding: 8px 12px;
+  border-radius: 3px;
+  font-size: 14px;
+  color: #444;
+  will-change: opacity;
+  transition: opacity 1s cubic-bezier(0, 0, 0.3, 1);
+
+  &--dismissed {
+    opacity: 0;
+  }
+}

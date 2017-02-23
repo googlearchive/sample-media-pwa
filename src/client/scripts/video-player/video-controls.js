@@ -18,8 +18,13 @@
 'use strict';
 
 import Utils from '../helpers/utils';
+import DownloadProgress from './download-progress';
 
 class VideoControls {
+
+  static get OFFLINE_BUTTON_SELECTOR () {
+    return 'js-offline-button';
+  }
 
   static get HIDE_TIMEOUT () {
     return 500;
@@ -39,6 +44,7 @@ class VideoControls {
     this._playhead = this._videoControls.querySelector('.js-playhead');
     this._duration = this._videoControls.querySelector('.js-duration');
     this._replay = document.querySelector('.js-replay');
+    this._offline = document.querySelectorAll('.js-offline');
 
     this._enabled = false;
     this._pendingHide = undefined;
@@ -111,12 +117,22 @@ class VideoControls {
     this._videoControls.addEventListener('mousedown', this._onInputDown);
     this._videoControls.addEventListener('mousemove', this._onInputMove);
     this._videoControls.addEventListener('mouseup', this._onInputUp);
-    this._videoControls.addEventListener('touchstart', this._onInputDown);
-    this._videoControls.addEventListener('touchmove', this._onInputMove);
-    this._videoControls.addEventListener('touchend', this._onInputUp);
+    this._videoControls.addEventListener('touchstart', this._onInputDown, {
+      passive: false
+    });
+    this._videoControls.addEventListener('touchmove', this._onInputMove, {
+      passive: false
+    });
+    this._videoControls.addEventListener('touchend', this._onInputUp, {
+      passive: false
+    });
 
     this._videoControls.addEventListener('click', this._onClick);
     this._replay.addEventListener('click', this._onClick);
+
+    Array.from(this._offline).forEach(offline => {
+      offline.addEventListener('click', this._onClick);
+    });
 
     document.addEventListener('keydown', this._onKeyDown);
     document.addEventListener('fullscreenchange', this._onFullscreenChange);
@@ -176,8 +192,46 @@ class VideoControls {
       return;
     }
 
+    if (Number.isNaN(duration)) {
+      duration = 1;
+    }
+
     const normalizedTime = time / duration;
     this._setTimeTrackPosition(normalizedTime);
+  }
+
+  updateOfflineProgress (percentage) {
+    Array.from(this._offline).forEach(offline => {
+      DownloadProgress.update(offline, percentage);
+    });
+  }
+
+  update (state) {
+    const pausedBigClass = 'player__controls-big-play-pause--paused';
+    const pausedStandardClass = 'player__controls-standard-play-pause--paused';
+    const fsClass = 'player__controls-standard-toggle-fullscreen--active';
+    const volumeClass = 'player__controls-standard-toggle-volume--muted';
+    const offlineHiddenClass =
+        'player__controls-standard-toggle-offline--hidden';
+    const offlineClass = 'offline--available';
+
+    this._videoControls.dataset.title = state.title;
+    this._playPauseBig.classList.toggle(pausedBigClass, state.paused);
+    this._playPauseStandard.classList.toggle(pausedStandardClass, state.paused);
+    this._fullscreen.classList.toggle(fsClass, state.fullscreen);
+    this._volume.classList.toggle(volumeClass, state.volume === 0);
+    this._duration.textContent = this._formatDuration(state.duration);
+    this.updateTimeTrack(state.currentTime, state.duration);
+
+    Array.from(this._offline).forEach(offline => {
+      if (!state.offlineSupported) {
+        offline.classList.add(offlineHiddenClass);
+        return;
+      }
+
+      offline.classList.toggle(offlineClass, state.offline);
+      offline.classList.add('fade-in');
+    });
   }
 
   _setTimeTrackPosition (normalizedPosition) {
@@ -191,6 +245,10 @@ class VideoControls {
   }
 
   _formatDuration (secs) {
+    if (Number.isNaN(secs)) {
+      return '00:00';
+    }
+
     const lPad = num => {
       return (num < 10 ? '0' : '') + num.toString();
     };
@@ -206,31 +264,37 @@ class VideoControls {
     return `${(hours > 0 ? hours + ':' : '')}${lPad(mins)}:${lPad(secs)}`;
   }
 
-  update (state) {
-    const pausedBigClass = 'player__controls-big-play-pause--paused';
-    const pausedStandardClass = 'player__controls-standard-play-pause--paused';
-    const fsClass = 'player__controls-standard-toggle-fullscreen--active';
-    const volumeClass = 'player__controls-standard-toggle-volume--muted';
-
-    this._playPauseBig.classList.toggle(pausedBigClass, state.paused);
-    this._playPauseStandard.classList.toggle(pausedStandardClass, state.paused);
-    this._fullscreen.classList.toggle(fsClass, state.fullscreen);
-    this._volume.classList.toggle(volumeClass, state.volume === 0);
-    this._duration.textContent = this._formatDuration(state.duration);
-    this.updateTimeTrack(state.currentTime, state.duration);
-  }
-
   _onClick (evt) {
     const type = evt.target.dataset.type;
+    const detail = {};
+
+    evt.stopImmediatePropagation();
 
     if (!type) {
       this.showControls();
       return;
     }
 
+    for (const data in evt.target.dataset) {
+      if (!data.startsWith('detail')) {
+        continue;
+      }
+
+      if (data === 'detail') {
+        detail.value = evt.target.dataset.detail;
+        continue;
+      }
+
+      let detailName = data.replace(/^detail/, '');
+      detailName = detailName.substr(0, 1).toLowerCase() +
+          detailName.substr(1);
+
+      detail[detailName] = evt.target.dataset[data];
+    }
+
     // Fire off whatever the button says as a custom event, which the player
     // can pick up and use to control the playback.
-    Utils.fire(this._videoControls, type);
+    Utils.fire(this._videoControls, type, detail);
   }
 
   _onFullscreenChange () {
@@ -284,6 +348,7 @@ class VideoControls {
       return;
     }
 
+    evt.preventDefault();
     this.showControls(true);
     this._evtToTrackPosition(evt);
   }

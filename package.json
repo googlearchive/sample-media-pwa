@@ -16,21 +16,26 @@
     "serve": "nodemon -e dust,js,css,json dist/server/index.js",
     "dev": "npm run build && parallelshell \"npm run watch\" \"npm run serve\"",
     "watch": "npm-watch",
-    "build": "npm run clean-dist && npm run make-dist && npm run make-client && npm run copy-all && npm run build-js && npm run build-sass",
+    "build": "npm run clean-dist && npm run make-dist && npm run make-client && npm run copy-all && npm run build-js && npm run build-sass && npm run build-resource-list",
     "build-js": "node build/transpile-javascript.js",
+    "build-resource-list": "node build/build-resource-list.js",
     "build-sass": "node build/transpile-sass.js",
+    "build-js-and-sass": "npm run build-js && npm run build-sass && npm run build-resource-list",
     "release": "npm version patch && npm run build"
   },
   "watch": {
-    "build-js": "src/client/**/*.js",
-    "build-sass": {
-      "patterns": "src/client/styles",
-      "extensions": "scss"
+    "build-js-and-sass": {
+      "patterns": "src/client",
+      "extensions": ["scss", "js"]
     },
     "copy-server": "src/server",
     "copy-views": {
       "patterns": "src/views",
-      "extensions": ["dust", "css", "js"]
+      "extensions": [
+        "dust",
+        "css",
+        "js"
+      ]
     },
     "copy-client": "src/client"
   },
@@ -40,8 +45,8 @@
     "babel": "^6.5.2",
     "babel-preset-babili": "0.0.10",
     "babel-preset-es2015-rollup": "^3.0.0",
-    "copy": "^0.3.0",
     "clean-css": "^4.0.2",
+    "copy": "^0.3.0",
     "get-pixels": "^3.3.0",
     "mkdirp": "^0.5.1",
     "node-sass": "^4.4.0",
@@ -50,11 +55,13 @@
     "parallelshell": "^2.0.0",
     "rollup": "^0.41.4",
     "rollup-plugin-babel": "^2.7.1",
+    "walk": "^2.3.9",
     "yargs": "^6.6.0"
   },
   "dependencies": {
     "adaro": "^1.0.4",
     "connect-memcached": "^0.2.0",
+    "dustjs-helpers": "^1.7.3",
     "express": "^4.14.0",
     "express-session": "^1.14.2",
     "passport": "^0.3.2",

@@ -5,7 +5,7 @@
         "https://biograf-155113.appspot-preview.com",
         "https://biograf-155113.appspot.com/"
     ],
-    "responseHeader": ["Content-Type", "Range"],
+    "responseHeader": ["Content-Type", "Range", "Content-Range", "X-From-Cache"],
     "method": ["GET", "HEAD", "OPTIONS"],
     "maxAgeSeconds": 3600
   }

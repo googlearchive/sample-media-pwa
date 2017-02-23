@@ -1,0 +1,130 @@
+/**
+ *
+ * Copyright 2017 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.video-grid {
+  list-style: none;
+  margin: 0;
+  position: relative;
+  left: -4px;
+  width: calc(100% + 8px);
+  padding: 0;
+
+  &__item {
+    width: 50%;
+    float: left;
+    padding: 4px;
+    position: relative;
+
+    &-image {
+      width: 100%;
+      height: 28.125vw;
+      background: #111 url(/static/images/video-placeholder.png) center center no-repeat;
+      background-size: 30px 30px;
+      position: relative;
+
+      &-content {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        opacity: 0;
+        transition: transform 0.2s cubic-bezier(0, 0, 0.4, 1);
+      }
+
+      &--no-script {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+      }
+    }
+  }
+
+  &::after {
+    content: '';
+    clear: both;
+    display: block;
+  }
+}
+
+@media (min-width: 600px) {
+  .video-grid {
+    &__item {
+      width: 33.3%;
+
+      &-image {
+        height: 18.73vw;
+      }
+    }
+  }
+}
+
+@media (min-width: 800px) {
+  .video-grid {
+    &__item {
+      width: 25%;
+
+      &-image {
+        height: 14.06vw;
+      }
+    }
+  }
+}
+
+@media (min-width: 1080px) {
+  .video-grid {
+    &__item-image {
+      &::before {
+        content: '';
+        width: 100%;
+        height: 100%;
+        background: #000;
+        top: 0;
+        left: 0;
+        position: absolute;
+        box-shadow: 0 0 8px 4px rgba(0, 0, 0, 1);
+        transition: opacity 0.2s cubic-bezier(0, 0, 0.4, 1),
+            transform 0.2s cubic-bezier(0, 0, 0.4, 1);
+        opacity: 0;
+      }
+
+      &:hover::before {
+        transform: translateY(10px) scale(1.04);
+        opacity: 0.4;
+      }
+
+      &-content:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+}
+
+@media (min-width: 1180px) {
+  .video-grid {
+    padding: 4px;
+    left: -8px;
+    width: calc(100% + 16px);
+
+    &__item {
+      width: 16.66%;
+
+      &-image {
+        height: 105px;
+      }
+    }
+  }
+}
+

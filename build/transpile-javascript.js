@@ -36,10 +36,11 @@ const intro = `/**
 `;
 
 const rollup = require('rollup');
+const hash = require('./plugins/hash').findHashes;
 const babel = require('rollup-plugin-babel');
 const entries = [
   'client/scripts/app.js',
-  'client/scripts/home.js'
+  'client/scripts/ranged-response.js'
 ];
 
 let cache;
@@ -48,6 +49,7 @@ entries.forEach(entry => {
     entry: `src/${entry}`,
     cache,
     plugins: [
+      hash(),
       babel()
     ]
   }).then(bundle => {

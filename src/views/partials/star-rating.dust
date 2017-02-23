@@ -6,6 +6,6 @@
     <use xlink:href="#star-path"/>
   </mask>
 
-  <rect mask="url(#star-mask)" x="0" y="0" width="137" height="24" fill="rgb({colors.tertiary.r}, {colors.tertiary.g}, {colors.tertiary.b})" />
-  <rect mask="url(#star-mask)" x="0" y="0" width="{@starRating rating=rating /}" height="24" fill="rgb({colors.primaryLight.r}, {colors.primaryLight.g}, {colors.primaryLight.b})" />
+  <rect mask="url(#star-mask)" x="0" y="0" width="137" height="24" fill="rgb({ratingColors.tertiary.r}, {ratingColors.tertiary.g}, {ratingColors.tertiary.b})" />
+  <rect mask="url(#star-mask)" x="0" y="0" width="{@starRating rating=rating /}" height="24" fill="rgb({ratingColors.primaryLight.r}, {ratingColors.primaryLight.g}, {ratingColors.primaryLight.b})" />
 </svg>

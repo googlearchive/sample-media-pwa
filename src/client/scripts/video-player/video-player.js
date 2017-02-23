@@ -17,17 +17,16 @@
 
 'use strict';
 
+import Constants from '../constants/constants';
 import Utils from '../helpers/utils';
+import Paths from '../helpers/paths';
 import VideoControls from './video-controls';
+import OfflineCache from '../helpers/offline-cache';
 
 class VideoPlayer {
 
   static get DEFAULT_BANDWIDTH () {
     return 5000000;
-  }
-
-  static get SHAKA_PATH () {
-    return '/static/third_party/libs/shaka-player.compiled.js';
   }
 
   static get SUPPORTS_MEDIA_SESSION () {
@@ -54,28 +53,18 @@ class VideoPlayer {
     return ('orientation' in window.screen);
   }
 
-  static get isFullScreen () {
-    return (document.fullscreenElement || document.webkitFullscreenElement);
-  }
-
-  static init () {
-    const video = document.querySelector('video');
-
+  constructor (video, {offlineSupported}={}) {
     if (!video) {
-      console.log('No video here.');
-      return;
+      throw new Error('No video element provided.');
     }
 
-    new VideoPlayer(video);
-  }
-
-  constructor (video) {
     const title = video.dataset.title;
     const manifest = video.dataset.src;
+    const hls = video.dataset.hls;
     const poster = video.dataset.poster;
     const showTitle = video.dataset.showTitle;
     const castSrc = video.dataset.castSrc;
-    const artworkPath = video.dataset.artworkPath;
+    const assetPath = video.dataset.assetPath;
 
     if (!manifest) {
       console.log('Video without manifest. Bailing.');
@@ -89,11 +78,13 @@ class VideoPlayer {
 
     // Refs to keep.
     this._manifest = manifest;
+    this._hls = hls;
+    this._usingHLS = false;
     this._poster = poster;
     this._castSrc = castSrc;
     this._title = title;
     this._showTitle = showTitle;
-    this._artworkPath = artworkPath;
+    this._assetPath = assetPath;
     this._video = video;
     this._videoContainer = this._video.parentNode;
     this._videoControls = null;
@@ -101,7 +92,9 @@ class VideoPlayer {
     this._player = null;
     this._fsLocked = false;
     this._playOnSeekFinished = false;
-    this._shakaLoaded = Utils.loadScript(VideoPlayer.SHAKA_PATH);
+    this._videoIsAvailableOffline = false;
+    this._offlineSupported = offlineSupported;
+    this._href = this._videoContainer.dataset.href;
 
     // Handlers.
     this._onKeyDown = this._onKeyDown.bind(this);
@@ -113,7 +106,7 @@ class VideoPlayer {
     this._onPause = this._onPause.bind(this);
     this._onBack30 = this._onBack30.bind(this);
     this._onFwd30 = this._onFwd30.bind(this);
-    this._onToggleFullScreen = this._onToggleFullScreen.bind(this);
+    this._onFullScreenToggle = this._onFullScreenToggle.bind(this);
     this._onChromecast = this._onChromecast.bind(this);
     this._onVolumeToggle = this._onVolumeToggle.bind(this);
     this._onOrientationChanged = this._onOrientationChanged.bind(this);
@@ -129,19 +122,88 @@ class VideoPlayer {
     this._onVideoEnd = this._onVideoEnd.bind(this);
     this._updateVideoControlsWithPlayerState =
         this._updateVideoControlsWithPlayerState.bind(this);
+  }
 
-    // Setup.
-    this._addEventListeners();
-    Utils.preloadImage(poster).then(_ => this._createPoster(poster));
+  get isFullScreen () {
+    return (document.fullscreenElement ||
+        this._video.webkitDisplayingFullscreen);
+  }
+
+  init () {
+    Utils.preloadImage(this._poster)
+        .then(_ => this._createPoster(this._poster));
+
+    return Utils.loadScript(Paths.SHAKA_PATH)
+        .then(_ => this._initPlayer())
+        .then(_ => {
+          this._addEventListeners();
+          this._initPlayerControls();
+
+          return this.update();
+        });
+  }
+
+  update () {
+    return OfflineCache.has(this._href).then(exists => {
+      this._videoIsAvailableOffline = exists;
+      return this._updateVideoControlsWithPlayerState();
+    });
+  }
+
+  updateOfflineProgress (percentage) {
+    if (!this._videoControls) {
+      return;
+    }
+
+    this._videoControls.updateOfflineProgress(percentage);
+  }
+
+  stop () {
+    return this._onClose();
+  }
+
+  _fallbackToHLS () {
+    this._player = {
+      destroy () {
+        return Promise.resolve();
+      }
+    };
+    this._usingHLS = true;
+    this._video.src = this._hls;
+    return Promise.resolve();
+  }
+
+  _initPlayer () {
+    if (!shaka.Player.isBrowserSupported()) {
+      return this._fallbackToHLS();
+    }
+
+    this._player = new shaka.Player(this._video);
+    this._player.addEventListener('buffering', this._onBufferChanged);
+    return Promise.resolve();
   }
 
   _createPoster (poster) {
     const posterElement = this._videoContainer.querySelector('.player__poster');
     posterElement.style.backgroundImage = `url(${poster})`;
-    posterElement.classList.add('image-fade-and-scale-in');
+    posterElement.classList.add('fade-and-scale-in');
   }
 
   _addEventListeners () {
+    this._addVideoPlaybackEventListeners();
+    this._addVideoStateEventListeners();
+    this._addOrientationEventListeners();
+    this._addFullscreenEventListeners();
+    this._addRemotePlaybackEventListeners();
+  }
+
+  _addFullscreenEventListeners () {
+    window.addEventListener('fullscreenchange', this._onFullScreenChanged);
+    this._video.addEventListener('webkitfullscreenchange',
+        this._updateVideoControlsWithPlayerState);
+  }
+
+  _addVideoPlaybackEventListeners () {
     this._videoContainer.addEventListener('keydown', this._onKeyDown);
     this._videoContainer.addEventListener('click', this._onClick);
     this._videoContainer.addEventListener('play-pause', this._onPlayPause);
@@ -151,28 +213,32 @@ class VideoPlayer {
     this._videoContainer.addEventListener('replay', this._onReplay);
     this._videoContainer.addEventListener('close', this._onClose);
     this._videoContainer.addEventListener('toggle-fullscreen',
-        this._onToggleFullScreen);
+        this._onFullScreenToggle);
     this._videoContainer.addEventListener('toggle-chromecast',
         this._onChromecast);
     this._videoContainer.addEventListener('toggle-volume',
         this._onVolumeToggle);
+  }
 
-    window.addEventListener('fullscreenchange', this._onFullScreenChanged);
-    window.addEventListener('webkitfullscreenchange',
-        this._onFullScreenChanged);
-
+  _addVideoStateEventListeners () {
     this._video.addEventListener('play', this._startTimeTracking);
     this._video.addEventListener('pause', this._stopTimeTracking);
     this._video.addEventListener('ended', this._onVideoEnd);
     this._video.addEventListener('durationchange',
         this._updateVideoControlsWithPlayerState);
+  }
 
-    if (VideoPlayer.SUPPORTS_ORIENTATION) {
-      window.screen.orientation.addEventListener('change',
-          this._onOrientationChanged);
+  _addOrientationEventListeners () {
+    if (!VideoPlayer.SUPPORTS_ORIENTATION) {
+      return;
     }
 
-    if (!VideoPlayer.SUPPORTS_MEDIA_SESSION) {
+    window.screen.orientation.addEventListener('change',
+          this._onOrientationChanged);
+  }
+
+  _addRemotePlaybackEventListeners () {
+    if (!VideoPlayer.SUPPORTS_REMOTE_PLAYBACK) {
       return;
     }
 
@@ -182,6 +248,213 @@ class VideoPlayer {
         .addEventListener('connect', this._onRemoteConnect);
     this._castVideo.remote
         .addEventListener('disconnect', this._onRemoteDisconnect);
+  }
+
+  _updateVideoControlsWithPlayerState () {
+    if (!this._videoControls) {
+      return;
+    }
+
+    this._videoControls.update(this._getVideoState());
+  }
+
+  _getVideoState () {
+    return {
+      paused: this._video.paused,
+      currentTime: this._video.currentTime,
+      duration: (
+          Number.isNaN(this._video.duration) ? 0.1 : this._video.duration
+      ),
+      volume: this._video.volume,
+      fullscreen: this.isFullScreen,
+      offline: this._videoIsAvailableOffline,
+      offlineSupported: this._offlineSupported,
+      title: this._title
+    };
+  }
+
+  _enterFullScreen () {
+    if (this._videoContainer.requestFullscreen) {
+      return this._videoContainer.requestFullscreen();
+    }
+
+    this._video.webkitEnterFullscreen();
+  }
+
+  _exitFullScreen () {
+    if (document.exitFullscreen) {
+      return document.exitFullscreen();
+    }
+
+    this._video.webkitExitFullscreen();
+  }
+
+  _loadAndPlayVideo () {
+    let boot = Promise.resolve();
+    if (!this._usingHLS) {
+      boot = boot
+          .then(_ => this._player.load(this._manifest))
+          .then(_ => {
+            return Promise.all([
+              // Either this is a "full fat" offline video...
+              OfflineCache.has(this._href),
+
+              // Or we've prefetched a chunk of it.
+              OfflineCache.hasPrefetched(this._assetPath)
+            ]).then(c => c.some(v => v));
+          })
+          .then(isAvailableOffline => {
+            // If we have nothing in any cache, then this is all for nought.
+            if (!isAvailableOffline) {
+              return;
+            }
+
+            // Lock the player to the offline stream.
+            const tracks = this._player.getTracks().filter(t => {
+              return t.height === Constants.PREFETCH_VIDEO_HEIGHT;
+            });
+
+            tracks.forEach(track => {
+              // This will disable ABR, so effectively bandwidth will be
+              // ignored for the time being. Later, when we run out of
+              // prefetched footage we will enable ABR again with a config.
+              this._player.selectTrack(track, true);
+              this._player.configure({
+                abr: {
+                  defaultBandwidthEstimate: track.bandwidth
+                },
+
+                streaming: {
+                  bufferingGoal: 60
+                }
+              });
+              console.log(`Selected track: ${track.width}x${track.height}`);
+            });
+
+            // Watch for the point at which the prefetched content has been
+            // exhausted. At that point reset the player to use the network.
+            // TODO: Instruct the OfflineCache to remove the prefetched content.
+            const netEngine = this._player.getNetworkingEngine();
+            netEngine.registerResponseFilter((_, response) => {
+              const isOfflineVideoResponse = response.uri
+                  .indexOf(`${Constants.PREFETCH_VIDEO_HEIGHT}p`) > 0;
+              if (!isOfflineVideoResponse) {
+                return;
+              }
+
+              const isFromCache =
+                  response.headers.find(h => (h === 'x-from-cache: true'));
+
+              if (isFromCache) {
+                console.log('Using prefetched content.');
+                return;
+              }
+
+              console.log('Switching back to adaptive.');
+              netEngine.clearAllResponseFilters();
+              this._player.resetConfiguration();
+              console.log(this._player.getConfiguration());
+            });
+          });
+    }
+
+    return boot.then(_ => {
+      if (this._video.paused) {
+        this._video.play();
+        this._video.volume = 1;
+      }
+      this._enablePlayerControls();
+      this._setMediaSessionData();
+      this._startChromecastWatch();
+    }, err => {
+      console.warn(err.message);
+    });
+  }
+
+  _onNetworkResponse (response) {
+    console.log(response);
+  }
+
+  _initPlayerControls () {
+    const videoControls =
+        this._videoContainer.querySelector('.player__controls');
+    if (!videoControls) {
+      console.warn('No video controls. Bailing.');
+      return;
+    }
+
+    if (!this._videoControls) {
+      this._videoControls = new VideoControls(videoControls);
+    }
+  }
+
+  _enablePlayerControls () {
+    this._videoControls.enabled = true;
+    this._updateVideoControlsWithPlayerState();
+  }
+
+  _setMediaSessionData () {
+    if (!VideoPlayer.SUPPORTS_MEDIA_SESSION) {
+      return;
+    }
+
+    const artworkPath256 = this._assetPath + '/artwork@256.jpg';
+    const artworkPath512 = this._assetPath + '/artwork@512.jpg';
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: this._title,
+      album: this._showTitle,
+      artwork: [
+        {src: artworkPath256, sizes: '256x256', type: 'image/jpg'},
+        {src: artworkPath512, sizes: '512x512', type: 'image/jpg'},
+      ]
+    });
+
+    navigator.mediaSession.setActionHandler('play', this._onPlay);
+    navigator.mediaSession.setActionHandler('pause', this._onPause);
+    navigator.mediaSession.setActionHandler('seekbackward', this._onBack30);
+    navigator.mediaSession.setActionHandler('seekforward', this._onFwd30);
+  }
+
+  _startChromecastWatch () {
+    if (!VideoPlayer.SUPPORTS_REMOTE_PLAYBACK) {
+      this._videoControls.hideChromecastButton();
+      return;
+    }
+
+    this._castVideo.remote.watchAvailability(available => {
+      if (available) {
+        this._videoControls.showChromecastButton();
+        return;
+      }
+
+      this._videoControls.hideChromecastButton();
+    }).catch(_ => {
+      if (!this._videoControls) {
+        return;
+      }
+
+      this._videoControls.hideChromecastButton();
+    });
+  }
+
+  _stopChromecastWatch () {
+    if (!VideoPlayer.SUPPORTS_REMOTE_PLAYBACK) {
+      this._videoControls.hideChromecastButton();
+      return;
+    }
+
+    this._castVideo.remote.cancelWatchAvailability();
+  }
+
+  _startTimeTracking () {
+    this._isTrackingTime = true;
+    requestAnimationFrame(this._onTimeUpdate);
+  }
+
+  _stopTimeTracking () {
+    this._isTrackingTime = false;
+    this._updateVideoControlsWithPlayerState();
   }
 
   _onBufferChanged (evt) {
@@ -211,11 +484,7 @@ class VideoPlayer {
       });
 
       // ... then load it.
-      this._loadVideo();
-    }
-
-    if (!this._videoControls) {
-      return;
+      return this._loadAndPlayVideo();
     }
   }
 
@@ -224,7 +493,7 @@ class VideoPlayer {
       return;
     }
 
-    if (VideoPlayer.isFullScreen) {
+    if (this.isFullScreen) {
       return window.screen.orientation.lock('landscape').catch(_ => {
         // Silently swallow errors from attempting to lock the orientation.
         // This only works in the case of web apps added to home screens, but
@@ -233,26 +502,6 @@ class VideoPlayer {
     }
 
     return window.screen.orientation.unlock();
-  }
-
-  _updateVideoControlsWithPlayerState () {
-    if (!this._videoControls) {
-      return;
-    }
-
-    this._videoControls.update(this._getVideoState());
-  }
-
-  _getVideoState () {
-    return {
-      paused: this._video.paused,
-      currentTime: this._video.currentTime,
-      duration: (
-          Number.isNaN(this._video.duration) ? 0.1 : this._video.duration
-      ),
-      volume: this._video.volume,
-      fullscreen: VideoPlayer.isFullScreen
-    };
   }
 
   _onPlayPause () {
@@ -266,7 +515,6 @@ class VideoPlayer {
 
   _onPlay () {
     this._video.play().then(_ => {
-      console.log('playing...');
       this._updateVideoControlsWithPlayerState();
     }, err => {
       console.warn(err);
@@ -283,12 +531,16 @@ class VideoPlayer {
       this._video.classList.remove('player__element--active');
       this._videoControls.enabled = false;
       this._exitFullScreen();
+
+      // Reboot the player.
+      return this._initPlayer();
     });
   }
 
   _onReplay () {
     this._player.destroy()
-        .then(_ => this._loadVideo())
+        .then(_ => this._initPlayer())
+        .then(_ => this._loadAndPlayVideo())
         .then(_ => {
           this._videoContainer.classList.remove('player--ended');
         });
@@ -340,8 +592,8 @@ class VideoPlayer {
     this._exitFullScreen();
   }
 
-  _onToggleFullScreen () {
-    if (VideoPlayer.isFullScreen) {
+  _onFullScreenToggle () {
+    if (this.isFullScreen) {
       this._fsLocked = false;
       this._exitFullScreen();
       return;
@@ -375,135 +627,17 @@ class VideoPlayer {
     this._videoControls.castConnected = false;
   }
 
-  _enterFullScreen () {
-    const enterFullScreenFn = this._videoContainer.requestFullscreen ||
-        this._videoContainer.webkitRequestFullscreen;
-
-    enterFullScreenFn.call(this._videoContainer);
-
-  }
-
-  _exitFullScreen () {
-    const exitFullScreenFn = document.exitFullscreen ||
-        document.webkitExitFullscreen;
-
-    exitFullScreenFn.call(document);
-  }
-
-  _loadVideo () {
-    return this._shakaLoaded.then(_ => {
-      this._player = new shaka.Player(this._video);
-      this._player.configure({
-        abr: {
-          defaultBandwidthEstimate: VideoPlayer.DEFAULT_BANDWIDTH
-        }
-      });
-
-      this._player.addEventListener('buffering', this._onBufferChanged);
-      this._player.load(this._manifest).then(_ => {
-        if (this._video.paused) {
-          this._video.play();
-          this._video.volume = 1;
-        }
-        this._initPlayerControls();
-        this._setMediaSessionData();
-        this._startChromecastWatch();
-      }, err => {
-        console.warn(err.message);
-      });
-    });
-  }
-
-  _initPlayerControls () {
-    const videoControls =
-        this._videoContainer.querySelector('.player__controls');
-    if (!videoControls) {
-      console.warn('No video controls. Bailing.');
-      return;
-    }
-
-    videoControls.dataset.title = this._title;
-
-    if (!this._videoControls) {
-      this._videoControls = new VideoControls(videoControls);
-    }
-
-    this._videoControls.enabled = true;
-    this._updateVideoControlsWithPlayerState();
-  }
-
-  _setMediaSessionData () {
-    if (!VideoPlayer.SUPPORTS_MEDIA_SESSION) {
-      return;
-    }
-
-    const artworkPath256 = this._artworkPath + 'artwork@256.jpg';
-    const artworkPath512 = this._artworkPath + 'artwork@512.jpg';
-
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: this._title,
-      album: this._showTitle,
-      artwork: [
-        {src: artworkPath256, sizes: '256x256', type: 'image/jpg'},
-        {src: artworkPath512, sizes: '512x512', type: 'image/jpg'},
-      ]
-    });
-
-    navigator.mediaSession.setActionHandler('play', this._onPlay);
-    navigator.mediaSession.setActionHandler('pause', this._onPause);
-    navigator.mediaSession.setActionHandler('seekbackward', this._onBack30);
-    navigator.mediaSession.setActionHandler('seekforward', this._onFwd30);
-  }
-
-  _startChromecastWatch () {
-    if (!VideoPlayer.SUPPORTS_REMOTE_PLAYBACK) {
-      this._videoControls.hideChromecastButton();
-      return;
-    }
-
-    this._castVideo.remote.watchAvailability(available => {
-      if (available) {
-        this._videoControls.showChromecastButton();
-        return;
-      }
-
-      this._videoControls.hideChromecastButton();
-    }).catch(_ => {
-      if (!this._videoControls) {
-        return;
-      }
-
-      this._videoControls.hideChromecastButton();
-    });
-  }
-
-  _stopChromecastWatch () {
-    if (!VideoPlayer.SUPPORTS_REMOTE_PLAYBACK) {
-      this._videoControls.hideChromecastButton();
-      return;
-    }
-
-    this._castVideo.remote.cancelWatchAvailability();
-  }
-
   _onTimeUpdate () {
-    this._videoControls.updateTimeTrack(
-        this._video.currentTime, this._video.duration);
-
     if (!this._isTrackingTime) {
       return;
     }
-
     requestAnimationFrame(this._onTimeUpdate);
-  }
 
-  _startTimeTracking () {
-    this._isTrackingTime = true;
-    requestAnimationFrame(this._onTimeUpdate);
-  }
-
-  _stopTimeTracking () {
-    this._isTrackingTime = false;
+    if (!this._videoControls) {
+      return;
+    }
+    this._videoControls.updateTimeTrack(
+        this._video.currentTime, this._video.duration);
   }
 }
 

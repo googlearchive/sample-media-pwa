@@ -15,10 +15,22 @@
  * limitations under the License.
  */
 
-@import '_app';
-@import '_player/_player';
-@import '_home/_home';
-@import '_footer/_footer';
-@import '_components/_toast';
-@import '_components/_video-grid';
-@import '_modifiers';
+.item--disabled {
+  will-change: opacity;
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.4;
+
+  & &__faded {
+    opacity: 0.4;
+  }
+
+  & &__desaturated {
+    filter: saturate(30%);
+  }
+
+  & &__unclickable {
+    pointer-events: none;
+    cursor: auto;
+  }
+}

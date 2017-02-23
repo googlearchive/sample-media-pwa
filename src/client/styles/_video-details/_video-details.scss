@@ -26,6 +26,12 @@
       color: #FFFFFF;
       line-height: 1.5;
       max-width: 590px;
+      flex: 1;
+
+      &-paragraph {
+        margin: 0;
+        padding: 0;
+      }
 
       &-meta {
         display: flex;
@@ -42,20 +48,57 @@
 
         &-duration {
           display: flex;
-          &::before {
-            opacity: 0.6;
-            content: '';
-            width: 24px;
-            height: 100%;
-            margin-right: 8px;
-            background: url(/static/images/video/ic_timelapse_white_24px.svg) 0 5px no-repeat;
-          }
         }
       }
     }
 
-    &-controls-and-cast {
-      border: 1px solid red;
+    &-controls {
+      margin-top: 32px;
+      flex: 1;
+
+      &-offline {
+        font-size: 16px;
+        color: #FFF;
+        background: none;
+        border: none;
+        padding: 0;
+        opacity: 0;
+        display: flex;
+        line-height: 24px;
+        cursor: pointer;
+        position: relative;
+        outline: none;
+
+        > svg {
+          position: relative;
+        }
+
+        &::before {
+          content: '';
+          position: absolute;
+          width: 24px;
+          height: 24px;
+          left: 0;
+          top: 0;
+          border-radius: 50%;
+          background: #555;
+        }
+
+        &::after {
+          margin-left: 8px;
+          content: 'Make available offline';
+        }
+
+        &.offline--available {
+          &::before {
+            background: none;
+          }
+
+          &::after {
+            content: 'Remove offline copy'
+          }
+        }
+      }
     }
   }
 }
@@ -75,6 +118,12 @@
     &__info {
       padding: 80px 32px 120px 32px;
       font-size: 18px;
+      flex-direction: row;
+
+      &-controls {
+        margin-top: 0;
+        padding-left: 64px;
+      }
     }
   }
 }

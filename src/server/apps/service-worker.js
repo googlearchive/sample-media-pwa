@@ -34,7 +34,6 @@ const dustOptions = {
 
 if (process.env.NODE_ENV === 'production') {
   dustOptions.cache = true;
-  dustOptions.whitespace = false;
   console.log('[App: Service Worker] Templating is cached.');
 }
 
