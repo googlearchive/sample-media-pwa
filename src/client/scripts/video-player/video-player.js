@@ -311,7 +311,7 @@ class VideoPlayer {
 
             // Lock the player to the offline stream.
             const tracks = this._player.getTracks().filter(t => {
-              return t.height === Constants.OFFLINE_VIDEO_HEIGHT;
+              return t.height === Constants.PREFETCH_VIDEO_HEIGHT;
             });
 
             tracks.forEach(track => {
@@ -322,6 +322,10 @@ class VideoPlayer {
               this._player.configure({
                 abr: {
                   defaultBandwidthEstimate: track.bandwidth
+                },
+
+                streaming: {
+                  bufferingGoal: 60
                 }
               });
               console.log(`Selected track: ${track.width}x${track.height}`);
@@ -333,7 +337,7 @@ class VideoPlayer {
             const netEngine = this._player.getNetworkingEngine();
             netEngine.registerResponseFilter((_, response) => {
               const isOfflineVideoResponse = response.uri
-                  .indexOf(`${Constants.OFFLINE_VIDEO_HEIGHT}p`) > 0;
+                  .indexOf(`${Constants.PREFETCH_VIDEO_HEIGHT}p`) > 0;
               if (!isOfflineVideoResponse) {
                 return;
               }

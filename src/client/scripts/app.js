@@ -22,6 +22,7 @@ import VideoPlayer from './video-player/video-player';
 import Toast from './helpers/toast';
 import LazyLoadImages from './helpers/lazy-load-images';
 import OfflineCache from './helpers/offline-cache';
+import Constants from './constants/constants';
 
 class App {
 
@@ -45,7 +46,7 @@ class App {
   }
 
   __PREFETCH () {
-    const path = 'https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/mp4/offline-720p.mpd';
+    const path = `https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/${Constants.PREFETCH_MANIFEST}`;
     this._offlineCache.prefetch(path, 30);
   }
 

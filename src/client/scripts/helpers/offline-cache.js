@@ -36,7 +36,7 @@ class OfflineCache {
     }
 
     return caches.open('prefetch').then(cache => {
-      return cache.match(`${assetPath}/${Constants.OFFLINE_VIDEO_PATH}_0`);
+      return cache.match(`${assetPath}/${Constants.PREFETCH_VIDEO_PATH}_0`);
     });
   }
 
@@ -108,6 +108,22 @@ class OfflineCache {
   }
 
   prefetch (manifestPath, prefetchLimit=30) {
+    const makeRequest = (path, start, end) => {
+      const chunk = true;
+      const headers = new Headers();
+      headers.set('range', `bytes=${start}-${end}`);
+      const response = fetch(path, {
+        mode: 'cors',
+        headers
+      });
+
+      return {
+        request: path,
+        response,
+        chunk
+      };
+    };
+
     return this._getManifest(manifestPath)
         .then(manifest => this._getRanges(manifestPath, manifest))
         .then(ranges => {
@@ -136,19 +152,14 @@ class OfflineCache {
 
               // Create a fetch for the particular byte range we want to use.
               const path = idx === 0 ? ranges.audio.path : ranges.video.path;
-              const chunk = true;
-              const headers = new Headers();
-              headers.set('range', `bytes=${start}-${end}`);
-              const response = fetch(path, {
-                mode: 'cors',
-                headers
-              });
+              return makeRequest(path, start, end);
+            });
 
-              return {
-                request: path,
-                response,
-                chunk
-              };
+            // Add on the requests for the first n bytes of the other
+            // representations that equate to the headers. It means that we
+            // won't need to wait for their bytes.
+            ranges.extra.forEach(extra => {
+              fetches.push(makeRequest(extra.path, 0, extra.end));
             });
 
             return this._download('prefetch', fetches, {
@@ -242,30 +253,53 @@ class OfflineCache {
           start: null,
           end: null
         }
-      }
+      },
+      extra: []
     };
 
     Array.from(doc.querySelectorAll('AdaptationSet')).forEach(adaptation => {
-      const segment = adaptation.querySelector('SegmentBase');
-      const baseURL = adaptation.querySelector('BaseURL');
+      const baseURLs = adaptation.querySelectorAll('BaseURL');
       const type = adaptation.getAttribute('contentType');
 
-      if (!(segment && baseURL)) {
+      if (!baseURLs.length) {
         return;
       }
 
-      const path = baseURL.textContent;
-      const range = segment.getAttribute('indexRange');
+      baseURLs.forEach(baseURL => {
+        const segment = baseURL.parentNode.querySelector('SegmentBase');
+        const path = baseURL.textContent;
+        const range = segment.getAttribute('indexRange');
 
-      if (!range) {
-        return;
-      }
+        if (!path.endsWith('mp4')) {
+          return;
+        }
 
-      const rangeVals = range.split('-');
+        if (!segment) {
+          return;
+        }
 
-      ranges[type].path = `${manifestParentPath}/${path}`;
-      ranges[type].bytes.start = parseInt(rangeVals[0], 10);
-      ranges[type].bytes.end = parseInt(rangeVals[1], 10);
+        if (!range) {
+          return;
+        }
+
+        const rangeVals = range.split('-');
+        const prefetchPath = `mp4/${path}`;
+
+        if (prefetchPath === Constants.PREFETCH_VIDEO_PATH ||
+            prefetchPath === Constants.PREFETCH_AUDIO_PATH) {
+          ranges[type].path = `${manifestParentPath}/${path}`;
+          ranges[type].bytes.start = parseInt(rangeVals[0], 10);
+          ranges[type].bytes.end = parseInt(rangeVals[1], 10);
+        } else {
+          // We can grab the bytes for any other representations as well, so that
+          // when the player boots up and asks for their headers we can pass them
+          // back super quickly from the cache.
+          ranges.extra.push({
+            path: `${manifestParentPath}/${path}`,
+            end: parseInt(rangeVals[1], 10)
+          });
+        }
+      });
     });
 
     return ranges;

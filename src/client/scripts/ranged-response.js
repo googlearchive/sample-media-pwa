@@ -79,7 +79,8 @@ class RangedResponse {
                 endIndex * Constants.CHUNK_SIZE + chunkSize;
 
             if (finalByteInEndChunk < end) {
-              console.log(`Cannot handle range request because unable to find
+              console.log(`${request.url}
+                  Cannot handle range request because unable to find
                   final chunk byte is at ${finalByteInEndChunk}, but end
                   requires ${end}.`);
             }
