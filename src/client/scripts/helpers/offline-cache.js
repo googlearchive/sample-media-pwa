@@ -108,10 +108,17 @@ class OfflineCache {
   }
 
   prefetch (manifestPath, prefetchLimit=30) {
-    const makeRequest = (path, start, end) => {
-      const chunk = true;
+    const makeRequest = ({path, start, end, chunk}={}) => {
       const headers = new Headers();
-      headers.set('range', `bytes=${start}-${end}`);
+      if (typeof start !== 'undefined' && typeof end !== 'undefined') {
+        headers.set('range', `bytes=${start}-${end}`);
+
+        if (!chunk) {
+          throw new Error(`Unable to cache unchunked, ranged requests.
+              (${path})`);
+        }
+      }
+
       const response = fetch(path, {
         mode: 'cors',
         headers
@@ -123,6 +130,8 @@ class OfflineCache {
         chunk
       };
     };
+
+    console.log('Prefetching ', prefetchLimit);
 
     return this._getManifest(manifestPath)
         .then(manifest => this._getRanges(manifestPath, manifest))
@@ -152,23 +161,30 @@ class OfflineCache {
 
               // Create a fetch for the particular byte range we want to use.
               const path = idx === 0 ? ranges.audio.path : ranges.video.path;
-              return makeRequest(path, start, end);
+              return makeRequest({path, start, end, chunk: true});
             });
 
             // Add on the requests for the first n bytes of the other
             // representations that equate to the headers. It means that we
             // won't need to wait for their bytes.
             ranges.extra.forEach(extra => {
-              fetches.push(makeRequest(extra.path, 0, extra.end));
+              fetches.push(makeRequest({
+                path: extra.path,
+                start: 0,
+                end: extra.end,
+                chunk: true
+              }));
             });
+
+            fetches.push(makeRequest({path: manifestPath}));
 
             return this._download('prefetch', fetches, {
               onProgressCallback () {},
               onCompleteCallback () {
                 console.log(`Prefetched ${prefetchLimit}s.`);
               }
-            }).catch(_ => {
-              console.log('Unable to prefetch video.');
+            }).catch(e => {
+              console.error(e);
             });
           });
         });
@@ -228,7 +244,7 @@ class OfflineCache {
 
           refs.push({
             startByte: 0,
-            endByte: file.bytes.start - 1,
+            endByte: file.bytes.end - 1,
             startTime: 0,
             endTime: 0
           });

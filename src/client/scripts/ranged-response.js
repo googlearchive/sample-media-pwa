@@ -169,7 +169,8 @@ class RangedResponse {
         const {start, end} = RangedResponse._getStartAndEnd(rangeHeader);
 
         return response.arrayBuffer().then(buffer => {
-          return _createRangedResponse(buffer, response.headers, start, end);
+          return this._createRangedResponse(buffer,
+              response.headers, start, end);
         });
       } catch (e) {
         return new Response(e.message, {status: 400});

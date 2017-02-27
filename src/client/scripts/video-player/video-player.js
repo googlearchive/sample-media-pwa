@@ -26,7 +26,7 @@ import OfflineCache from '../helpers/offline-cache';
 class VideoPlayer {
 
   static get DEFAULT_BANDWIDTH () {
-    return 5000000;
+    return 2500000;
   }
 
   static get SUPPORTS_MEDIA_SESSION () {
@@ -291,20 +291,52 @@ class VideoPlayer {
 
   _loadAndPlayVideo () {
     let boot = Promise.resolve();
+    let isAvailableOffline = false;
+    let isPrefetched = false;
+
     if (!this._usingHLS) {
+      this._player.configure({
+        abr: {
+          defaultBandwidthEstimate: VideoPlayer.DEFAULT_BANDWIDTH
+        }
+      });
+
       boot = boot
-          .then(_ => this._player.load(this._manifest))
           .then(_ => {
             return Promise.all([
-              // Either this is a "full fat" offline video...
-              OfflineCache.has(this._href),
-
               // Or we've prefetched a chunk of it.
-              OfflineCache.hasPrefetched(this._assetPath)
-            ]).then(c => c.some(v => v));
+              OfflineCache.hasPrefetched(this._assetPath),
+
+              // Either this is a "full fat" offline video...
+              OfflineCache.has(this._href)
+            ]).then(c => {
+              isAvailableOffline = c.some(v => v);
+              isPrefetched = c[0];
+            });
           })
-          .then(isAvailableOffline => {
+          .then(_ => {
             // If we have nothing in any cache, then this is all for nought.
+            if (!isAvailableOffline) {
+              return;
+            }
+
+            const height = isPrefetched ? Constants.PREFETCH_VIDEO_HEIGHT :
+                Constants.OFFLINE_VIDEO_HEIGHT;
+
+            this._player.configure({
+              streaming: {
+                bufferingGoal: Constants.PREFETCH_DEFAULT_BUFFER_GOAL
+              },
+
+              restrictions: {
+                minHeight: height,
+                maxHeight: height,
+                mimeType: 'video/mp4'
+              }
+            });
+          })
+          .then(_ => this._player.load(this._manifest))
+          .then(_ => {
             if (!isAvailableOffline) {
               return;
             }
@@ -322,13 +354,10 @@ class VideoPlayer {
               this._player.configure({
                 abr: {
                   defaultBandwidthEstimate: track.bandwidth
-                },
-
-                streaming: {
-                  bufferingGoal: 60
                 }
               });
-              console.log(`Selected track: ${track.width}x${track.height}`);
+
+              console.log(`Selected track: ${track.width}x${track.height}`, track);
             });
 
             // Watch for the point at which the prefetched content has been
@@ -353,7 +382,6 @@ class VideoPlayer {
               console.log('Switching back to adaptive.');
               netEngine.clearAllResponseFilters();
               this._player.resetConfiguration();
-              console.log(this._player.getConfiguration());
             });
           });
     }
@@ -366,8 +394,6 @@ class VideoPlayer {
       this._enablePlayerControls();
       this._setMediaSessionData();
       this._startChromecastWatch();
-    }, err => {
-      console.warn(err.message);
     });
   }
 

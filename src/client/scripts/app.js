@@ -47,7 +47,8 @@ class App {
 
   __PREFETCH () {
     const path = `https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/${Constants.PREFETCH_MANIFEST}`;
-    this._offlineCache.prefetch(path, 30);
+    this._offlineCache.prefetch(path,
+        Constants.PREFETCH_DEFAULT_BUFFER_GOAL / 2);
   }
 
   constructor () {
@@ -71,21 +72,6 @@ class App {
     this._videoPlayer.init().then(_ => {
       this._videoPlayer.update();
       this._addEventListeners();
-
-      // console.log('Getting for offline.');
-      // const off = new shaka.offline.Storage(new shaka.Player(document.createElement('video')));
-      // off.configure({
-      //   trackSelectionCallback: function (tracks) {
-      //     return tracks;
-      //   }
-      // });
-      // off.generateSegments(path).then(segments => {
-      //   console.log('MWAH!');
-      //   segments.audio.forEach(segment => {
-      //     console.log('Offset: ' + segment.startByte + ', size: ' +
-      //         (segment.endByte - segment.startByte));
-      //   });
-      // });
     }, err => {
       console.log(err);
     });

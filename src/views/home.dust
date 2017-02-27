@@ -11,6 +11,15 @@
   assetPath=featured.items.assetPath
   href=featured.items.href /}
 
+
+<div class="featured-episode">
+  <h2 class="featured-episode__show-title">{featured.breadcrumbs[0]}</h2>
+  <h3 class="featured-episode__episode-title">{featured.items.title}</h3>
+  <div class="featured-episode__star-rating">
+    {>"partials/star-rating" ratingColors=featured.items.colors rating=featured.items.rating /}
+  </div>
+</div>
+
 <section class="home main-content">
   <div class="home__new-releases content-block">
     <h2 class="home__new-releases-title primary-light-col">Newest Releases</h2>
