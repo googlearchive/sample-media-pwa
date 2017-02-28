@@ -1,6 +1,56 @@
 {
-  "featured": "chrome-channel/trailer",
+  "featured": "polymer/sizzle-2015",
   "shows": [
+    {
+      "title": "Polymer",
+      "slug": "polymer",
+      "description": "Well, it's only the Chrome Developer Videos",
+      "episodes": [
+        {
+          "released": "2017-01-26T16:46:31.376Z",
+          "title": "2015 Sizze Reel",
+          "shortDescription": "The sizzle reel for the Polymer Summit 2015.",
+          "description": "The sizzle reel for the Polymer Summit 2015.",
+          "slug": "sizzle-2015",
+          "duration": "159",
+          "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/poly-sizzle-2015",
+          "rating": 4.9,
+          "sources": {
+            "full": "https://storage.googleapis.com/biograf-video-files/videos/poly-sizzle-2015/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "https://storage.googleapis.com/biograf-video-files/videos/poly-sizzle-2015/mp4/dash.mpd",
+            "hls": "https://storage.googleapis.com/biograf-video-files/videos/poly-sizzle-2015/hls/all.m3u8"
+          },
+          "colors": {
+            "primary": {
+              "r": 199,
+              "g": 156,
+              "b": 41
+            },
+            "secondary": {
+              "r": 149,
+              "g": 117,
+              "b": 31
+            },
+            "tertiary": {
+              "r": 100,
+              "g": 78,
+              "b": 21
+            },
+            "quaternary": {
+              "r": 50,
+              "g": 39,
+              "b": 10
+            },
+            "primaryLight": {
+              "r": 255,
+              "g": 255,
+              "b": 82
+            }
+          }
+        }
+      ]
+    },
+
     {
       "title": "Chrome Channel",
       "slug": "chrome-channel",

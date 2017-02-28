@@ -17,10 +17,21 @@
 
 'use strict';
 
-class Paths {
-  static get SHAKA_PATH () {
-    return '{@hash path="dist/client/third_party/libs/shaka-player.compiled.js"}{/hash}';
+import Constants from '../constants/constants';
+import idbKeyval from '../../third_party/libs/idb-keyval';
+
+class Settings {
+  constructor () {
+    throw new Error('Settings should not be instantiated.');
+  }
+
+  static set (name, value) {
+    return idbKeyval.set(`${Constants.APP_NAME}_${name}`, value);
+  }
+
+  static get (name) {
+    return idbKeyval.get(`${Constants.APP_NAME}_${name}`);
   }
 }
 
-export default Paths;
+export default Settings;

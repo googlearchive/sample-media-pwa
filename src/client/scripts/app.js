@@ -17,19 +17,15 @@
 
 'use strict';
 
-import ServiceWorkerInstaller from './helpers/sw-install';
+import ServiceWorkerInstaller from './helpers/service-worker-installer';
 import VideoPlayer from './video-player/video-player';
 import Toast from './helpers/toast';
 import LazyLoadImages from './helpers/lazy-load-images';
 import OfflineCache from './helpers/offline-cache';
+import Settings from './helpers/settings';
 import Constants from './constants/constants';
 
 class App {
-
-  static get SUPPORTS_OFFLINE () {
-    return ('caches' in window);
-  }
-
   static get CONNECTIVITY_STATES () {
     return {
       ONLINE: 1,
@@ -59,25 +55,56 @@ class App {
         App.CONNECTIVITY_STATES.ONLINE :
         App.CONNECTIVITY_STATES.OFFLINE;
     this._offlineCache = new OfflineCache();
-    this._videoPlayer = new VideoPlayer(document.querySelector('video'), {
-      offlineSupported: App.SUPPORTS_OFFLINE
-    });
     this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.IDLE;
+    this._forcedOffline = false;
+
     this._onOnline = this._onOnline.bind(this);
     this._onOffline = this._onOffline.bind(this);
     this._onOfflineToggle = this._onOfflineToggle.bind(this);
     this._onProgressCallback = this._onProgressCallback.bind(this);
     this._onCompleteCallback = this._onCompleteCallback.bind(this);
-
-    this._videoPlayer.init().then(_ => {
-      this._videoPlayer.update();
-      this._addEventListeners();
-    }, err => {
-      console.log(err);
-    });
+    this._onMenuClick = this._onMenuClick.bind(this);
 
     this._toggleLinkStates().then(_ => {
       LazyLoadImages.init();
+    });
+
+    this._addMenuListeners();
+    this._addOfflineToggleListeners();
+    this._processSettings();
+
+    const video = document.querySelector('video');
+    if (!video) {
+      return;
+    }
+
+    this._videoPlayer = new VideoPlayer(video, {
+      offlineSupported: ServiceWorkerInstaller.SUPPORTS_OFFLINE
+    });
+
+    this._videoPlayer.init().then(_ => {
+      this._videoPlayer.update();
+      this._addVideoEventListeners();
+    }, err => {
+      console.log(err);
+    });
+  }
+
+  _processSettings () {
+    Settings.get('prefetch').then(shouldPrefetch => {
+      console.log('Prefetch enabled: ' + shouldPrefetch);
+    });
+
+    Settings.get('downloads-only').then(downloadsOnly => {
+      this._forcedOffline = downloadsOnly;
+      console.log('Downloads only: ' + this._forcedOffline);
+      if (this._forcedOffline) {
+        return this._onOffline();
+      }
+
+      this._onOnline();
+    }, _ => {
+      console.warn('Unable to get settings.');
     });
   }
 
@@ -121,18 +148,31 @@ class App {
     }));
   }
 
+  _onMenuClick (evt) {
+    const menuActiveClass = 'menu__toggle--active';
+    const menu = document.querySelector('.js-menu');
+    if (evt.target === menu) {
+      return menu.classList.toggle(menuActiveClass);
+    }
+
+    menu.classList.remove(menuActiveClass);
+  }
+
   _cancel (evt) {
     evt.stopImmediatePropagation();
     evt.preventDefault();
   }
 
-  _addEventListeners () {
+  _addVideoEventListeners () {
     this._addStatusChangeListeners();
-    this._addOfflineToggleListeners();
+  }
+
+  _addMenuListeners () {
+    document.addEventListener('click', this._onMenuClick);
   }
 
   _addStatusChangeListeners () {
-    if (!('serviceWorker' in navigator)) {
+    if (!ServiceWorkerInstaller.SUPPORTS_OFFLINE) {
       return;
     }
 
@@ -144,7 +184,7 @@ class App {
   }
 
   _addOfflineToggleListeners () {
-    if (!App.SUPPORTS_OFFLINE) {
+    if (!ServiceWorkerInstaller.SUPPORTS_OFFLINE) {
       console.warn('Unable to support offline.');
       return;
     }
@@ -153,6 +193,14 @@ class App {
   }
 
   _onOnline () {
+    if (!navigator.onLine) {
+      return;
+    }
+
+    if (this._forcedOffline) {
+      return;
+    }
+
     // TODO: Hide banner;
     this._appConnectivityState = App.CONNECTIVITY_STATES.ONLINE;
     this._toggleLinkStates();
@@ -203,7 +251,7 @@ class App {
     }
 
     if (this._offlineDownloadState === App.VIDEO_DOWNLOAD_STATES.REMOVING) {
-      Toast.create('Removing video. Please wait.', {tag: 'offline'});
+      Toast.create('Deleting video. Please wait.', {tag: 'offline'});
       return;
     }
 

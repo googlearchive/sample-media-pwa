@@ -29,9 +29,13 @@ class LazyLoadImages {
     return 0.01;
   }
 
+  static get HANDLED_CLASS () {
+    return 'js-lazy-image--handled';
+  }
+
   static init () {
     if (this._instance) {
-      return this._instance;
+      this._instance._disconnect();
     }
 
     this._instance = new LazyLoadImages();
@@ -53,8 +57,20 @@ class LazyLoadImages {
     this._onIntersection = this._onIntersection.bind(this);
     this._observer = new IntersectionObserver(this._onIntersection, config);
     images.forEach(image => {
+      if (image.classList.contains(LazyLoadImages.HANDLED_CLASS)) {
+        return;
+      }
+
       this._observer.observe(image);
     });
+  }
+
+  _disconnect () {
+    if (!this._observer) {
+      return;
+    }
+
+    this._observer.disconnect();
   }
 
   _onIntersection (entries) {
@@ -63,7 +79,7 @@ class LazyLoadImages {
         return;
       }
 
-      if (entry.target.classList.contains('js-lazy-image--handled')) {
+      if (entry.target.classList.contains(LazyLoadImages.HANDLED_CLASS)) {
         return;
       }
 

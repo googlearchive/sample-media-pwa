@@ -40,11 +40,18 @@ class OfflineCache {
     });
   }
 
+  static getAll () {
+    return caches.keys().then(caches => {
+      return caches.filter(c => {
+        return !(c === 'prefetch' || c.startsWith(Constants.APP_NAME));
+      });
+    });
+  }
+
   static convertPathToName (path) {
     return path
         .replace(/^\//, '')
-        .replace(/\/$/, '')
-        .replace(/\//, '-');
+        .replace(/\/$/, '');
   }
 
   constructor () {

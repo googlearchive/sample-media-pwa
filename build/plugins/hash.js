@@ -28,14 +28,17 @@ function findHashes (options={}) {
         return;
       }
 
-      const needsHash = /{@hash\spath="([^"]+)"\s?}{\/hash}/;
-      const matches = needsHash.exec(code);
+      const needsHash = /{@hash\spath="([^"]+)"}{\/hash}/gim;
+      let matches;
+      do {
+        matches = needsHash.exec(code);
 
-      if (matches && matches.length >= 1) {
-        const path = matches[1];
-        const hashedName = hashFileName(path).replace('dist/client', '/static');
-        code = code.replace(needsHash, hashedName);
-      }
+        if (matches) {
+          const path = matches[1];
+          const hashedName = hashFileName(path).replace('dist/client', '/static');
+          code = code.replace(`{@hash path="${path}"}{/hash}`, hashedName);
+        }
+      } while (matches);
 
       return {
         code,

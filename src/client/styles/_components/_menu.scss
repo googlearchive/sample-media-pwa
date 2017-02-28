@@ -1,0 +1,116 @@
+/**
+ *
+ * Copyright 2017 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.menu {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+
+  &__toggle {
+    border: none;
+    background: none;
+    color: #FFF;
+    outline: none;
+    display: flex;
+    font-size: 14px;
+    align-items: center;
+    position: relative;
+    border-radius: 2px;
+    padding: 2px 10px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+    &:hover,
+    &:focus {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    &::before {
+      content: '';
+      height: 32px;
+      width: 28px;
+      background: url(/static/images/header/ic_account_circle_white_24px.svg) left center no-repeat;
+    }
+
+    &--active + .menu__list {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(100%) translateY(5px);
+    }
+  }
+
+  &__list {
+    width: 260px;
+    max-width: 80vw;
+    margin: 0;
+    list-style: none;
+    opacity: 0;
+    pointer-events: none;
+    will-change: opacity;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #FFF;
+    border-radius: 2px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    transform: translateY(100%) translateY(15px);
+    transition: transform 0.3s cubic-bezier(0, 0, 0.3, 1),
+        opacity 0.2s cubic-bezier(0, 0, 0.3, 1);
+
+    &-title {
+      border-bottom: 1px solid #DDD;
+      padding: 12px;
+    }
+
+    &-items {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+
+      &-item > * {
+        display: flex;
+        font-size: 14px;
+        padding: 8px 12px;
+        margin: 4px 0;
+        text-align: left;
+        border: none;
+        background: none;
+        color: #444;
+        text-decoration: none;
+        width: 100%;
+        cursor: pointer;
+
+        &:hover {
+          background: #DDD;
+        }
+      }
+    }
+
+    &::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      position: absolute;
+      transform: rotate(45deg);
+      top: -5px;
+      right: 40px;
+      background: #FFF;
+    }
+  }
+}
+

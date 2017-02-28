@@ -15,7 +15,22 @@
  * limitations under the License.
  */
 
-@import 'inline';
-@import '_video-details/_video-details';
-@import '_downloads/_downloads';
-@import '_settings/_settings';
+.settings {
+  min-height: 100vh;
+  padding: 32px 0;
+
+  &__content {
+    padding: 0 8px;
+
+    &-title {
+      margin: 0;
+      padding-bottom: 16px;
+    }
+  }
+}
+
+@media (min-width: 1180px) {
+  .settings__content {
+    padding: 0;
+  }
+}

@@ -16,13 +16,12 @@
  */
 
 .item--disabled {
-  will-change: opacity;
   pointer-events: none;
   cursor: default;
-  opacity: 0.4;
 
   & &__faded {
     opacity: 0.4;
+    animation: none;
   }
 
   & &__desaturated {

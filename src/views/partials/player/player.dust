@@ -40,7 +40,7 @@
 
   <button class="player__play-button item--disabled__unclickable">Play Video</button>
 
-  <div class="player__poster item--disabled__desaturated">
+  <div class="player__poster item--disabled__desaturated item--disabled__faded">
 
     <div class="content-block player__poster-episode-info">
       <div class="player__poster-star-rating">

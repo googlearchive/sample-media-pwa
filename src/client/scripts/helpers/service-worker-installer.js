@@ -17,12 +17,15 @@
 
 'use strict';
 
-// import {Toast} from './components/toast';
-// import {PushHandler} from './components/push-handler';
+import Toast from './toast';
 
 class ServiceWorkerInstaller {
+  static get SUPPORTS_OFFLINE () {
+    return ('ReadableStream' in window);
+  }
+
   static init () {
-    if (!('serviceWorker' in navigator)) {
+    if (!ServiceWorkerInstaller.SUPPORTS_OFFLINE) {
       console.log('Service Worker not supported - aborting');
       return;
     }
@@ -41,8 +44,7 @@ class ServiceWorkerInstaller {
             console.log('Service Worker moved from ' +
                       currentVersion + ' to ' + newVersion);
           } else {
-            // Toast.create('Site updated. Refresh to get the latest!');
-            console.log('Site updated. Refresh to get the latest!');
+            Toast.create('Site updated. Refresh to get the latest!');
           }
         }
       }
@@ -52,8 +54,6 @@ class ServiceWorkerInstaller {
       if (!('pushManager' in registration)) {
         return;
       }
-
-      // PushHandler.init();
     });
 
     navigator.serviceWorker.register('/sw.js').then(function (registration) {
@@ -65,8 +65,8 @@ class ServiceWorkerInstaller {
       registration.onupdatefound = function () {
         console.log('A new version has been found... Installing...');
 
-        // If an update is found the spec says that there is a new Service Worker
-        // installing, so we should wait for that to complete then show a
+        // If an update is found the spec says that there is a new Service
+        // Worker installing, so we should wait for that to complete then show a
         // notification to the user.
         registration.installing.onstatechange = function () {
           if (this.state === 'installed') {

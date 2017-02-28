@@ -19,7 +19,6 @@
 
 import Constants from '../constants/constants';
 import Utils from '../helpers/utils';
-import Paths from '../helpers/paths';
 import VideoControls from './video-controls';
 import OfflineCache from '../helpers/offline-cache';
 
@@ -125,15 +124,15 @@ class VideoPlayer {
   }
 
   get isFullScreen () {
-    return (document.fullscreenElement ||
-        this._video.webkitDisplayingFullscreen);
+    return !!(document.isFullScreen ||
+        document.webkitIsFullScreen);
   }
 
   init () {
     Utils.preloadImage(this._poster)
         .then(_ => this._createPoster(this._poster));
 
-    return Utils.loadScript(Paths.SHAKA_PATH)
+    return Utils.loadScript(Constants.PATHS.SHAKA)
         .then(_ => this._initPlayer())
         .then(_ => {
           this._addEventListeners();
@@ -278,12 +277,20 @@ class VideoPlayer {
       return this._videoContainer.requestFullscreen();
     }
 
+    if (this._videoContainer.webkitRequestFullscreen) {
+      return this._videoContainer.webkitRequestFullscreen();
+    }
+
     this._video.webkitEnterFullscreen();
   }
 
   _exitFullScreen () {
     if (document.exitFullscreen) {
       return document.exitFullscreen();
+    }
+
+    if (document.webkitExitFullscreen) {
+      return document.webkitExitFullscreen();
     }
 
     this._video.webkitExitFullscreen();

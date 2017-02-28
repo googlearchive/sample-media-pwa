@@ -30,8 +30,11 @@ const ignore = [
   'home.css',
 ];
 const fs = require('fs');
-const resourceList = [
+const resourceList = [];
+const pathList = [
   '/',
+  '/downloads/',
+  '/settings/'
 ];
 
 const getHomePageAssets = _ => {
@@ -100,6 +103,10 @@ Promise.all([
 ]).then(resources => {
   resourceList.push(...resources[0], ...resources[1]);
 
-  const manifest = `const cacheManifest = ${JSON.stringify(resourceList, null, 2)};\n`;
+  const manifest = [
+    `const pathManifest = ${JSON.stringify(pathList, null, 2)}\n`,
+    `const cacheManifest = ${JSON.stringify(resourceList, null, 2)};\n`
+  ].join('\n');
+
   fs.writeFile('./dist/client/cache-manifest.js', manifest);
 });

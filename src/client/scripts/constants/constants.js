@@ -19,6 +19,8 @@
 
 const constants = {
 
+  APP_NAME: 'Biograf',
+
   // Half a meg chunks.
   CHUNK_SIZE: 1024 * 512,
 
@@ -45,7 +47,12 @@ const constants = {
       src: 'mp4/offline-720p.mpd',
       dest: 'mp4/dash.mpd'
     }
-  ]
+  ],
+
+  PATHS: {
+    VIDEOS: '{@hash path="dist/client/videos.json"}{/hash}',
+    SHAKA: '{@hash path="dist/client/third_party/libs/shaka-player.compiled.js"}{/hash}'
+  }
 };
 
 export default constants;

@@ -50,6 +50,10 @@ limitations under the License.
     .primary-light-col {
       color: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
     }
+
+    .quaternary-col {
+      color: rgb({quaternary.r}, {quaternary.g}, {quaternary.b});
+    }
     {/colors}
 
     {styles|s}
@@ -62,5 +66,16 @@ limitations under the License.
       <a href="/" class="app__header-content-link">
         <h1 class="app__header-content-link-title">Biograf</h1>
       </a>
+
+      <div class="menu">
+        <button class="menu__toggle js-menu">Your Account</button>
+        <div class="menu__list">
+          <div class="menu__list-title quaternary-col js-menu-username">Hey!</div>
+          <ul class="menu__list-items">
+            <li class="menu__list-items-item"><a href="/downloads/">Manage downloads</a></li>
+            <li class="menu__list-items-item"><a href="/settings/">Settings</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
   </header>

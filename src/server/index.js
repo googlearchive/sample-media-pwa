@@ -35,6 +35,8 @@ app.use('/static', require('./apps/static'));
 app.use('/auth', require('./apps/authentication').app);
 app.use('/admin', require('./apps/admin'));
 app.use('/sw.js', require('./apps/service-worker'));
+app.use('/downloads/?', require('./apps/downloads'));
+app.use('/settings/?', require('./apps/settings'));
 app.use('/', require('./apps/dynamic'));
 
 app.listen(PORT, _ => {

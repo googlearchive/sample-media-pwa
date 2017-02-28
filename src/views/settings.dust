@@ -1,0 +1,22 @@
+{>"partials/header" title=title colors=colors /}
+
+<section class="settings main-content">
+  <div class="settings__content content-block">
+    <h2 class="settings__content-title primary-light-col">Settings</h2>
+    <div class="settings__content-list js-content-list">
+      It's your settings!
+
+      <div>
+        <label for="prefetch">Prefetch</label>
+        <input id="prefetch" name="prefetch" class="js-prefetch" data-setting-name="prefetch" type="checkbox" />
+      </div>
+
+      <div>
+        <label for="downloads-only">Show downloads only</label>
+        <input id="downloads-only" name="downloads-only" class="js-downloads-only" data-setting-name="downloads-only" type="checkbox" />
+      </div>
+    </div>
+  </div>
+</section>
+
+{>"partials/footer" scripts=scripts /}

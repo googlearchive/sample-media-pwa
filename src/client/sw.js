@@ -25,6 +25,9 @@ importScripts('{@hash path="dist/client/cache-manifest.js"}{/hash}');
 importScripts('{@hash path="dist/client/third_party/libs/shaka-player.compiled.js"}{/hash}');
 importScripts('{@hash path="dist/client/scripts/ranged-response.js"}{/hash}');
 
+
+// TODO: Hook this up to pull from Constants.
+
 const NAME = 'Biograf';
 const VERSION = '{version}';
 
@@ -33,12 +36,17 @@ self.oninstall = evt => {
     caches
       .open(NAME + '-v' + VERSION)
       .then(cache => {
-        return cacheManifest.map(url => {
+        const toCache = [
+          ...pathManifest,
+          ...cacheManifest
+        ];
+
+        return toCache.map(url => {
           // For each URL in the cacheManifest do a check in the current cache,
           // and copy across any existing asset (we're using hashing so we
           // shouldn't get mistaken hits).
           return caches.match(url).then(cachedResponse => {
-            if (!cachedResponse || url === '/') {
+            if (!cachedResponse || pathManifest.indexOf(url) !== -1) {
               // Anything not already cached should be pulled from the network.
               // Same is true for the home page.
               console.log('Getting ' + url + ' from network.');
