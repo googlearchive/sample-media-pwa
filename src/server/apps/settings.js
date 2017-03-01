@@ -56,7 +56,6 @@ settings.use(require('../middleware/no-cache.js'));
 
 settings.get('/', (req, res) => {
   const viewOptions = Object.assign({}, defaultViewOptions, {
-    title: 'Biograf - settings',
     css: [
       'dist/client/styles/biograf.css'
     ],

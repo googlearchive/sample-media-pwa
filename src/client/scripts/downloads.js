@@ -83,6 +83,10 @@ class Downloads {
   }
 
   _createMarkup (videoData) {
+    if (!videoData) {
+      return '';
+    }
+
     return `
       <div class="downloads__content-list-item">
         <a href="/${videoData.slug}/" class="downloads__content-list-item-link">
@@ -113,15 +117,14 @@ class Downloads {
     ]).then(items => {
       const videos = items[0];
       const library = items[1];
-
-      if (videos.length === 0) {
-        return this._setNoDownloadedContentMesssage();
-      }
-
       const html = videos
           .map(video => VideoLibrary.inflate(video, library))
           .map(video => this._createMarkup(video))
           .join('');
+
+      if (videos.length === 0 || html === '') {
+        return this._setNoDownloadedContentMesssage();
+      }
 
       this._element.innerHTML = html;
 

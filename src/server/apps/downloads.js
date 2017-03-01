@@ -56,7 +56,6 @@ downloads.use(require('../middleware/no-cache.js'));
 
 downloads.get('/', (req, res) => {
   const viewOptions = Object.assign({}, defaultViewOptions, {
-    title: 'Biograf - Downloads',
     css: [
       'dist/client/styles/biograf.css'
     ],
