@@ -29,8 +29,17 @@ class Settings {
     return idbKeyval.set(`${Constants.APP_NAME}_${name}`, value);
   }
 
-  static get (name) {
-    return idbKeyval.get(`${Constants.APP_NAME}_${name}`);
+  static get (name, defaultValue=false) {
+    return idbKeyval.get(`${Constants.APP_NAME}_${name}`)
+        .then(value => {
+          if (value === undefined) {
+            return Settings.set(name, defaultValue).then(_ => {
+              return defaultValue;
+            });
+          }
+
+          return value;
+        });
   }
 }
 

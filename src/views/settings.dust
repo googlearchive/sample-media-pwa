@@ -3,17 +3,47 @@
 <section class="settings main-content">
   <div class="settings__content content-block">
     <h2 class="settings__content-title primary-light-col">Settings</h2>
-    <div class="settings__content-list js-content-list">
-      It's your settings!
+    <p class="settings__text settings__content-description">This is where you an update your settings.</p>
 
-      <div>
-        <label for="prefetch">Prefetch</label>
-        <input id="prefetch" name="prefetch" class="js-prefetch" data-setting-name="prefetch" type="checkbox" />
+    <div class="settings__content-list js-content-list">
+      <div class="settings__content-list-group">
+        <div class="settings__content-list-group-item">
+          <div class="settings__content-list-group-item-control">
+
+            <input id="prefetch"
+                name="prefetch"
+                class="settings__content-list-group-item-control-input js-prefetch" data-setting-name="prefetch"
+                type="checkbox" />
+
+            <label class="settings__content-list-group-item-control-label" for="prefetch">
+              Prefetch popular content
+            </label>
+          </div>
+
+          <p class="settings__text settings__content-list-group-item-description">
+            When enabled, the app will periodically prefetch the first portion of
+            popular content. This means that you when you want to watch video
+            it can begin playback immediately without buffering. Please note:
+            this feature will use bandwidth.</p>
+        </div>
       </div>
 
-      <div>
-        <label for="downloads-only">Show downloads only</label>
-        <input id="downloads-only" name="downloads-only" class="js-downloads-only" data-setting-name="downloads-only" type="checkbox" />
+      <div class="settings__content-list-group">
+        <div class="settings__content-list-group-item">
+          <div class="settings__content-list-group-item-control">
+            <input id="downloads-only"
+                name="downloads-only"
+                class="settings__content-list-group-item-control-input js-downloads-only"
+                data-setting-name="downloads-only"
+                type="checkbox" />
+
+            <label class="settings__content-list-group-item-control-label" for="downloads-only">Show offline content only</label>
+          </div>
+
+          <p class="settings__text settings__content-list-group-item-description">
+            When enabled, you will only be shown content that is available offline.
+          </p>
+        </div>
       </div>
     </div>
   </div>

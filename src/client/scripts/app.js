@@ -23,6 +23,8 @@ import Toast from './helpers/toast';
 import LazyLoadImages from './helpers/lazy-load-images';
 import OfflineCache from './helpers/offline-cache';
 import Settings from './helpers/settings';
+import Utils from './helpers/utils';
+import VideoLibrary from './helpers/video-library';
 import Constants from './constants/constants';
 
 class App {
@@ -39,12 +41,6 @@ class App {
       REMOVING: 2,
       ADDING: 3
     };
-  }
-
-  __PREFETCH () {
-    const path = `https://storage.googleapis.com/biograf-video-files/videos/chr-trailer/${Constants.PREFETCH_MANIFEST}`;
-    this._offlineCache.prefetch(path,
-        Constants.PREFETCH_DEFAULT_BUFFER_GOAL / 2);
   }
 
   constructor () {
@@ -65,14 +61,26 @@ class App {
     this._onCompleteCallback = this._onCompleteCallback.bind(this);
     this._onMenuClick = this._onMenuClick.bind(this);
 
-    this._toggleLinkStates().then(_ => {
+    this._processAppConnectivityState().then(_ => {
       LazyLoadImages.init();
     });
 
+    this._initMenuAndOffline();
+    this._initVideoPlayer();
+  }
+
+  _initMenuAndOffline () {
+    if (!ServiceWorkerInstaller.SUPPORTS_OFFLINE) {
+      return;
+    }
+
+    this._showMenu();
     this._addMenuListeners();
     this._addOfflineToggleListeners();
     this._processSettings();
+  }
 
+  _initVideoPlayer () {
     const video = document.querySelector('video');
     if (!video) {
       return;
@@ -82,7 +90,7 @@ class App {
       offlineSupported: ServiceWorkerInstaller.SUPPORTS_OFFLINE
     });
 
-    this._videoPlayer.init().then(_ => {
+    return this._videoPlayer.init().then(_ => {
       this._videoPlayer.update();
       this._addVideoEventListeners();
     }, err => {
@@ -90,9 +98,42 @@ class App {
     });
   }
 
+  _prefetchPopularVideos () {
+    return VideoLibrary.load()
+      .then(library => VideoLibrary.getAllEpisodes(library.shows))
+      .then(videos => {
+        return videos.reduce((prev, video) => {
+          return prev.then(_ => {
+            if (!video.popular) {
+              return;
+            }
+
+            // TODO remove stale prefetched content.
+            return OfflineCache.hasPrefetched(video.assetPath)
+                .then(hasPrefetched => {
+                  if (hasPrefetched) {
+                    return;
+                  }
+
+                  const compositePath =
+                      `${video.assetPath}/${Constants.PREFETCH_MANIFEST}`;
+
+                  console.log('Prefetching ' + compositePath);
+                  this._offlineCache.prefetch(compositePath,
+                      Constants.PREFETCH_DEFAULT_BUFFER_GOAL / 2);
+                });
+          });
+        }, Promise.resolve());
+      });
+  }
+
   _processSettings () {
     Settings.get('prefetch').then(shouldPrefetch => {
-      console.log('Prefetch enabled: ' + shouldPrefetch);
+      if (!shouldPrefetch) {
+        return OfflineCache.removeAllPrefetched();
+      }
+
+      return this._prefetchPopularVideos();
     });
 
     Settings.get('downloads-only').then(downloadsOnly => {
@@ -108,7 +149,7 @@ class App {
     });
   }
 
-  _toggleLinkStates () {
+  _processAppConnectivityState () {
     switch (this._appConnectivityState) {
       case App.CONNECTIVITY_STATES.ONLINE:
         return this._enableAllLinks();
@@ -167,6 +208,19 @@ class App {
     this._addStatusChangeListeners();
   }
 
+  _showMenu () {
+    const menu = document.querySelector('.menu');
+
+    if (!menu) {
+      return;
+    }
+
+    Utils.assert(ServiceWorkerInstaller.SUPPORTS_OFFLINE,
+      'The menu is only added for browsers supporting offline.');
+
+    menu.classList.add('fade-in');
+  }
+
   _addMenuListeners () {
     document.addEventListener('click', this._onMenuClick);
   }
@@ -184,11 +238,6 @@ class App {
   }
 
   _addOfflineToggleListeners () {
-    if (!ServiceWorkerInstaller.SUPPORTS_OFFLINE) {
-      console.warn('Unable to support offline.');
-      return;
-    }
-
     document.addEventListener('toggle-offline', this._onOfflineToggle);
   }
 
@@ -203,14 +252,14 @@ class App {
 
     // TODO: Hide banner;
     this._appConnectivityState = App.CONNECTIVITY_STATES.ONLINE;
-    this._toggleLinkStates();
+    this._processAppConnectivityState();
   }
 
   _onOffline () {
     // TODO: Show banner;
     this._appConnectivityState = App.CONNECTIVITY_STATES.OFFLINE;
     console.log('Offline');
-    this._toggleLinkStates();
+    this._processAppConnectivityState();
   }
 
   _onProgressCallback (bytesLoaded, bytesTotal) {

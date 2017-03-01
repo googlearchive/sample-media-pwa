@@ -17,12 +17,14 @@
 
 const express = require('express');
 const app = express();
+const compression = require('compression');
 const PORT = process.env.PORT || 8080;
 
 // Init all the global middleware.
 app.use(require('./middleware/session'));
 app.use(require('./middleware/https-redirect'));
 app.use(require('./middleware/hash-removal'));
+app.use(compression());
 
 // Start up passport so that it's available to every app.
 const passport = require('passport');

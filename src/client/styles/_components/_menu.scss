@@ -20,6 +20,12 @@
   display: flex;
   justify-content: flex-end;
   position: relative;
+  opacity: 0;
+  pointer-events: none;
+
+  &.fade-in {
+    pointer-events: auto;
+  }
 
   &__toggle {
     border: none;

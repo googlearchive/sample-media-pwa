@@ -19,12 +19,18 @@
 
 import ServiceWorkerInstaller from './helpers/service-worker-installer';
 import OfflineCache from './helpers/offline-cache';
-import Constants from './constants/constants';
+import VideoLibrary from './helpers/video-library';
 import LazyLoadImages from './helpers/lazy-load-images';
 import Toast from './helpers/toast';
 
 class Downloads {
   constructor () {
+    this._element = document.querySelector('.js-content-list');
+    if (!this._element) {
+      console.warn('Unable to locate download list element.');
+      return;
+    }
+
     if (!ServiceWorkerInstaller.SUPPORTS_OFFLINE) {
       this._setDownloadUnavailableContentMesssage();
       return;
@@ -32,11 +38,6 @@ class Downloads {
 
     this._deletingVideo = false;
     this._offlineCache = new OfflineCache();
-    this._element = document.querySelector('.js-content-list');
-    if (!this._element) {
-      console.warn('Unable to locate download list element.');
-      return;
-    }
 
     this._onClick = this._onClick.bind(this);
     document.addEventListener('click', this._onClick);
@@ -77,40 +78,8 @@ class Downloads {
     });
   }
 
-  _loadVideoLibrary () {
-    return fetch(Constants.PATHS.VIDEOS).then(r => r.json());
-  }
-
   _getAllStoredVideos () {
     return OfflineCache.getAll().then(names => names.sort());
-  }
-
-  _expandVideo (videoPath, library) {
-    const parts = videoPath.split('/');
-    let showTitle = '';
-    let node = library.shows;
-
-    parts.forEach(part => {
-      node = node.find(n => n.slug === part);
-      if (!node) {
-        return;
-      }
-
-      if (!node.episodes) {
-        return;
-      }
-
-      showTitle = node.title;
-      node = node.episodes;
-    });
-
-    // Update the slug to match the path provided.
-    if (node) {
-      node.slug = videoPath;
-      node.showTitle = showTitle;
-    }
-
-    return node;
   }
 
   _createMarkup (videoData) {
@@ -140,7 +109,7 @@ class Downloads {
 
     return Promise.all([
       this._getAllStoredVideos(),
-      this._loadVideoLibrary()
+      VideoLibrary.load()
     ]).then(items => {
       const videos = items[0];
       const library = items[1];
@@ -150,7 +119,7 @@ class Downloads {
       }
 
       const html = videos
-          .map(video => this._expandVideo(video, library))
+          .map(video => VideoLibrary.inflate(video, library))
           .map(video => this._createMarkup(video))
           .join('');
 

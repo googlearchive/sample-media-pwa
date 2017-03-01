@@ -58,6 +58,14 @@ const clamp = (value, min, max) => {
   return Math.max(min, Math.min(max, value));
 };
 
+const assert = (predicate, message) => {
+  if (predicate) {
+    return;
+  }
+
+  throw new Error(message);
+};
+
 export default {
-  loadScript, removeElement, preloadImage, fire, clamp
+  loadScript, removeElement, preloadImage, fire, clamp, assert
 };

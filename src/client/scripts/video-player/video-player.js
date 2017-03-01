@@ -119,6 +119,7 @@ class VideoPlayer {
     this._stopTimeTracking = this._stopTimeTracking.bind(this);
     this._onSeek = this._onSeek.bind(this);
     this._onVideoEnd = this._onVideoEnd.bind(this);
+    this._onVideoStart = this._onVideoStart.bind(this);
     this._updateVideoControlsWithPlayerState =
         this._updateVideoControlsWithPlayerState.bind(this);
   }
@@ -220,7 +221,7 @@ class VideoPlayer {
   }
 
   _addVideoStateEventListeners () {
-    this._video.addEventListener('play', this._startTimeTracking);
+    this._video.addEventListener('play', this._onVideoStart);
     this._video.addEventListener('pause', this._stopTimeTracking);
     this._video.addEventListener('ended', this._onVideoEnd);
     this._video.addEventListener('durationchange',
@@ -398,9 +399,6 @@ class VideoPlayer {
         this._video.play();
         this._video.volume = 1;
       }
-      this._enablePlayerControls();
-      this._setMediaSessionData();
-      this._startChromecastWatch();
     });
   }
 
@@ -599,6 +597,13 @@ class VideoPlayer {
   _onSeek (evt) {
     this._video.currentTime =
         evt.detail.newTime * this._video.duration;
+  }
+
+  _onVideoStart () {
+    this._enablePlayerControls();
+    this._setMediaSessionData();
+    this._startChromecastWatch();
+    this._startTimeTracking();
   }
 
   _onVideoEnd () {

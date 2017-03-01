@@ -40,6 +40,10 @@ class OfflineCache {
     });
   }
 
+  static removeAllPrefetched () {
+    return caches.delete('prefetch');
+  }
+
   static getAll () {
     return caches.keys().then(caches => {
       return caches.filter(c => {
@@ -137,8 +141,6 @@ class OfflineCache {
         chunk
       };
     };
-
-    console.log('Prefetching ', prefetchLimit);
 
     return this._getManifest(manifestPath)
         .then(manifest => this._getRanges(manifestPath, manifest))

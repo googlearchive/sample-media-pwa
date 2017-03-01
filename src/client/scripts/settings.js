@@ -76,6 +76,7 @@ class SettingsManager {
         }
 
         control.checked = values[idx];
+        control.parentNode.classList.add('fade-in');
       });
     });
   }

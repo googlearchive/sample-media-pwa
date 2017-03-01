@@ -26,7 +26,10 @@
   "watch": {
     "build-js-and-sass": {
       "patterns": "src/client",
-      "extensions": ["scss", "js"]
+      "extensions": [
+        "scss",
+        "js"
+      ]
     },
     "copy-server": "src/server",
     "copy-views": {
@@ -60,6 +63,7 @@
   },
   "dependencies": {
     "adaro": "^1.0.4",
+    "compression": "^1.6.2",
     "connect-memcached": "^0.2.0",
     "dustjs-helpers": "^1.7.3",
     "express": "^4.14.0",
