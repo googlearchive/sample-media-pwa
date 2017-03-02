@@ -2,6 +2,185 @@
   "featured": "polymer/sizzle-2015",
   "shows": [
     {
+      "title": "Developer Diary",
+      "slug": "developer-diary",
+      "description": "Paul Lewis runs through building PWAs and explains the challenges he's facing.",
+      "episodes": [
+        {
+          "released": "2016-09-26T01:00:00.000Z",
+          "title": "Season 1, Day 4",
+          "shortDescription": "Day 4 and Paul decides to crack the mast head images for the Chrome Dev Summit site.",
+          "description": "Day 4 and Paul decides to crack the mast head images for the Chrome Dev Summit site. Easier said then done right? Right! With angular cut offs on all the images, Paul has been experimenting with SVG and found a load of ways for the images look wrong on the site. Can he find the solution he wants?",
+          "slug": "s1-day-4",
+          "duration": "352",
+          "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/dd-ep-4",
+          "rating": 4.9,
+          "sources": {
+            "full": "https://storage.googleapis.com/biograf-video-files/videos/dd-ep-4/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "https://storage.googleapis.com/biograf-video-files/videos/dd-ep-4/mp4/dash.mpd",
+            "hls": "https://storage.googleapis.com/biograf-video-files/videos/dd-ep-4/hls/all.m3u8"
+          },
+          "colors": {
+            "primary": {
+              "r": 82,
+              "g": 99,
+              "b": 143
+            },
+            "secondary": {
+              "r": 62,
+              "g": 74,
+              "b": 107
+            },
+            "tertiary": {
+              "r": 41,
+              "g": 50,
+              "b": 72
+            },
+            "quaternary": {
+              "r": 21,
+              "g": 25,
+              "b": 36
+            },
+            "primaryLight": {
+              "r": 164,
+              "g": 198,
+              "b": 255
+            }
+          }
+        },
+
+        {
+          "released": "2016-10-27T01:00:00.000Z",
+          "title": "Season 1, Day 5.2",
+          "shortDescription": "Things are getting a little more visual.",
+          "description": "Things are getting a little more visual: the header has arrived, complete with CSS-only, keyboard-navigable sidenav and a little SVG to give it and angular look.",
+          "slug": "s1-day-5-2",
+          "duration": "329",
+          "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/dd-ep-6",
+          "rating": 4.9,
+          "sources": {
+            "full": "https://storage.googleapis.com/biograf-video-files/videos/dd-ep-6/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "https://storage.googleapis.com/biograf-video-files/videos/dd-ep-6/mp4/dash.mpd",
+            "hls": "https://storage.googleapis.com/biograf-video-files/videos/dd-ep-6/hls/all.m3u8"
+          },
+          "colors": {
+            "primary": {
+              "r": 139,
+              "g": 118,
+              "b": 115
+            },
+            "secondary": {
+              "r": 104,
+              "g": 89,
+              "b": 86
+            },
+            "tertiary": {
+              "r": 70,
+              "g": 59,
+              "b": 58
+            },
+            "quaternary": {
+              "r": 35,
+              "g": 30,
+              "b": 29
+            },
+            "primaryLight": {
+              "r": 255,
+              "g": 236,
+              "b": 230
+            }
+          }
+        },
+
+        {
+          "released": "2016-09-29T01:00:00.000Z",
+          "title": "Season 1, Day 7",
+          "shortDescription": "On #DevDiary Day7 and the site is complete... from a static point of view.",
+          "description": "On #DevDiary Day7 and the site is complete... from a static point of view. Paul shows you around the site & the code and covers some of the next steps for the Chrome Dev Summit site.",
+          "slug": "s1-day-7",
+          "duration": "313",
+          "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/dd-ep-7",
+          "rating": 4.2,
+          "sources": {
+            "full": "https://storage.googleapis.com/biograf-video-files/videos/dd-ep-7/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "https://storage.googleapis.com/biograf-video-files/videos/dd-ep-7/mp4/dash.mpd",
+            "hls": "https://storage.googleapis.com/biograf-video-files/videos/dd-ep-7/hls/all.m3u8"
+          },
+          "colors": {
+            "primary": {
+              "r": 177,
+              "g": 127,
+              "b": 128
+            },
+            "secondary": {
+              "r": 133,
+              "g": 95,
+              "b": 96
+            },
+            "tertiary": {
+              "r": 89,
+              "g": 64,
+              "b": 64
+            },
+            "quaternary": {
+              "r": 44,
+              "g": 32,
+              "b": 32
+            },
+            "primaryLight": {
+              "r": 255,
+              "g": 254,
+              "b": 255
+            }
+          }
+        },
+
+        {
+          "released": "2017-02-03T01:00:00.000Z",
+          "title": "Season 2, Day 2",
+          "shortDescription": "In Developer Diary Media Player #Day2 Paul talks about video formats, focusing on how to do video playback on the web.",
+          "description": "In Developer Diary Media Player #Day2 Paul talks about video formats, focusing on how to do video playback on the web.",
+          "slug": "s2-day-2",
+          "duration": "448",
+          "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/dd-ep-20",
+          "rating": 4.2,
+          "sources": {
+            "full": "https://storage.googleapis.com/biograf-video-files/videos/dd-ep-20/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "https://storage.googleapis.com/biograf-video-files/videos/dd-ep-20/mp4/dash.mpd",
+            "hls": "https://storage.googleapis.com/biograf-video-files/videos/dd-ep-20/hls/all.m3u8"
+          },
+          "colors": {
+            "primary": {
+              "r": 113,
+              "g": 36,
+              "b": 30
+            },
+            "secondary": {
+              "r": 85,
+              "g": 27,
+              "b": 23
+            },
+            "tertiary": {
+              "r": 57,
+              "g": 18,
+              "b": 15
+            },
+            "quaternary": {
+              "r": 28,
+              "g": 9,
+              "b": 8
+            },
+            "primaryLight": {
+              "r": 226,
+              "g": 72,
+              "b": 60
+            }
+          }
+        }
+      ]
+    },
+
+    {
       "title": "Polymer",
       "slug": "polymer",
       "description": "Well, it's only the Chrome Developer Videos",
