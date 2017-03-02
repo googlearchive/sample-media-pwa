@@ -19,12 +19,19 @@ const express = require('express');
 const app = express();
 const compression = require('compression');
 const PORT = process.env.PORT || 8080;
+const compressResponse = req => {
+  if (req.headers['x-no-compression']) {
+    return false;
+  }
+
+  return true;
+};
 
 // Init all the global middleware.
 app.use(require('./middleware/session'));
 app.use(require('./middleware/https-redirect'));
 app.use(require('./middleware/hash-removal'));
-app.use(compression());
+app.use(compression({filter: compressResponse}));
 
 // Start up passport so that it's available to every app.
 const passport = require('passport');

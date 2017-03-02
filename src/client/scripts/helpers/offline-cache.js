@@ -110,9 +110,15 @@ class OfflineCache {
       });
     });
 
+    // Ensure that the request for the page isn't gzipped in response.
+    const headers = new Headers();
+    headers.set('x-no-compression', true);
+
     assets.push({
       request: pagePath,
-      response: fetch(pagePath)
+      response: fetch(pagePath, {
+        headers
+      })
     });
 
     return this._download(name, assets, callbacks);

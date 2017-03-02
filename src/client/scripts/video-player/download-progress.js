@@ -17,6 +17,8 @@
 
 'use strict';
 
+import Utils from '../helpers/utils';
+
 class DownloadProgress {
 
   static get DEFAULT_RADIUS () {
@@ -24,6 +26,8 @@ class DownloadProgress {
   }
 
   static update (target, percentage=0) {
+    percentage = Utils.clamp(percentage, 0, 1);
+
     const START = Math.PI * 0.5;
     const TAU = Math.PI * 2;
 
