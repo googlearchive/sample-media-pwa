@@ -70,6 +70,7 @@ dynamic.engine('dust', adaro.dust(dustOptions));
 dynamic.set('view engine', 'dust');
 dynamic.set('views', viewPath);
 dynamic.use(require('../middleware/no-cache.js'));
+dynamic.set('etag', false);
 
 dynamic.get('/', (req, res) => {
   // The cut-off for when new releases becomes more
