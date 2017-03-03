@@ -2,7 +2,7 @@
 
 <section class="downloads main-content">
   <div class="downloads__content content-block">
-    <h2 class="downloads__content-title primary-light-col">Manage your downloads</h2>
+    <h2 class="downloads__content-title secondary-col">Manage your downloads</h2>
     <div class="downloads__content-list js-content-list">
       Retrieving downloads. Please wait.
     </div>

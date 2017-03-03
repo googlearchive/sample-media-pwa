@@ -2,7 +2,7 @@
 
 <section class="settings main-content">
   <div class="settings__content content-block">
-    <h2 class="settings__content-title primary-light-col">Settings</h2>
+    <h2 class="settings__content-title secondary-col">Settings</h2>
     <p class="settings__text settings__content-description">This is where you an update your settings.</p>
 
     <div class="settings__content-list js-content-list">

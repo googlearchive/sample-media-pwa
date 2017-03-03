@@ -61,6 +61,7 @@ a {
         height: 100%;
         align-items: center;
         text-decoration: none;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
         &-icon {
           width: 24px;

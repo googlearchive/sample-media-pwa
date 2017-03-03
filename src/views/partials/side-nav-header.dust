@@ -1,0 +1,87 @@
+<svg width="100%" height="100%" viewBox="0 0 304 171" preserveAspectRatio="none">
+  <defs>
+    <path id="side-nav-a" d="M0 0h304v171H0z"/>
+    <path id="side-nav-d" d="M138.594 179.04l62.69-136.26 56.66 50.704-92.655 100.06z"/>
+    <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="side-nav-c">
+      <feOffset in="SourceAlpha" result="shadowOffsetOuter1"/>
+      <feGaussianBlur stdDeviation=".5" in="shadowOffsetOuter1" result="shadowBlurOuter1"/>
+      <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0" in="shadowBlurOuter1"/>
+    </filter>
+    <path id="side-nav-f" d="M134.594 179.04l62.69-136.26 46.626 52.243-82.62 98.52z"/>
+    <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="side-nav-e">
+      <feOffset in="SourceAlpha" result="shadowOffsetOuter1"/>
+      <feGaussianBlur stdDeviation=".5" in="shadowOffsetOuter1" result="shadowBlurOuter1"/>
+      <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0" in="shadowBlurOuter1"/>
+    </filter>
+    <path id="side-nav-h" d="M107.387 199.61l26.336-2.33L222.84 26.76 106.254 8.906z"/>
+    <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="side-nav-g">
+      <feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"/>
+      <feGaussianBlur stdDeviation=".5" in="shadowOffsetOuter1" result="shadowBlurOuter1"/>
+      <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0" in="shadowBlurOuter1"/>
+    </filter>
+    <path id="side-nav-j" d="M113.922 185.45L161.227-31 31.647-10.512l47.83 190.555z"/>
+    <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="side-nav-i">
+      <feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"/>
+      <feGaussianBlur stdDeviation="1" in="shadowOffsetOuter1" result="shadowBlurOuter1"/>
+      <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0" in="shadowBlurOuter1"/>
+    </filter>
+    <path d="M111.45 174.336l28.12-183.71-107.922-1.138 30.3 190.555 49.5-5.707z" id="side-nav-l"/>
+    <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="side-nav-k">
+      <feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"/>
+      <feGaussianBlur stdDeviation="1" in="shadowOffsetOuter1" result="shadowBlurOuter1"/>
+      <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0" in="shadowBlurOuter1"/>
+    </filter>
+    <path id="side-nav-n" d="M88.746-12.852l193.24 193.24 58.612-2.638-10.446-210.53z"/>
+    <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="side-nav-m">
+      <feOffset dy="5" in="SourceAlpha" result="shadowOffsetOuter1"/>
+      <feGaussianBlur stdDeviation="10.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"/>
+      <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.349637681 0" in="shadowBlurOuter1"/>
+    </filter>
+    <path id="side-nav-q" d="M101.746 181.914l-55.723-204.7h-71.77V184.45l133.368 1.734z"/>
+    <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="side-nav-p">
+      <feOffset dy="4" in="SourceAlpha" result="shadowOffsetOuter1"/>
+      <feGaussianBlur stdDeviation="3.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"/>
+      <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.640115489 0" in="shadowBlurOuter1"/>
+    </filter>
+    <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="side-nav-r">
+      <stop stop-opacity="0" offset="0%"/>
+      <stop stop-opacity=".103" offset="100%"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <mask id="side-nav-b" fill="#fff">
+      <use xlink:href="#side-nav-a"/>
+    </mask>
+    <use fill="rgb({colors.primary.r}, {colors.primary.g}, {colors.primary.b})" xlink:href="#side-nav-a"/>
+    <path fill="rgb({colors.secondary.r}, {colors.secondary.g}, {colors.secondary.b})" mask="url(#side-nav-b)" d="M152.594 187.04l62.69-136.26 65.657 80.94-101.65 69.823"/>
+    <g mask="url(#side-nav-b)">
+      <use fill="#000" filter="url(#side-nav-c)" xlink:href="#side-nav-d"/>
+      <use fill="rgb({colors.secondary.r}, {colors.secondary.g}, {colors.secondary.b})" xlink:href="#side-nav-d"/>
+    </g>
+    <g mask="url(#side-nav-b)">
+      <use fill="#000" filter="url(#side-nav-e)" xlink:href="#side-nav-f"/>
+      <use fill="rgb({colors.secondary.r}, {colors.secondary.g}, {colors.secondary.b})" xlink:href="#side-nav-f"/>
+    </g>
+    <g mask="url(#side-nav-b)">
+      <use fill="#000" filter="url(#side-nav-g)" xlink:href="#side-nav-h"/>
+      <use fill="rgb({colors.secondary.r}, {colors.secondary.g}, {colors.secondary.b})" xlink:href="#side-nav-h"/>
+    </g>
+    <g mask="url(#side-nav-b)">
+      <use fill="#000" filter="url(#side-nav-i)" xlink:href="#side-nav-j"/>
+      <use fill="rgb({colors.tertiary.r}, {colors.tertiary.g}, {colors.tertiary.b})" xlink:href="#side-nav-j"/>
+    </g>
+    <g mask="url(#side-nav-b)">
+      <use fill="#000" filter="url(#side-nav-k)" xlink:href="#side-nav-l"/>
+      <use fill="rgb({colors.tertiary.r}, {colors.tertiary.g}, {colors.tertiary.b})" xlink:href="#side-nav-l"/>
+    </g>
+    <g mask="url(#side-nav-b)">
+      <use fill="#000" filter="url(#side-nav-m)" xlink:href="#side-nav-n"/>
+      <use fill="rgb({colors.primaryLight.r}, {colors.primaryLight.g}, {colors.primaryLight.b})" xlink:href="#side-nav-n"/>
+    </g>
+    <g mask="url(#side-nav-b)">
+      <use fill="#000" filter="url(#side-nav-p)" xlink:href="#side-nav-q"/>
+      <use fill="rgb({colors.tertiary.r}, {colors.tertiary.g}, {colors.tertiary.b})" xlink:href="#side-nav-q"/>
+    </g>
+    <path fill="url(#side-nav-r)" mask="url(#side-nav-b)" d="M0 116h304v56H0z"/>
+  </g>
+</svg>

@@ -101,6 +101,16 @@
       }
     }
   }
+
+  &__watch-more {
+    padding: 0 0 140px 0;
+
+    &-title {
+      font-size: 16px;
+      margin: 0 0 8px 0;
+      font-weight: 700;
+    }
+  }
 }
 
 @media (min-width: 440px) {
