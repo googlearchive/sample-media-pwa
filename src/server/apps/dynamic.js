@@ -92,7 +92,7 @@ dynamic.get('/', (req, res) => {
 
   res.render('home', viewOptions, (err, html) => {
     if (err) {
-      res.status(500).send('Fail');
+      return res.status(500).send('Fail');
     }
 
     res.set('etag', etag(req, html));
@@ -138,7 +138,7 @@ dynamic.get('/*', (req, res) => {
 
   res.render('video', viewOptions, (err, html) => {
     if (err) {
-      res.status(500).send('Fail');
+      return res.status(500).send('Fail');
     }
 
     res.set('etag', etag(req, html));
