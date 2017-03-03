@@ -29,6 +29,7 @@ const viewPath = path.join(__dirname, '..', '..', 'views');
 const packageReader = require('../utils/package-reader');
 const version = packageReader.getVersion();
 const videoLibrary = require('../utils/video-library');
+const etag = require('../utils/etag');
 const library = videoLibrary.load(libraryPath);
 const inlines = {
   js: fs.readFileSync(path.join(viewPath, 'inlines', 'bootstrap.js'), 'utf-8'),
@@ -70,7 +71,6 @@ dynamic.engine('dust', adaro.dust(dustOptions));
 dynamic.set('view engine', 'dust');
 dynamic.set('views', viewPath);
 dynamic.use(require('../middleware/no-cache.js'));
-dynamic.set('etag', false);
 
 dynamic.get('/', (req, res) => {
   // The cut-off for when new releases becomes more
@@ -90,7 +90,14 @@ dynamic.get('/', (req, res) => {
     inlines
   });
 
-  res.status(200).render('home', viewOptions);
+  res.render('home', viewOptions, (err, html) => {
+    if (err) {
+      res.status(500).send('Fail');
+    }
+
+    res.set('etag', etag(req, html));
+    res.status(200).send(html);
+  });
 });
 
 dynamic.get('/*', (req, res) => {
@@ -101,6 +108,9 @@ dynamic.get('/*', (req, res) => {
 
   const pathParts = fullPath.split('/');
   const search = videoLibrary.find(library.shows, pathParts);
+  const watchMore =
+      videoLibrary.getOtherTitlesInShow(library.shows, pathParts[0], fullPath);
+
   const viewOptions = Object.assign({}, defaultViewOptions, {
     title: `Biograf - ${search.title}`,
     item: search.items,
@@ -110,7 +120,8 @@ dynamic.get('/*', (req, res) => {
     inlines: {
       js: inlines.js
     },
-    fullPath
+    fullPath,
+    watchMore
   });
 
   if (search.items.length === 0) {
@@ -125,7 +136,14 @@ dynamic.get('/*', (req, res) => {
     return res.status(200).render('listing', viewOptions);
   }
 
-  res.status(200).render('video', viewOptions);
+  res.render('video', viewOptions, (err, html) => {
+    if (err) {
+      res.status(500).send('Fail');
+    }
+
+    res.set('etag', etag(req, html));
+    res.status(200).send(html);
+  });
 });
 
 console.log('[App: Dynamic] initialized.');

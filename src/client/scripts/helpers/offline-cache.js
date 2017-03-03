@@ -112,7 +112,7 @@ class OfflineCache {
 
     // Ensure that the request for the page isn't gzipped in response.
     const headers = new Headers();
-    headers.set('x-no-compression', true);
+    headers.set('X-No-Compression', true);
 
     assets.push({
       request: pagePath,
@@ -404,28 +404,32 @@ class OfflineCache {
   }) {
     let byteCount = 0;
     const byteTotal = responses.reduce((byteTotal, r) => {
-      return byteTotal + parseInt(r.headers.get('Content-Length'), 10);
+      let responseLength = parseInt(r.headers.get('Content-Length'), 10);
+      if (Number.isNaN(responseLength)) {
+        responseLength = 0;
+      }
+
+      return byteTotal + responseLength;
     }, 0);
 
-    responses.forEach(response => {
-      const clone = response.clone();
-      const onStreamData = result => {
-        if (result.done) {
-          if (byteCount !== byteTotal) {
-            return;
+    Promise.all(responses.map(response => {
+      return new Promise((resolve, reject) =>{
+        const clone = response.clone();
+        const onStreamData = result => {
+          if (result.done) {
+            return resolve();
           }
 
-          onCompleteCallback(byteTotal);
-          return;
-        }
+          byteCount += result.value.length;
+          onProgressCallback(byteCount, byteTotal);
+          return reader.read().then(onStreamData);
+        };
 
-        byteCount += result.value.length;
-        onProgressCallback(byteCount, byteTotal);
-        return reader.read().then(onStreamData);
-      };
-
-      const reader = clone.body.getReader();
-      reader.read().then(onStreamData);
+        const reader = clone.body.getReader();
+        reader.read().then(onStreamData);
+      });
+    })).then(_ => {
+      onCompleteCallback(byteTotal);
     });
   }
 
