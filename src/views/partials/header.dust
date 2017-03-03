@@ -51,6 +51,10 @@ limitations under the License.
       color: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
     }
 
+    .secondary-col {
+      color: rgb({secondary.r}, {secondary.g}, {secondary.b});
+    }
+
     .quaternary-col {
       color: rgb({quaternary.r}, {quaternary.g}, {quaternary.b});
     }
@@ -63,19 +67,30 @@ limitations under the License.
 <body>
   <header class="app__header">
     <div class="app__header-content">
+      <button class="js-menu-show app__header-menu-toggle">
+        menu
+      </button>
+
       <a href="/" class="app__header-content-link">
         <h1 class="app__header-content-link-title">Biograf</h1>
       </a>
 
-      <div class="menu">
-        <button class="menu__toggle js-menu">Your Account</button>
-        <div class="menu__list">
-          <div class="menu__list-title quaternary-col js-menu-username">Hey!</div>
-          <ul class="menu__list-items">
-            <li class="menu__list-items-item"><a href="/downloads/">Manage downloads</a></li>
-            <li class="menu__list-items-item"><a href="/settings/">Settings</a></li>
-          </ul>
-        </div>
-      </div>
     </div>
   </header>
+
+  <div class="js-side-nav side-nav">
+    <nav class="js-side-nav-container side-nav__container">
+      <header class="side-nav__header primary-bg">
+        {>"partials/side-nav-header" /}
+
+        <h2 class="side-nav__header-title" aria-hidden="true">Biograf</h2>
+      </header>
+
+      <button class="js-menu-hide side-nav__hide">close</button>
+
+      <ul class="side-nav__content">
+        <li><a class="primary-light-col" href="/downloads/">Manage downloads</a></li>
+        <li><a class="primary-light-col" href="/settings/">Settings</a></li>
+      </ul>
+    </nav>
+  </div>

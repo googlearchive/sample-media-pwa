@@ -25,6 +25,7 @@ import OfflineCache from './helpers/offline-cache';
 import Settings from './helpers/settings';
 import Utils from './helpers/utils';
 import VideoLibrary from './helpers/video-library';
+import SideNav from './side-nav/side-nav';
 import Constants from './constants/constants';
 
 class App {
@@ -45,6 +46,7 @@ class App {
 
   constructor () {
     ServiceWorkerInstaller.init();
+    SideNav.init();
 
     // TODO: Restore the user preference here.
     this._appConnectivityState = navigator.onLine ?
@@ -59,7 +61,6 @@ class App {
     this._onOfflineToggle = this._onOfflineToggle.bind(this);
     this._onProgressCallback = this._onProgressCallback.bind(this);
     this._onCompleteCallback = this._onCompleteCallback.bind(this);
-    this._onMenuClick = this._onMenuClick.bind(this);
 
     this._processAppConnectivityState().then(_ => {
       LazyLoadImages.init();
@@ -74,8 +75,6 @@ class App {
       return;
     }
 
-    this._showMenu();
-    this._addMenuListeners();
     this._addOfflineToggleListeners();
     this._processSettings();
   }
@@ -206,23 +205,6 @@ class App {
 
   _addVideoEventListeners () {
     this._addStatusChangeListeners();
-  }
-
-  _showMenu () {
-    const menu = document.querySelector('.menu');
-
-    if (!menu) {
-      return;
-    }
-
-    Utils.assert(ServiceWorkerInstaller.SUPPORTS_OFFLINE,
-      'The menu is only added for browsers supporting offline.');
-
-    menu.classList.add('fade-in');
-  }
-
-  _addMenuListeners () {
-    document.addEventListener('click', this._onMenuClick);
   }
 
   _addStatusChangeListeners () {
