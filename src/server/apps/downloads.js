@@ -61,13 +61,19 @@ downloads.get('/', (req, res) => {
     ],
     colors: {
       primary: {
-        r: 25, g: 213, b: 185
+        r: 171, g: 247, b: 226
       },
       primaryLight: {
+        r: 218, g: 242, b: 245
+      },
+      secondary: {
         r: 25, g: 213, b: 185
       },
+      tertiary: {
+        r: 59, g: 85, b: 94
+      },
       quaternary: {
-        r: 12, g: 103, b: 90
+        r: 36, g: 52, b: 57
       }
     }
   });
