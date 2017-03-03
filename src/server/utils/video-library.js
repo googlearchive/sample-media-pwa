@@ -81,9 +81,19 @@ class VideoLibrary {
         .slice(start, limit + start);
   }
 
-  static getOtherTitlesInShow (library, showName) {
-    const showNames = Object.keys(library);
-    return null;
+  static getOtherTitlesInShow (library, showPath, ignore) {
+    const show = this.find(library, [showPath]);
+    if (!ignore) {
+      return show;
+    }
+
+    show.items = show.items.filter(s => {
+      console.log(showPath, s.slug, ignore);
+
+      return `${showPath}/${s.slug}` !== ignore;
+    });
+
+    return show;
   }
 
   static find (library, path) {
