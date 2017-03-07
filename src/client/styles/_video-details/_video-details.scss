@@ -16,8 +16,10 @@
  */
 
 .video-details {
+  padding: 0 8px;
+
   &__info {
-    padding: 20px 8px 120px 8px;
+    padding: 20px 0 120px 0;
     display: flex;
     flex-direction: column;
     font-size: 14px;
