@@ -71,9 +71,7 @@ limitations under the License.
         menu
       </button>
 
-      <a href="/" class="app__header-content-link">
-        <h1 class="app__header-content-link-title">Biograf</h1>
-      </a>
+      <h1 class="app__header-content-link-title">Biograf</h1>
 
     </div>
   </header>
@@ -89,6 +87,7 @@ limitations under the License.
       <button class="js-menu-hide side-nav__hide">close</button>
 
       <ul class="side-nav__content">
+        <li><a class="primary-light-col" href="/">Home</a></li>
         <li><a class="primary-light-col" href="/downloads/">Manage downloads</a></li>
         <li><a class="primary-light-col" href="/settings/">Settings</a></li>
       </ul>
