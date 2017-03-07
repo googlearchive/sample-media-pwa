@@ -1,6 +1,6 @@
 <div class="player primary-light-col js-item-link" data-href="{href}">
 
-  <video class="player__element" preload="metadata"
+  <video class="player__element" preload="metadata" playsinline
       data-cast-src="{castSrc}"
       data-title="{episodeTitle}"
       data-show-title="{showTitle}"
