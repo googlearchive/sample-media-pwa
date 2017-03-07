@@ -88,8 +88,6 @@ class VideoLibrary {
     }
 
     show.items = show.items.filter(s => {
-      console.log(showPath, s.slug, ignore);
-
       return `${showPath}/${s.slug}` !== ignore;
     });
 
