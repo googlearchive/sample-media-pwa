@@ -612,13 +612,13 @@ class VideoPlayer {
   }
 
   _onOrientationChanged () {
-    // Ignore orientation changes when not playing the video.
-    if (this._video.paused) {
-      return;
-    }
-
     const isLandscape = window.screen.orientation.type.startsWith('landscape');
     if (isLandscape) {
+      // Don't go FS when not playing the video.
+      if (this._video.paused) {
+        return;
+      }
+
       this._enterFullScreen();
       return;
     }
