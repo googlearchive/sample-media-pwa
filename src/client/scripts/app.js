@@ -23,7 +23,6 @@ import Toast from './helpers/toast';
 import LazyLoadImages from './helpers/lazy-load-images';
 import OfflineCache from './helpers/offline-cache';
 import Settings from './helpers/settings';
-import Utils from './helpers/utils';
 import VideoLibrary from './helpers/video-library';
 import SideNav from './side-nav/side-nav';
 import Constants from './constants/constants';
