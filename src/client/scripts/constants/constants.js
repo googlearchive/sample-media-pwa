@@ -42,6 +42,7 @@ const constants = {
     'artwork@512.jpg',
     'poster-small.jpg',
     'poster.jpg',
+    'thumbnail-strip.jpg',
     {
       // TODO: Make this based on user preference.
       src: 'mp4/offline-720p.mpd',

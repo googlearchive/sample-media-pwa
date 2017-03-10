@@ -84,6 +84,7 @@ class VideoPlayer {
     this._title = title;
     this._showTitle = showTitle;
     this._assetPath = assetPath;
+    this._thumbnailPath = `${assetPath}/thumbnail-strip.jpg`;
     this._video = video;
     this._videoContainer = this._video.parentNode;
     this._videoControls = null;
@@ -132,6 +133,9 @@ class VideoPlayer {
   init () {
     Utils.preloadImage(this._poster)
         .then(_ => this._createPoster(this._poster));
+
+    Utils.preloadImage(this._thumbnailPath)
+        .then(_ => this._createThumbnail(this._thumbnailPath));
 
     return Utils.loadScript(Constants.PATHS.SHAKA)
         .then(_ => this._initPlayer())
@@ -184,9 +188,18 @@ class VideoPlayer {
   }
 
   _createPoster (poster) {
-    const posterElement = this._videoContainer.querySelector('.player__poster');
+    const posterElement = this._videoContainer.querySelector('.js-poster');
     posterElement.style.backgroundImage = `url(${poster})`;
     posterElement.classList.add('fade-and-scale-in');
+  }
+
+  _createThumbnail (thumbnailPath) {
+    const thumbnailImg = new Image();
+    thumbnailImg.src = thumbnailPath;
+    thumbnailImg.classList.add('js-thumbnail-image-inner-content');
+
+    const container = this._videoContainer.querySelector('.js-thumbnail-image-inner');
+    container.appendChild(thumbnailImg);
   }
 
   _addEventListeners () {

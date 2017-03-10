@@ -22,12 +22,16 @@ import DownloadProgress from './download-progress';
 
 class VideoControls {
 
+  static get THUMBNAIL_HEIGHT () {
+    return 81;
+  }
+
   static get OFFLINE_BUTTON_SELECTOR () {
     return 'js-offline-button';
   }
 
   static get HIDE_TIMEOUT () {
-    return 500;
+    return 50000;
   }
 
   constructor (videoControls) {
@@ -45,9 +49,15 @@ class VideoControls {
     this._duration = this._videoControls.querySelector('.js-duration');
     this._replay = document.querySelector('.js-replay');
     this._offline = document.querySelectorAll('.js-offline');
+    this._thumbnail = document.querySelector('.js-thumbnail');
+    this._thumbnailImage = this._thumbnail.querySelector('.js-thumbnail-image');
+    this._thumbnailImageInner =
+        this._thumbnail.querySelector('.js-thumbnail-image-inner');
+    this._thumbnailImageInnerContent = undefined;
 
     this._enabled = false;
     this._pendingHide = undefined;
+    this._thumbnailHeight = undefined;
     this._castConnected = false;
     this._trackDrag = false;
     this._trackBCR = null;
@@ -198,6 +208,8 @@ class VideoControls {
 
     const normalizedTime = time / duration;
     this._setTimeTrackPosition(normalizedTime);
+    this._setThumbnailPosition(normalizedTime);
+    this._setThumbnailImagePosition(normalizedTime);
   }
 
   updateOfflineProgress (percentage) {
@@ -242,6 +254,49 @@ class VideoControls {
 
     this._playhead.style.transform =
         `translateX(${(normalizedPosition - 1) * 100}%)`;
+  }
+
+  _setThumbnailPosition (normalizedPosition) {
+    if (!this._thumbnailImage) {
+      return;
+    }
+
+    if (!this._trackBCR) {
+      return;
+    }
+
+    const playheadPosition =
+        this._trackBCR.left + normalizedPosition * this._trackBCR.width;
+
+    // If the playhead button is to the left of 80px then the thumbnail image
+    // will be off the screen, so transform it by that amount to the right.
+    if (playheadPosition < 80) {
+      const x = 80 - playheadPosition;
+      this._thumbnailImage.style.transform = `translateX(${x}px)`;
+    }
+  }
+
+  _setThumbnailImagePosition (normalizedPosition) {
+    if (!this._thumbnailImageInnerContent) {
+      this._thumbnailImageInnerContent =
+          document.querySelector('.js-thumbnail-image-inner-content');
+    }
+
+    if (!this._thumbnailImageInnerContent) {
+      return;
+    }
+
+    if (!this._thumbnailHeight) {
+      this._thumbnailHeight = this._thumbnailImageInnerContent.offsetHeight;
+    }
+
+    const availableHeight =
+        this._thumbnailHeight - VideoControls.THUMBNAIL_HEIGHT;
+    const index = Math.floor((normalizedPosition * availableHeight) /
+        VideoControls.THUMBNAIL_HEIGHT);
+    const offset = index * VideoControls.THUMBNAIL_HEIGHT;
+    this._thumbnailImageInnerContent.style.transform =
+        `translateY(-${offset}px)`;
   }
 
   _formatDuration (secs) {
@@ -322,24 +377,22 @@ class VideoControls {
         this._videoControls.classList.contains('player__controls--visible');
 
     if (!controlsVisible) {
-      evt.preventDefault();
       this.showControls();
       return;
     }
 
     this._trackDrag = ('timeTrack' in evt.target.dataset);
-
     if (!this._trackDrag) {
       return;
     }
 
-    if (this._trackBCR) {
-      this._evtToTrackPosition(evt);
-      return;
+    this._thumbnail.classList.add('player__thumbnail--visible');
+
+    // Lazily pick up a read on how wide the track is.
+    if (!this._trackBCR) {
+      this._trackBCR = evt.target.getBoundingClientRect();
     }
 
-    // Get a read on the target element's dimensions.
-    this._trackBCR = evt.target.getBoundingClientRect();
     this._evtToTrackPosition(evt);
   }
 
@@ -354,6 +407,8 @@ class VideoControls {
   }
 
   _onInputUp (evt) {
+    this._thumbnail.classList.remove('player__thumbnail--visible');
+
     if (!this._trackDrag) {
       return;
     }
@@ -385,6 +440,8 @@ class VideoControls {
         1);
 
     this._setTimeTrackPosition(normalizedPosition);
+    this._setThumbnailPosition(normalizedPosition);
+    this._setThumbnailImagePosition(normalizedPosition);
     return normalizedPosition;
   }
 

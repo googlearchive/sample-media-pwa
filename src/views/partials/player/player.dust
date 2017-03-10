@@ -23,7 +23,13 @@
       <div class="player__controls-standard-time js-time-track" data-time-track="true">
         <div class="player__controls-standard-time-track primary-light-bg"></div>
         <div class="player__controls-standard-time-track-used primary-bg js-time-used"></div>
-        <button class="player__controls-standard-time-track-playhead js-playhead"></button>
+        <button class="player__controls-standard-time-track-playhead js-playhead">
+          <div class="player__thumbnail js-thumbnail">
+            <div class="player__thumbnail-image js-thumbnail-image">
+              <div class="player__thumbnail-image-inner js-thumbnail-image-inner"></div>
+            </div>
+          </div>
+        </button>
       </div>
       <div class="player__controls-standard-video-duration js-duration"></div>
       <button class="player__controls-standard-toggle-volume js-volume" data-type="toggle-volume">Toggle Volume</button>
@@ -40,7 +46,7 @@
 
   <button class="player__play-button item--disabled__unclickable">Play Video</button>
 
-  <div class="player__poster item--disabled__desaturated item--disabled__faded">
+  <div class="player__poster item--disabled__desaturated item--disabled__faded js-poster">
 
     <div class="content-block player__poster-episode-info">
       <div class="player__poster-star-rating">
