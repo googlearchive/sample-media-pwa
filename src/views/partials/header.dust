@@ -68,21 +68,18 @@ limitations under the License.
   <header class="app__header">
     <div class="app__header-content">
       <button class="js-menu-show app__header-menu-toggle">
-        menu
+        Biograf
       </button>
-
-      <h1 class="app__header-content-link-title">Biograf</h1>
-
     </div>
   </header>
 
   <div class="js-side-nav side-nav">
     <nav class="js-side-nav-container side-nav__container">
-      <header class="side-nav__header primary-bg">
+      <section class="side-nav__header primary-bg">
         {>"partials/side-nav-header" /}
 
         <h2 class="side-nav__header-title" aria-hidden="true">Biograf</h2>
-      </header>
+      </section>
 
       <button class="js-menu-hide side-nav__hide">close</button>
 

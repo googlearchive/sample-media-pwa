@@ -51,6 +51,18 @@ a {
     box-shadow: 0 2px 7px rgba(0, 0, 0, 0.3);
     z-index: 10000;
 
+    &-menu-toggle {
+      border: none;
+      height: 24px;
+      display: block;
+      padding: 0 0 0 32px;
+      margin: 0;
+      color: #FFF;
+      background: url(/static/images/header/ic_menu_white_24px.svg) left center no-repeat;
+      font-size: 16px;
+      font-weight: 400;
+    }
+
     &-content {
       display: flex;
       height: 100%;
@@ -67,19 +79,6 @@ a {
           width: 24px;
           height: 24px;
           margin-right: 8px;
-        }
-
-        &-title {
-          font-size: 16px;
-          color: #FFF;
-          opacity: 0.8;
-          font-weight: 400;
-          margin: 0;
-
-          &:hover {
-            transition: opacity 0.2s ease-out;
-            opacity: 1;
-          }
         }
       }
     }
