@@ -63,7 +63,6 @@ const defaultViewOptions = {
 
 if (process.env.NODE_ENV === 'production') {
   dustOptions.cache = true;
-  dustOptions.whitespace = false;
   console.log('[App: Dynamic] Templating is cached.');
 }
 
