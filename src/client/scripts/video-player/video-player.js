@@ -306,6 +306,12 @@ class VideoPlayer {
       this._player.configure({
         abr: {
           defaultBandwidthEstimate: VideoPlayer.DEFAULT_BANDWIDTH
+        },
+
+        drm: {
+          servers: {
+            'com.widevine.alpha': 'https://widevine-proxy.appspot.com/proxy'
+          }
         }
       });
 
