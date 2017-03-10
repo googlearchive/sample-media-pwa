@@ -25,12 +25,12 @@ class LazyLoadImages {
     return ('IntersectionObserver' in window);
   }
 
-  static get THRESHOLD () {
-    return 0.01;
-  }
-
   static get HANDLED_CLASS () {
     return 'js-lazy-image--handled';
+  }
+
+  static get THRESHOLD () {
+    return 0.01;
   }
 
   static init () {
@@ -38,6 +38,7 @@ class LazyLoadImages {
       this._instance._disconnect();
     }
 
+    this._count = 0;
     this._instance = new LazyLoadImages();
   }
 
@@ -54,6 +55,7 @@ class LazyLoadImages {
       return;
     }
 
+    this._count = images.length;
     this._onIntersection = this._onIntersection.bind(this);
     this._observer = new IntersectionObserver(this._onIntersection, config);
     images.forEach(image => {
@@ -79,13 +81,16 @@ class LazyLoadImages {
         return;
       }
 
-      if (entry.target.classList.contains(LazyLoadImages.HANDLED_CLASS)) {
-        return;
-      }
-
-      entry.target.classList.add('js-lazy-image--handled');
+      this._count--;
+      this._observer.unobserve(entry.target);
       this._preloadImage(entry.target);
     });
+
+    if (this._count > 0) {
+      return;
+    }
+
+    this._observer.disconnect();
   }
 
   _preloadImage (image) {
@@ -107,6 +112,8 @@ class LazyLoadImages {
       return;
     }
 
+    // Prevent this from being lazy loaded a second time.
+    img.classList.add(LazyLoadImages.HANDLED_CLASS);
     el.style.backgroundImage = `url(${src})`;
     el.classList.add('fade-in');
   }
