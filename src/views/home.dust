@@ -9,7 +9,8 @@
   castSrc=featured.items.sources.full
   rating=featured.items.rating
   assetPath=featured.items.assetPath
-  href=featured.items.href /}
+  href=featured.items.href
+  drm=featured.item.drm /}
 
 
 <div class="featured-episode">

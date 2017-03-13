@@ -7,7 +7,9 @@
       data-asset-path="{assetPath}"
       data-poster="{assetPath}/poster.jpg"
       data-src="{dash}"
-      data-hls="{hls}"></video>
+      data-hls="{hls}"
+      data-drm-name="{drm.name}"
+      data-drm-url="{drm.url}"></video>
 
   <div class="player__controls">
     <div class="player__controls-big">

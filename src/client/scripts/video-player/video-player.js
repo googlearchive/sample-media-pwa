@@ -52,6 +52,19 @@ class VideoPlayer {
     return ('orientation' in window.screen);
   }
 
+  static wrapDRMInfo (name, url) {
+    if (!name) {
+      return;
+    }
+
+    const drm = {
+      servers: {}
+    };
+
+    drm.servers[name] = url;
+    return drm;
+  }
+
   constructor (video, {offlineSupported}={}) {
     if (!video) {
       throw new Error('No video element provided.');
@@ -64,6 +77,8 @@ class VideoPlayer {
     const showTitle = video.dataset.showTitle;
     const castSrc = video.dataset.castSrc;
     const assetPath = video.dataset.assetPath;
+    const assetDRM = VideoPlayer.wrapDRMInfo(video.dataset.drmName,
+        video.dataset.drmUrl);
 
     if (!manifest) {
       console.log('Video without manifest. Bailing.');
@@ -84,6 +99,7 @@ class VideoPlayer {
     this._title = title;
     this._showTitle = showTitle;
     this._assetPath = assetPath;
+    this._assetDRM = assetDRM;
     this._thumbnailPath = `${assetPath}/thumbnail-strip.jpg`;
     this._video = video;
     this._videoContainer = this._video.parentNode;
@@ -321,11 +337,7 @@ class VideoPlayer {
           defaultBandwidthEstimate: VideoPlayer.DEFAULT_BANDWIDTH
         },
 
-        drm: {
-          servers: {
-            'com.widevine.alpha': 'https://widevine-proxy.appspot.com/proxy'
-          }
-        }
+        drm: this._assetDRM
       });
 
       boot = boot

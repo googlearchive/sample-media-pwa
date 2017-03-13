@@ -395,6 +395,10 @@
             "dash": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-31/mp4/dash.mpd",
             "hls": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-31/hls/all.m3u8"
           },
+          "drm": {
+            "name": "com.widevine.alpha",
+            "url": "https://widevine-proxy.appspot.com/proxy"
+          },
           "colors": {
             "primary": {
               "r": 82,
