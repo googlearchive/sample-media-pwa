@@ -31,7 +31,7 @@ class VideoControls {
   }
 
   static get HIDE_TIMEOUT () {
-    return 50000;
+    return 500;
   }
 
   constructor (videoControls) {
@@ -377,6 +377,7 @@ class VideoControls {
         this._videoControls.classList.contains('player__controls--visible');
 
     if (!controlsVisible) {
+      evt.stopImmediatePropagation();
       this.showControls();
       return;
     }
