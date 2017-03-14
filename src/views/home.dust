@@ -17,7 +17,7 @@
   <h2 class="featured-episode__show-title">{featured.breadcrumbs[0]}</h2>
   <h3 class="featured-episode__episode-title">{featured.items.title}</h3>
   <div class="featured-episode__star-rating">
-    {>"partials/star-rating" ratingColors=featured.items.colors rating=featured.items.rating /}
+    {>"partials/star-rating" id="secondary" ratingColors=featured.items.colors rating=featured.items.rating /}
   </div>
 </div>
 
@@ -49,7 +49,7 @@
               </div>
 
               <div class="home__new-releases-list-item-meta-star-rating">
-                {>"partials/star-rating" ratingColors=featured.items.colors rating=rating /}
+                {>"partials/star-rating" id=$idx ratingColors=featured.items.colors rating=rating /}
               </div>
             </div>
           </a>
