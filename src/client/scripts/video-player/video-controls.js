@@ -324,7 +324,6 @@ class VideoControls {
     const detail = {};
 
     evt.stopImmediatePropagation();
-
     if (!type) {
       this.showControls();
       return;
@@ -377,8 +376,6 @@ class VideoControls {
         this._videoControls.classList.contains('player__controls--visible');
 
     if (!controlsVisible) {
-      evt.stopImmediatePropagation();
-      this.showControls();
       return;
     }
 
@@ -408,6 +405,16 @@ class VideoControls {
   }
 
   _onInputUp (evt) {
+    const controlsVisible =
+        this._videoControls.classList.contains('player__controls--visible');
+
+    if (!controlsVisible) {
+      evt.preventDefault();
+      evt.stopImmediatePropagation();
+      this.showControls();
+      return;
+    }
+
     this._thumbnail.classList.remove('player__thumbnail--visible');
 
     if (!this._trackDrag) {
