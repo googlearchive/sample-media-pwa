@@ -111,6 +111,8 @@ class VideoPlayer {
     this._videoIsAvailableOffline = false;
     this._offlineSupported = offlineSupported;
     this._href = this._videoContainer.dataset.href;
+    this._previousDeviceOrientation = undefined;
+    this._currentDeviceOrientation = undefined;
 
     // Handlers.
     this._onKeyDown = this._onKeyDown.bind(this);
@@ -126,6 +128,8 @@ class VideoPlayer {
     this._onChromecast = this._onChromecast.bind(this);
     this._onVolumeToggle = this._onVolumeToggle.bind(this);
     this._onOrientationChanged = this._onOrientationChanged.bind(this);
+    this._onDeviceOrientationChange =
+        this._onDeviceOrientationChange.bind(this);
     this._onBufferChanged = this._onBufferChanged.bind(this);
     this._onRemoteConnecting = this._onRemoteConnecting.bind(this);
     this._onRemoteConnect = this._onRemoteConnect.bind(this);
@@ -228,6 +232,8 @@ class VideoPlayer {
 
   _addFullscreenEventListeners () {
     window.addEventListener('fullscreenchange', this._onFullScreenChanged);
+    window.addEventListener('webkitfullscreenchange',
+        this._onFullScreenChanged);
     this._video.addEventListener('webkitfullscreenchange',
         this._updateVideoControlsWithPlayerState);
   }
@@ -315,6 +321,9 @@ class VideoPlayer {
   }
 
   _exitFullScreen () {
+    window.removeEventListener('deviceorientation',
+      this._onDeviceOrientationChange);
+
     if (document.exitFullscreen) {
       return document.exitFullscreen();
     }
@@ -431,10 +440,6 @@ class VideoPlayer {
         this._video.volume = 1;
       }
     });
-  }
-
-  _onNetworkResponse (response) {
-    console.log(response);
   }
 
   _initPlayerControls () {
@@ -556,7 +561,11 @@ class VideoPlayer {
     }
 
     if (this.isFullScreen) {
-      return window.screen.orientation.lock('landscape').catch(_ => {
+      return window.screen.orientation.lock('landscape').then(_ => {
+        // Listen for the device going back to portrait in order to unlock it.
+        window.addEventListener('deviceorientation',
+            this._onDeviceOrientationChange);
+      }).catch(_ => {
         // Silently swallow errors from attempting to lock the orientation.
         // This only works in the case of web apps added to home screens, but
         // we want to call it anyway.
@@ -659,6 +668,30 @@ class VideoPlayer {
     }
 
     this._exitFullScreen();
+  }
+
+  _onDeviceOrientationChange (evt) {
+    if (!VideoPlayer.SUPPORTS_ORIENTATION_LOCK) {
+      return;
+    }
+
+    // event.beta represents a front to back motion of the device and
+    // event.gamma a left to right motion.
+    if (Math.abs(evt.gamma) > 10 || Math.abs(evt.beta) < 10) {
+      this._previousDeviceOrientation = this._currentDeviceOrientation;
+      this._currentDeviceOrientation = 'landscape';
+      return;
+    }
+
+    if (Math.abs(evt.gamma) < 10 || Math.abs(evt.beta) > 10) {
+      this._previousDeviceOrientation = this._currentDeviceOrientation;
+      // When device is rotated back to portrait, unlock the screen orientation.
+      if (this._previousDeviceOrientation == 'landscape') {
+        screen.orientation.unlock();
+        window.removeEventListener('deviceorientation',
+          this._onDeviceOrientationChange);
+      }
+    }
   }
 
   _onFullScreenToggle () {
