@@ -44,11 +44,11 @@ class RangedResponse {
       return Promise.resolve(false);
     }
 
-    // First check for the entire file in cache storage.
-    return caches.match(request.url)
-        .then(response => {
-          if (response) {
-            return true;
+    // First check for the first chunk in cache storage.
+    return caches.match(`${request.url}_0`)
+        .then(firstChunk => {
+          if (!firstChunk) {
+            return false;
           }
 
           // Failing that, look up the chunks that would be needeed, and assume
@@ -56,7 +56,12 @@ class RangedResponse {
           // is sufficient for success.
           const header = request.headers.get('Range');
           const rangeHeader = header.trim().toLowerCase();
-          const {start, end} = this._getStartAndEnd(rangeHeader);
+          const size = parseInt(firstChunk.headers.get('Content-Length'), 10);
+          if (!size) {
+            return false;
+          }
+
+          const {start, end} = this._getStartAndEnd(rangeHeader, size);
           const startIndex = Math.floor(start / Constants.CHUNK_SIZE);
           const endIndex = Math.floor(end / Constants.CHUNK_SIZE);
 
@@ -85,7 +90,7 @@ class RangedResponse {
                   requires ${end}.`);
             }
 
-            return finalByteInEndChunk > end;
+            return finalByteInEndChunk >= end;
           });
         });
   }
@@ -96,7 +101,7 @@ class RangedResponse {
     }
   }
 
-  static _getStartAndEnd (rangeHeader) {
+  static _getStartAndEnd (rangeHeader, size) {
     if (!rangeHeader.startsWith('bytes=')) {
       throw new Error('Invalid range unit');
     }
@@ -106,9 +111,19 @@ class RangedResponse {
       throw new Error('Invalid range unit');
     }
 
-    const start = Number(rangeParts[1]);
-    // Range values are inclusive, so add 1 to the value.
-    const end = Number(rangeParts[2]) + 1;
+    let start = 0;
+    let end = 0;
+    if (rangeParts[1] === '') {
+      start = size - Number(rangeParts[2]);
+      end = size;
+    } else if (rangeParts[2] === '') {
+      start = Number(rangeParts[1]);
+      end = size;
+    } else {
+      start = Number(rangeParts[1]);
+      // Range values are inclusive, so add 1 to the value.
+      end = Number(rangeParts[2]) + 1;
+    }
 
     if (start < 0) {
       throw new Error('Range not satisfiable');
