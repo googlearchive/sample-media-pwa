@@ -124,9 +124,26 @@ dynamic.get('/*', (req, res) => {
   });
 
   if (search.items.length === 0) {
-    return res.status(400).render('404', {
-      text: 'No findey'
-    });
+    return res.status(404).render('404',
+      Object.assign({
+        colors: {
+          primary: {
+            r: 171, g: 247, b: 226
+          },
+          primaryLight: {
+            r: 218, g: 242, b: 245
+          },
+          secondary: {
+            r: 25, g: 213, b: 185
+          },
+          tertiary: {
+            r: 59, g: 85, b: 94
+          },
+          quaternary: {
+            r: 36, g: 52, b: 57
+          }
+        }
+      }, viewOptions));
   } else if (Array.isArray(search.items)) {
     if (search.items.length === 1) {
       return res.redirect(`${search.items[0].slug}/`);

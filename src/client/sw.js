@@ -95,6 +95,7 @@ self.onmessage = evt => {
 };
 
 self.onfetch = evt => {
+  const FETCH_TIMEOUT = 10000;
   const request = evt.request;
 
   evt.respondWith(
@@ -111,7 +112,18 @@ self.onfetch = evt => {
             return response;
           }
 
-          return fetch(evt.request);
+          return Promise.race([
+            fetch(evt.request),
+            new Promise(resolve => {
+              setTimeout(resolve, FETCH_TIMEOUT);
+            })
+          ]).then(response => {
+            if (response) {
+              return response;
+            }
+
+            return caches.match('/404/');
+          });
         });
     })
   );

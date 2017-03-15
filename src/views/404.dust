@@ -1,8 +1,12 @@
-{>"partials/header" title=title css=inlines.css /}
+{>"partials/header" title=title styles=inlines.css colors=featured.items.colors /}
 
-<div>
-<h1>404</h1>
-<p>{text}</p>
-</div>
+<section class="home main-content">
+  <div class="home__new-releases content-block">
+    <h2 class="home__new-releases-title primary-light-col">Page Not Found!</h2>
+    <p>Sorry - can't find what you're looking for! It may be that your connection is slow,
+      or that the content doesn't exist.
+    </p>
+  </div>
+</section>
 
-{>"partials/footer" js=inlines.js /}
+{>"partials/footer" inline=inlines.js scripts=scripts /}
