@@ -27,7 +27,70 @@ class OfflineCache {
     }
 
     name = this.convertPathToName(name);
-    return caches.has(name);
+    return this.purgePartialDownloads(name).then(_ => {
+      return caches.has(name);
+    });
+  }
+
+  static purgePartialDownloads (name) {
+    name = this.convertPathToName(name);
+    return caches.has(name).then(hasCacheOfName => {
+      if (!hasCacheOfName) {
+        return;
+      }
+
+      return caches.open(name)
+          // 1. Get all the items in the cache.
+          .then(cache => cache.keys())
+          .then(cacheItems => {
+            // 2. Locate the chunks, if there are any.
+            let maxIndex = Number.NEGATIVE_INFINITY;
+            let url = '';
+
+            cacheItems.forEach(item => {
+              const endsInNumber = /_(\d+)$/.exec(item.url);
+              if (!endsInNumber) {
+                return;
+              }
+
+              const chunkIndex = parseInt(endsInNumber[1], 10);
+              if (chunkIndex < maxIndex) {
+                return;
+              }
+
+              maxIndex = chunkIndex;
+              url = item.url;
+            });
+
+            // No chunks stored at all.
+            if (maxIndex === Number.NEGATIVE_INFINITY) {
+              return;
+            }
+
+            if (url === '') {
+              return;
+            }
+
+            // 3. Compare the largest chunk index to what we'd expect to have.
+            return caches.match(url).then(chunk => {
+              return parseInt(chunk.headers.get('Content-Length'), 10);
+            }).then(videoSize => {
+              if (isNaN(videoSize)) {
+                return;
+              }
+
+              const expectedIndex =
+                  Math.floor(videoSize / Constants.CHUNK_SIZE);
+              if (expectedIndex == maxIndex) {
+                return;
+              }
+
+              // This is a partial download - purge it.
+              console.log(`Purging ${name}`);
+              return caches.delete(name);
+            });
+          });
+    });
   }
 
   static hasPrefetched (assetPath) {
