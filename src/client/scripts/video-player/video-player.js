@@ -649,6 +649,7 @@ class VideoPlayer {
   _onVideoEnd () {
     this._videoContainer.classList.add('player--ended');
     this._updateVideoControlsWithPlayerState();
+    this._videoControls.hideControls();
   }
 
   _onOrientationChanged () {
