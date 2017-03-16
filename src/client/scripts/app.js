@@ -60,6 +60,7 @@ class App {
     this._onOfflineToggle = this._onOfflineToggle.bind(this);
     this._onProgressCallback = this._onProgressCallback.bind(this);
     this._onCompleteCallback = this._onCompleteCallback.bind(this);
+    this._onCancelCallback = this._onCancelCallback.bind(this);
 
     this._processAppConnectivityState().then(_ => {
       LazyLoadImages.init();
@@ -243,6 +244,13 @@ class App {
     this._processAppConnectivityState();
   }
 
+  _onCancelCallback (name) {
+    OfflineCache.purgePartialDownloads(name).then(_ => {
+      this._videoPlayer.updateOfflineProgress(0);
+      this._onCompleteCallback();
+    });
+  }
+
   _onProgressCallback (bytesLoaded, bytesTotal) {
     this._videoPlayer.updateOfflineProgress(bytesLoaded / bytesTotal);
   }
@@ -271,11 +279,13 @@ class App {
     const pagePath = `/${evt.detail.pagePath}/`;
     const name = evt.detail.pagePath;
     const assetPath = evt.detail.assetPath;
-    const manifestPath = `${assetPath}/mp4/dash.mpd`;
 
     if (this._offlineDownloadState === App.VIDEO_DOWNLOAD_STATES.ADDING) {
       if (confirm('Do you want to cancel this download?')) {
-        return this._offlineCache.cancel(manifestPath);
+        this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.REMOVING;
+        Toast.create('Cancelling video.', {tag: 'offline'});
+
+        return this._offlineCache.cancel(name);
       }
       return;
     }
@@ -303,7 +313,8 @@ class App {
         return this._offlineCache.add(
           name, assetPath, pagePath, {
             onProgressCallback: this._onProgressCallback,
-            onCompleteCallback: this._onCompleteCallback
+            onCompleteCallback: this._onCompleteCallback,
+            onCancelCallback: this._onCancelCallback
           }
         ).catch(_ => {
           console.error(_);

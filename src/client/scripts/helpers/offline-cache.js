@@ -62,13 +62,9 @@ class OfflineCache {
               url = item.url;
             });
 
-            // No chunks stored at all.
-            if (maxIndex === Number.NEGATIVE_INFINITY) {
-              return;
-            }
-
-            if (url === '') {
-              return;
+            // No chunks stored at all - delete.
+            if (maxIndex === Number.NEGATIVE_INFINITY || url === '') {
+              return caches.delete(name);
             }
 
             // 3. Compare the largest chunk index to what we'd expect to have.
@@ -127,12 +123,13 @@ class OfflineCache {
 
   cancel (name) {
     name = OfflineCache.convertPathToName(name);
-    return this.has(name).then(hasCache => {
+    return OfflineCache.has(name).then(hasCache => {
       // Can't cancel if the item is already cached.
       if (hasCache) {
         return Promise.reject();
       }
 
+      console.log('Setting cancel for ' + name);
       this._cancel.add(name);
     });
   }
@@ -273,14 +270,9 @@ class OfflineCache {
 
     const downloads = Promise.all(fetches.map(r => r.response));
     return downloads.then(responses => {
-      this._trackDownload(responses, callbacks);
+      this._trackDownload(name, responses, callbacks);
 
       return caches.open(name).then(cache => {
-        if (this._cancel.has(name)) {
-          this._cancel.delete(name);
-          return Promise.reject();
-        }
-
         return Promise.all(fetches.map(asset => {
           return asset.response.then(response => {
             if (!asset.chunk) {
@@ -458,12 +450,14 @@ class OfflineCache {
     reader.read().then(onStreamData);
   }
 
-  _trackDownload (responses, {
+  _trackDownload (name, responses, {
     onProgressCallback,
-    onCompleteCallback
+    onCompleteCallback,
+    onCancelCallback
   }={
     onProgressCallback () {},
-    onCompleteCallback () {}
+    onCompleteCallback () {},
+    onCancelCallback () {}
   }) {
     let byteCount = 0;
     const byteTotal = responses.reduce((byteTotal, r) => {
@@ -479,7 +473,7 @@ class OfflineCache {
       return new Promise((resolve, reject) =>{
         const clone = response.clone();
         const onStreamData = result => {
-          if (result.done) {
+          if (result.done || this._cancel.has(name)) {
             return resolve();
           }
 
@@ -492,6 +486,11 @@ class OfflineCache {
         reader.read().then(onStreamData);
       });
     })).then(_ => {
+      if (this._cancel.has(name)) {
+        this._cancel.delete(name);
+        return onCancelCallback(name);
+      }
+
       onCompleteCallback(byteTotal);
     });
   }
