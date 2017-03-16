@@ -35,7 +35,7 @@ const pathList = [
   '/',
   '/downloads/',
   '/settings/',
-  '/404/'
+  '/404/?cache|/404/'
 ];
 
 const getHomePageAssets = _ => {

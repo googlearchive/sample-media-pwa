@@ -124,7 +124,8 @@ dynamic.get('/*', (req, res) => {
   });
 
   if (search.items.length === 0) {
-    return res.status(404).render('404',
+    const status = req.query.cache !== undefined ? 200 : 404;
+    return res.status(status).render('404',
       Object.assign({
         colors: {
           primary: {

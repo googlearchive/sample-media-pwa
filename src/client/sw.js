@@ -25,7 +25,6 @@ importScripts('{@hash path="dist/client/cache-manifest.js"}{/hash}');
 importScripts('{@hash path="dist/client/third_party/libs/shaka-player.compiled.js"}{/hash}');
 importScripts('{@hash path="dist/client/scripts/ranged-response.js"}{/hash}');
 
-
 // TODO: Hook this up to pull from Constants.
 
 const NAME = 'Biograf';
@@ -35,25 +34,42 @@ self.oninstall = evt => {
   evt.waitUntil(
     caches
       .open(NAME + '-v' + VERSION)
-      .then(cache => {
+      .then(newCache => {
         const toCache = [
           ...pathManifest,
           ...cacheManifest
         ];
 
         return toCache.map(url => {
-          // For each URL in the cacheManifest do a check in the current cache,
+          const urlParts = url.split('|');
+          const srcUrl = urlParts[0];
+          const destUrl = urlParts.length === 2 ? urlParts[1] : urlParts[0];
+
+          console.log(url, srcUrl, destUrl);
+
+          // For each URL in the cacheManifest do a check in the caches,
           // and copy across any existing asset (we're using hashing so we
           // shouldn't get mistaken hits).
-          return caches.match(url).then(cachedResponse => {
+          return caches.match(destUrl).then(cachedResponse => {
             if (!cachedResponse || pathManifest.indexOf(url) !== -1) {
               // Anything not already cached should be pulled from the network.
               // Same is true for the home page.
-              console.log('Getting ' + url + ' from network.');
-              return fetch(url).then(response => cache.put(url, response));
+              console.log('Getting ' + srcUrl + ' from network.');
+              return fetch(srcUrl)
+                  .then(response => {
+                    if (destUrl === '/404/') {
+                      response = new Response(response.body, {
+                        status: 404,
+                        statusText: 'Not Found',
+                        headers: response.headers
+                      });
+                    }
+
+                    newCache.put(destUrl, response);
+                  });
             }
 
-            return cache.put(url, cachedResponse);
+            return newCache.put(destUrl, cachedResponse);
           });
         });
       }));
