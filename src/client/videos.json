@@ -1,5 +1,5 @@
 {
-  "featured": "polymer/sizzle-2015",
+  "featured": "chrome-channel/trailer",
   "shows": [
     {
       "title": "Developer Diary",
@@ -227,6 +227,50 @@
               "b": 82
             }
           }
+        },
+
+        {
+          "popular": true,
+          "released": "2017-02-26T16:46:31.376Z",
+          "title": "2016 Sizze Reel",
+          "shortDescription": "The sizzle reel for the Polymer Summit 2016.",
+          "description": "The sizzle reel for the Polymer Summit 2016.",
+          "slug": "sizzle-2016",
+          "duration": "83",
+          "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/poly-sizzle-2016",
+          "rating": 4.9,
+          "sources": {
+            "full": "https://storage.googleapis.com/biograf-video-files/videos/poly-sizzle-2016/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "https://storage.googleapis.com/biograf-video-files/videos/poly-sizzle-2016/mp4/dash.mpd",
+            "hls": "https://storage.googleapis.com/biograf-video-files/videos/poly-sizzle-2016/hls/all.m3u8"
+          },
+          "colors": {
+            "primary": {
+              "r": 34,
+              "g": 41,
+              "b": 97
+            },
+            "secondary": {
+              "r": 26,
+              "g": 31,
+              "b": 73
+            },
+            "tertiary": {
+              "r": 17,
+              "g": 21,
+              "b": 49
+            },
+            "quaternary": {
+              "r": 9,
+              "g": 10,
+              "b": 24
+            },
+            "primaryLight": {
+              "r": 68,
+              "g": 82,
+              "b": 194
+            }
+          }
         }
       ]
     },
@@ -294,12 +338,12 @@
           "description": "Watch all the talks from Chrome Developer Summit 2016 here at: https://goo.gl/TkgXYM. Paul Lewis and Jake Archibald look back over their highlights of the Chrome Developer Summit 2016. Check out the talks that caught their attention and don't miss out on pair donning matching tuxedos!",
           "slug": "showreel",
           "duration": "58",
-          "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1",
+          "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/cds-showreel",
           "rating": 3.0,
           "sources": {
-            "full": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/mp4/v-1080p-4500k-libx264.mp4",
-            "dash": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/mp4/dash.mpd",
-            "hls": "https://storage.googleapis.com/biograf-video-files/videos/cds-ep-1/hls/all.m3u8"
+            "full": "https://storage.googleapis.com/biograf-video-files/videos/cds-showreel/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "https://storage.googleapis.com/biograf-video-files/videos/cds-showreel/mp4/dash.mpd",
+            "hls": "https://storage.googleapis.com/biograf-video-files/videos/cds-showreel/hls/all.m3u8"
           },
           "colors": {
             "primary": {
@@ -381,6 +425,49 @@
         },
 
         {
+          "released": "2017-03-04T10:00:00.000Z",
+          "title": "Lighthouse",
+          "shortDescription": "Want to do performance auditing like a pro? Well checkout this minitip where we look at Lighthouse, a new tool for testing the performance of your web app.",
+          "description": "Want to do performance auditing like a pro? Well checkout this minitip where we look at Lighthouse, a new tool for testing the performance of your web app.",
+          "slug": "episode-2",
+          "duration": "463",
+          "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-2",
+          "rating": 3.7,
+          "sources": {
+            "full": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-2/mp4/v-1080p-4500k-libx264.mp4",
+            "dash": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-2/mp4/dash.mpd",
+            "hls": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-2/hls/all.m3u8"
+          },
+          "colors": {
+            "primary": {
+              "r": 149,
+              "g": 126,
+              "b": 74
+            },
+            "secondary": {
+              "r": 112,
+              "g": 95,
+              "b": 56
+            },
+            "tertiary": {
+              "r": 75,
+              "g": 63,
+              "b": 37
+            },
+            "quaternary": {
+              "r": 37,
+              "g": 32,
+              "b": 19
+            },
+            "primaryLight": {
+              "r": 255,
+              "g": 252,
+              "b": 148
+            }
+          }
+        },
+
+        {
           "popular": true,
           "released": "2016-09-26T01:00:00.000Z",
           "title": "ENCRYPTED SAMPLE",
@@ -429,6 +516,7 @@
         }
       ]
     },
+
 
     {
       "title": "HTTP 203",
