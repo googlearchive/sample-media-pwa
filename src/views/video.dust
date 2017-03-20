@@ -34,6 +34,9 @@ drm=item.drm /}
       <button class="video-details__info-controls-offline js-offline toggle-offline"
           data-detail-page-path="{fullPath}"
           data-detail-asset-Path="{item.assetPath}"
+          {#item.drm}
+            data-detail-has-drm="true"
+          {/item.drm}
           data-type="toggle-offline">
           {>"partials/offline" /}
       </button>

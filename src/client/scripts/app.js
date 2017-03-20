@@ -271,58 +271,83 @@ class App {
     this._videoPlayer.update();
   }
 
+  _ensureShakaSupport () {
+    return shaka.Player.probeSupport().then(support => {
+      return support.drm['com.widevine.alpha'].persistentState;
+    });
+  }
+
   _onOfflineToggle (evt) {
     if (!(evt && evt.detail)) {
       console.warn('Unable to locate file to remove');
       return;
     }
 
-    const pagePath = `/${evt.detail.pagePath}/`;
-    const name = evt.detail.pagePath;
-    const assetPath = evt.detail.assetPath;
+    // Assume there's no licensing to account for.
+    let offlineLicenseSupport = Promise.resolve(true);
+    if (evt.detail.hasDrm) {
+      offlineLicenseSupport = offlineLicenseSupport
+          .then(_ => this._ensureShakaSupport())
+          .catch(_ => {
+            // If the user cancels the prompt, assume that persistent licensing
+            // is unavailable.
+            return false;
+          });
+    }
 
-    if (this._offlineDownloadState === App.VIDEO_DOWNLOAD_STATES.ADDING) {
-      if (confirm('Do you want to cancel this download?')) {
-        this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.REMOVING;
-        Toast.create('Cancelling video.', {tag: 'offline'});
-
-        return this._offlineCache.cancel(name);
+    return offlineLicenseSupport.then(persistentLicensing => {
+      if (!persistentLicensing) {
+        Toast.create('Unable to download protected video.', {tag: 'offline'});
+        return;
       }
-      return;
-    }
 
-    if (this._offlineDownloadState === App.VIDEO_DOWNLOAD_STATES.REMOVING) {
-      Toast.create('Deleting video. Please wait.', {tag: 'offline'});
-      return;
-    }
+      const pagePath = `/${evt.detail.pagePath}/`;
+      const name = evt.detail.pagePath;
+      const assetPath = evt.detail.assetPath;
 
-    OfflineCache.has(name).then(videoIsAvailableOffline => {
-      if (videoIsAvailableOffline) {
-        // TODO: prompt the user to confirm removal properly.
-        if (!confirm('Are you sure you wish to remove this video?')) {
-          return;
+      if (this._offlineDownloadState === App.VIDEO_DOWNLOAD_STATES.ADDING) {
+        if (confirm('Do you want to cancel this download?')) {
+          this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.REMOVING;
+          Toast.create('Cancelling video.', {tag: 'offline'});
+
+          return this._offlineCache.cancel(name);
         }
-
-        this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.REMOVING;
-        Toast.create('Deleting video.', {tag: 'offline'});
-        return this._offlineCache.remove(name).then(_ => {
-          this._onCompleteCallback();
-        });
-      } else {
-        this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.ADDING;
-        Toast.create('Caching video for offline.', {tag: 'offline'});
-        return this._offlineCache.add(
-          name, assetPath, pagePath, {
-            onProgressCallback: this._onProgressCallback,
-            onCompleteCallback: this._onCompleteCallback,
-            onCancelCallback: this._onCancelCallback
-          }
-        ).catch(_ => {
-          console.error(_);
-          Toast.create('Cancelled download.', {tag: 'offline'});
-          this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.IDLE;
-        });
+        return;
       }
+
+      if (this._offlineDownloadState === App.VIDEO_DOWNLOAD_STATES.REMOVING) {
+        Toast.create('Deleting video. Please wait.', {tag: 'offline'});
+        return;
+      }
+
+      OfflineCache.has(name).then(videoIsAvailableOffline => {
+        if (videoIsAvailableOffline) {
+          // TODO: prompt the user to confirm removal properly.
+          if (!confirm('Are you sure you wish to remove this video?')) {
+            return;
+          }
+
+          this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.REMOVING;
+          Toast.create('Deleting video.', {tag: 'offline'});
+          return this._offlineCache.remove(name).then(_ => {
+            this._onCompleteCallback();
+          });
+        } else {
+          this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.ADDING;
+          Toast.create('Caching video for offline.', {tag: 'offline'});
+          return this._offlineCache.add(
+            name, assetPath, pagePath, {
+              onProgressCallback: this._onProgressCallback,
+              onCompleteCallback: this._onCompleteCallback,
+              onCancelCallback: this._onCancelCallback
+            }
+          ).catch(_ => {
+            console.error(_);
+            Toast.create('Cancelled download.', {tag: 'offline'});
+            this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.IDLE;
+          });
+        }
+      });
     });
   }
 }
