@@ -18,6 +18,7 @@
 'use strict';
 
 import Toast from './helpers/toast';
+import Utils from './helpers/utils';
 import Settings from './helpers/settings';
 
 class SettingsManager {
@@ -58,6 +59,7 @@ class SettingsManager {
 
     Settings.set(settingName, evt.target.checked).then(_ => {
       this._updateControls();
+      Utils.fire(evt.target, 'settings-updated');
       Toast.create('Settings updated.', {tag: 'settings'});
     });
   }

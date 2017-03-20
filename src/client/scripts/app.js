@@ -61,6 +61,7 @@ class App {
     this._onProgressCallback = this._onProgressCallback.bind(this);
     this._onCompleteCallback = this._onCompleteCallback.bind(this);
     this._onCancelCallback = this._onCancelCallback.bind(this);
+    this._processSettings = this._processSettings.bind(this);
 
     this._processAppConnectivityState().then(_ => {
       LazyLoadImages.init();
@@ -221,6 +222,7 @@ class App {
 
   _addOfflineToggleListeners () {
     document.addEventListener('toggle-offline', this._onOfflineToggle);
+    document.addEventListener('settings-updated', this._processSettings);
   }
 
   _onOnline () {
@@ -232,15 +234,14 @@ class App {
       return;
     }
 
-    // TODO: Hide banner;
+    document.body.classList.remove('offline');
     this._appConnectivityState = App.CONNECTIVITY_STATES.ONLINE;
     this._processAppConnectivityState();
   }
 
   _onOffline () {
-    // TODO: Show banner;
+    document.body.classList.add('offline');
     this._appConnectivityState = App.CONNECTIVITY_STATES.OFFLINE;
-    console.log('Offline');
     this._processAppConnectivityState();
   }
 

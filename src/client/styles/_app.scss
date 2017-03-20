@@ -30,6 +30,14 @@ body {
   color: #FFF;
   height: 100%;
   padding-top: 48px;
+
+  &.offline {
+    .app__header {
+      &::before {
+        opacity: 1;
+      }
+    }
+  }
 }
 
 button {
@@ -51,6 +59,27 @@ a {
     box-shadow: 0 2px 7px rgba(0, 0, 0, 0.3);
     z-index: 10000;
 
+    &::before {
+      display: flex;
+      text-transform: uppercase;
+      align-items: center;
+      justify-content: center;
+      content: 'Downloads only';
+      font-size: 13px;
+      text-align: center;
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 150px;
+      height: 100%;
+      border-left: 1px solid rgba(255, 255, 255, 0.2);
+      background: darken(#1D2227, 5%);
+      opacity: 0;
+      pointer-events: none;
+      color: rgba(255, 255, 255, 0.75);
+      transition: opacity 0.3s cubic-bezier(0, 0, 0.3, 1);
+    }
+
     &-menu-toggle {
       border: none;
       height: 24px;
@@ -67,6 +96,7 @@ a {
       display: flex;
       height: 100%;
       align-items: center;
+      position: relative;
 
       &-link {
         display: flex;
