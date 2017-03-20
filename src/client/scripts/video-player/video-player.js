@@ -104,7 +104,6 @@ class VideoPlayer {
     this._video = video;
     this._videoContainer = this._video.parentNode;
     this._videoControls = null;
-    this._castVideo = document.createElement('video');
     this._player = null;
     this._fsLocked = false;
     this._playOnSeekFinished = false;
@@ -143,6 +142,12 @@ class VideoPlayer {
     this._onVideoStart = this._onVideoStart.bind(this);
     this._updateVideoControlsWithPlayerState =
         this._updateVideoControlsWithPlayerState.bind(this);
+
+    // To support the Remote Playback API we need to have a separate
+    // video file, one which doesn't use MSE / DASH.
+    this._castVideo = document.createElement('video');
+    this._castVideo.setAttribute('autoplay', 'false');
+    this._castVideo.setAttribute('preload', 'metadata');
   }
 
   get isFullScreen () {
@@ -304,7 +309,8 @@ class VideoPlayer {
       fullscreen: this.isFullScreen,
       offline: this._videoIsAvailableOffline,
       offlineSupported: this._offlineSupported,
-      title: this._title
+      title: this._title,
+      encrypted: (this._assetDRM !== undefined)
     };
   }
 
@@ -335,10 +341,94 @@ class VideoPlayer {
     this._video.webkitExitFullscreen();
   }
 
-  _loadAndPlayVideo () {
-    let boot = Promise.resolve();
+  _chooseOfflineContentIfAvailable () {
     let isAvailableOffline = false;
     let isPrefetched = false;
+
+    return Promise.all([
+      // Or we've prefetched a chunk of it.
+      OfflineCache.hasPrefetched(this._assetPath),
+
+      // Either this is a "full fat" offline video...
+      OfflineCache.has(this._href)
+    ]).then(c => {
+      isAvailableOffline = c.some(v => v);
+      isPrefetched = c[0];
+    })
+    .then(_ => {
+      // If we have nothing in any cache, then this is all for nought.
+      if (!isAvailableOffline) {
+        return;
+      }
+
+      const height = isPrefetched ? Constants.PREFETCH_VIDEO_HEIGHT :
+          Constants.OFFLINE_VIDEO_HEIGHT;
+
+      this._player.configure({
+        streaming: {
+          bufferingGoal: Constants.PREFETCH_DEFAULT_BUFFER_GOAL
+        },
+
+        restrictions: {
+          minHeight: height,
+          maxHeight: height,
+          mimeType: 'video/mp4'
+        }
+      });
+    })
+    .then(_ => this._player.load(this._manifest))
+    .then(_ => {
+      if (!isAvailableOffline) {
+        return;
+      }
+
+      // Lock the player to the offline stream.
+      const tracks = this._player.getTracks().filter(t => {
+        return t.height === Constants.PREFETCH_VIDEO_HEIGHT;
+      });
+
+      tracks.forEach(track => {
+        // This will disable ABR, so effectively bandwidth will be
+        // ignored for the time being. Later, when we run out of
+        // prefetched footage we will enable ABR again with a config.
+        this._player.selectTrack(track, true);
+        this._player.configure({
+          abr: {
+            defaultBandwidthEstimate: track.bandwidth
+          }
+        });
+
+        console.log(`Selected track: ${track.width}x${track.height}`, track);
+      });
+
+      // Watch for the point at which the prefetched content has been
+      // exhausted. At that point reset the player to use the network.
+      // TODO: Instruct the OfflineCache to remove the prefetched content.
+      const netEngine = this._player.getNetworkingEngine();
+      netEngine.registerResponseFilter((_, response) => {
+        const isOfflineVideoResponse = response.uri
+            .indexOf(`${Constants.PREFETCH_VIDEO_HEIGHT}p`) > 0;
+        if (!isOfflineVideoResponse) {
+          return;
+        }
+
+        const isFromCache =
+            response.headers.find(h => (h === 'x-from-cache: true'));
+
+        if (isFromCache) {
+          console.log('Using prefetched content.');
+          return;
+        }
+
+        console.log('Switching back to adaptive.');
+        netEngine.clearAllResponseFilters();
+        this._player.resetConfiguration();
+      });
+    });
+  }
+
+  _loadAndPlayVideo () {
+    let boot = Promise.resolve();
 
     if (!this._usingHLS) {
       this._player.configure({
@@ -349,93 +439,12 @@ class VideoPlayer {
         drm: this._assetDRM
       });
 
-      boot = boot
-          .then(_ => {
-            return Promise.all([
-              // Or we've prefetched a chunk of it.
-              OfflineCache.hasPrefetched(this._assetPath),
-
-              // Either this is a "full fat" offline video...
-              OfflineCache.has(this._href)
-            ]).then(c => {
-              isAvailableOffline = c.some(v => v);
-              isPrefetched = c[0];
-            });
-          })
-          .then(_ => {
-            // If we have nothing in any cache, then this is all for nought.
-            if (!isAvailableOffline) {
-              return;
-            }
-
-            const height = isPrefetched ? Constants.PREFETCH_VIDEO_HEIGHT :
-                Constants.OFFLINE_VIDEO_HEIGHT;
-
-            this._player.configure({
-              streaming: {
-                bufferingGoal: Constants.PREFETCH_DEFAULT_BUFFER_GOAL
-              },
-
-              restrictions: {
-                minHeight: height,
-                maxHeight: height,
-                mimeType: 'video/mp4'
-              }
-            });
-          })
-          .then(_ => this._player.load(this._manifest))
-          .then(_ => {
-            if (!isAvailableOffline) {
-              return;
-            }
-
-            // Lock the player to the offline stream.
-            const tracks = this._player.getTracks().filter(t => {
-              return t.height === Constants.PREFETCH_VIDEO_HEIGHT;
-            });
-
-            tracks.forEach(track => {
-              // This will disable ABR, so effectively bandwidth will be
-              // ignored for the time being. Later, when we run out of
-              // prefetched footage we will enable ABR again with a config.
-              this._player.selectTrack(track, true);
-              this._player.configure({
-                abr: {
-                  defaultBandwidthEstimate: track.bandwidth
-                }
-              });
-
-              console.log(`Selected track: ${track.width}x${track.height}`, track);
-            });
-
-            // Watch for the point at which the prefetched content has been
-            // exhausted. At that point reset the player to use the network.
-            // TODO: Instruct the OfflineCache to remove the prefetched content.
-            const netEngine = this._player.getNetworkingEngine();
-            netEngine.registerResponseFilter((_, response) => {
-              const isOfflineVideoResponse = response.uri
-                  .indexOf(`${Constants.PREFETCH_VIDEO_HEIGHT}p`) > 0;
-              if (!isOfflineVideoResponse) {
-                return;
-              }
-
-              const isFromCache =
-                  response.headers.find(h => (h === 'x-from-cache: true'));
-
-              if (isFromCache) {
-                console.log('Using prefetched content.');
-                return;
-              }
-
-              console.log('Switching back to adaptive.');
-              netEngine.clearAllResponseFilters();
-              this._player.resetConfiguration();
-            });
-          });
+      boot = boot.then(_ => this._chooseOfflineContentIfAvailable());
     }
 
     return boot.then(_ => {
       if (this._video.paused) {
+        // TODO: Restore from last known playhead position.
         this._video.play();
         this._video.volume = 1;
       }
@@ -484,12 +493,15 @@ class VideoPlayer {
   }
 
   _startChromecastWatch () {
+    console.log('_startChromecastWatch');
     if (!VideoPlayer.SUPPORTS_REMOTE_PLAYBACK) {
       this._videoControls.hideChromecastButton();
       return;
     }
 
+    this._castVideo.src = this._castSrc;
     this._castVideo.remote.watchAvailability(available => {
+      console.log('_startChromecastWatch:' + available);
       if (available) {
         this._videoControls.showChromecastButton();
         return;
@@ -712,21 +724,23 @@ class VideoPlayer {
   }
 
   _onChromecast () {
-    // To support the Remote Playback API we need to have a separate
-    // video file, one which doesn't use MSE / DASH.
-    this._castVideo.src = this._castSrc;
-    this._castVideo.remote.prompt();
+    this._castVideo.remote.prompt().catch(_ => {
+      // Don't worry about errors.
+    });
   }
 
   _onRemoteConnect () {
+    console.log('_onRemoteConnect');
     this._videoControls.castConnected = true;
   }
 
   _onRemoteConnecting () {
+    console.log('_onRemoteConnecting');
     this._videoControls.castConnecting = true;
   }
 
   _onRemoteDisconnect () {
+    console.log('_onRemoteDisconnect');
     this._videoControls.castConnected = false;
   }
 
