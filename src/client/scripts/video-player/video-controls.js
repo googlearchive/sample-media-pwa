@@ -227,7 +227,8 @@ class VideoControls {
         'player__controls-standard-toggle-offline--hidden';
     const offlineClass = 'offline--available';
 
-    this._videoControls.dataset.title = state.title;
+    this._videoControls.dataset.title = state.title + (state.encrypted ?
+        ' (Protected)' : '');
     this._playPauseBig.classList.toggle(pausedBigClass, state.paused);
     this._playPauseStandard.classList.toggle(pausedStandardClass, state.paused);
     this._fullscreen.classList.toggle(fsClass, state.fullscreen);
