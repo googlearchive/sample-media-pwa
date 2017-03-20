@@ -51,13 +51,13 @@ drm=item.drm /}
         <li class="video-grid__item">
           <a href="../{slug}/" class="video-details__watch-more-list-item-link js-item-link">
             <div class="video-details__watch-more-list-item-image js-lazy-image video-grid__item-image item--disabled__unclickable item--disabled__desaturated item--disabled__faded"
-                data-src="{assetPath}/poster-small.jpg">
+                data-src="{assetPath}/poster-tiny.jpg">
 
                 <div class="video-details__watch-more-list-item-image-content js-lazy-image-content video-grid__item-image-content"></div>
 
             <noscript>
               <div class="video-details__watch-more-list-item-image--no-script"
-                    style="background-image: url({assetPath}/poster-small.jpg)"></div>
+                    style="background-image: url({assetPath}/poster-tiny.jpg)"></div>
             </noscript>
 
             </div>
