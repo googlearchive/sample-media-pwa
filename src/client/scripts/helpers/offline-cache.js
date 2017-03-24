@@ -185,6 +185,10 @@ class OfflineCache {
   }
 
   prefetch (manifestPath, prefetchLimit=30) {
+    if (typeof shaka === 'undefined') {
+      return;
+    }
+
     const makeRequest = ({path, start, end, chunk}={}) => {
       const headers = new Headers();
       if (typeof start !== 'undefined' && typeof end !== 'undefined') {
