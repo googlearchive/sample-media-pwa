@@ -388,6 +388,17 @@ class VideoControls {
       return;
     }
 
+    switch (type) {
+      case 'close':
+        this._requestVideoStart.removeAttribute('aria-hidden');
+        this._requestVideoStart.focus();
+        break;
+
+      case 'request-video-start':
+        this._requestVideoStart.setAttribute('aria-hidden', 'true');
+        break;
+    }
+
     for (const data in evt.target.dataset) {
       if (!data.startsWith('detail')) {
         continue;

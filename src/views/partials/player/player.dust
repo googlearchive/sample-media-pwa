@@ -15,13 +15,13 @@
     <button title="Close video" tabindex="-1" class="player__controls-standard-close js-close" data-type="close">Close video</button>
 
     <div class="player__controls-big">
-      <button tabindex="-1" class="player__controls-big-back-30" data-type="back-30">Back 30s</button>
-      <button tabindex="-1" class="player__controls-big-play-pause js-play-pause-big" data-type="play-pause">Play/Pause</button>
-      <button tabindex="-1" class="player__controls-big-fwd-30" data-type="fwd-30">Forward 30s</button>
+      <button tabindex="-1" class="player__controls-big-back-30" data-type="back-30">Back 30 seconds</button>
+      <button tabindex="-1" class="player__controls-big-play-pause js-play-pause-big" data-type="play-pause">Toggle Play / Pause</button>
+      <button tabindex="-1" class="player__controls-big-fwd-30" data-type="fwd-30">Forward 30 seconds</button>
     </div>
 
     <div class="player__controls-standard">
-      <button tabindex="-1" class="player__controls-standard-play-pause js-play-pause-standard" data-type="play-pause">Play/Pause</button>
+      <button tabindex="-1" class="player__controls-standard-play-pause js-play-pause-standard" data-type="play-pause">Toggle Play / Pause</button>
       <div class="player__controls-standard-time js-time-track" data-time-track="true">
         <div class="player__controls-standard-time-track primary-light-bg"></div>
         <div class="player__controls-standard-time-track-used primary-bg js-time-used"></div>
@@ -35,7 +35,7 @@
       </div>
       <div class="player__controls-standard-video-duration js-duration"></div>
       <button tabindex="-1" class="player__controls-standard-toggle-volume js-volume" data-type="toggle-volume">Toggle Volume</button>
-      <button tabindex="-1" class="player__controls-standard-toggle-fullscreen js-fullscreen"  data-type="toggle-fullscreen">Toggle FS</button>
+      <button tabindex="-1" class="player__controls-standard-toggle-fullscreen js-fullscreen"  data-type="toggle-fullscreen">Toggle Fullscreen</button>
       <button tabindex="-1" class="player__controls-standard-toggle-offline toggle-offline js-offline"
           data-type="toggle-offline"
           data-detail-page-path="{href}"
@@ -46,11 +46,11 @@
           {/drm}
         {>"partials/offline"/}
       </button>
-      <button tabindex="-1" class="player__controls-standard-chromecast js-chromecast" data-type="toggle-chromecast">Chromecast</button>
+      <button tabindex="-1" class="player__controls-standard-chromecast js-chromecast" data-type="toggle-chromecast">Toggle Chromecast</button>
     </div>
   </div>
 
-  <button class="player__play-button item--disabled__unclickable js-request-video-start" data-type="request-video-start">Play Video</button>
+  <button class="player__play-button item--disabled__unclickable js-request-video-start" data-type="request-video-start">Play {showTitle}: {episodeTitle}</button>
 
   <div class="player__poster item--disabled__desaturated item--disabled__faded js-poster">
 
