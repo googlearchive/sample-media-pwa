@@ -26,6 +26,10 @@ const files = [
     out: path.join(outPath, 'views', 'inlines', 'bootstrap.css')
   },
   {
+    in: path.join(inPath, 'fonts.scss'),
+    out: path.join(outPath, 'views', 'inlines', 'fonts.css')
+  },
+  {
     in: path.join(inPath, 'biograf.scss'),
     out: path.join(outPath, 'client', 'styles', 'biograf.css')
   }

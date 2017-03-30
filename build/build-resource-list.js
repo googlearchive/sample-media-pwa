@@ -32,7 +32,7 @@ const ignore = [
 const fs = require('fs');
 const resourceList = [];
 const pathList = [
-  '/',
+  '/?cache|/',
   '/downloads/',
   '/settings/',
   '/404/?cache|/404/'

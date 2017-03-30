@@ -33,7 +33,8 @@ const etag = require('../utils/etag');
 const library = videoLibrary.load(libraryPath);
 const inlines = {
   js: fs.readFileSync(path.join(viewPath, 'inlines', 'bootstrap.js'), 'utf-8'),
-  css: fs.readFileSync(path.join(viewPath, 'inlines', 'bootstrap.css'), 'utf-8')
+  css: fs.readFileSync(path.join(viewPath, 'inlines', 'bootstrap.css'), 'utf-8'),
+  fonts: fs.readFileSync(path.join(viewPath, 'inlines', 'fonts.css'), 'utf-8')
 };
 
 const dustOptions = {
@@ -72,7 +73,10 @@ dynamic.set('views', viewPath);
 dynamic.use(require('../middleware/no-cache.js'));
 
 dynamic.get('/', (req, res) => {
-  // The cut-off for when new releases becomes more
+  if (req.query.cache !== undefined) {
+    inlines.css += '\n' + inlines.fonts;
+  }
+
   const NEW_VS_MORE = 4;
   const MAX_WATCH_MORE = 18;
   const viewOptions = Object.assign({}, defaultViewOptions, {
