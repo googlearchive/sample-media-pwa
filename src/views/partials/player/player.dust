@@ -11,47 +11,51 @@
       data-drm-name="{drm.name}"
       data-drm-url="{drm.url}"></video>
 
-  <div class="player__controls">
+  <div class="player__controls js-play-controls" aria-hidden="true">
+    <button title="Close video" tabindex="-1" class="player__controls-standard-close js-close" data-type="close">Close video</button>
+
     <div class="player__controls-big">
-      <button class="player__controls-big-back-30" data-type="back-30">Back 30s</button>
-      <button class="player__controls-big-play-pause js-play-pause-big" data-type="play-pause">Play/Pause</button>
-      <button class="player__controls-big-fwd-30" data-type="fwd-30">Forward 30s</button>
+      <button tabindex="-1" class="player__controls-big-back-30" data-type="back-30">Back 30s</button>
+      <button tabindex="-1" class="player__controls-big-play-pause js-play-pause-big" data-type="play-pause">Play/Pause</button>
+      <button tabindex="-1" class="player__controls-big-fwd-30" data-type="fwd-30">Forward 30s</button>
     </div>
 
-    <button class="player__controls-standard-close js-close" data-type="close">Close video</button>
-
     <div class="player__controls-standard">
-      <button class="player__controls-standard-play-pause js-play-pause-standard" data-type="play-pause">Play/Pause</button>
+      <button tabindex="-1" class="player__controls-standard-play-pause js-play-pause-standard" data-type="play-pause">Play/Pause</button>
       <div class="player__controls-standard-time js-time-track" data-time-track="true">
         <div class="player__controls-standard-time-track primary-light-bg"></div>
         <div class="player__controls-standard-time-track-used primary-bg js-time-used"></div>
-        <button class="player__controls-standard-time-track-playhead js-playhead">
-          <div class="player__thumbnail js-thumbnail">
+        <div title="Video time track" class="player__controls-standard-time-track-playhead js-playhead">
+          <div aria-hidden="true" class="player__thumbnail js-thumbnail">
             <div class="player__thumbnail-image js-thumbnail-image">
               <div class="player__thumbnail-image-inner js-thumbnail-image-inner"></div>
             </div>
           </div>
-        </button>
+        </div>
       </div>
       <div class="player__controls-standard-video-duration js-duration"></div>
-      <button class="player__controls-standard-toggle-volume js-volume" data-type="toggle-volume">Toggle Volume</button>
-      <button class="player__controls-standard-toggle-fullscreen js-fullscreen"  data-type="toggle-fullscreen">Toggle FS</button>
-      <button class="player__controls-standard-toggle-offline toggle-offline js-offline"
+      <button tabindex="-1" class="player__controls-standard-toggle-volume js-volume" data-type="toggle-volume">Toggle Volume</button>
+      <button tabindex="-1" class="player__controls-standard-toggle-fullscreen js-fullscreen"  data-type="toggle-fullscreen">Toggle FS</button>
+      <button tabindex="-1" class="player__controls-standard-toggle-offline toggle-offline js-offline"
           data-type="toggle-offline"
           data-detail-page-path="{href}"
           data-detail-asset-Path="{assetPath}">
+          {#drm}
+            data-detail-drm="{drm.name}|{drm.url}"
+            data-detail-manifest="{dash}"
+          {/drm}
         {>"partials/offline"/}
       </button>
-      <button class="player__controls-standard-chromecast js-chromecast" data-type="toggle-chromecast">Chromecast</button>
+      <button tabindex="-1" class="player__controls-standard-chromecast js-chromecast" data-type="toggle-chromecast">Chromecast</button>
     </div>
   </div>
 
-  <button class="player__play-button item--disabled__unclickable">Play Video</button>
+  <button class="player__play-button item--disabled__unclickable js-request-video-start" data-type="request-video-start">Play Video</button>
 
   <div class="player__poster item--disabled__desaturated item--disabled__faded js-poster">
 
     <div class="content-block player__poster-episode-info">
-      <div class="player__poster-star-rating">
+      <div class="player__poster-star-rating" aria-title="Rating: {rating} stars">
         {>"partials/star-rating" id="primary" ratingColors=colors rating=rating /}
       </div>
       <h2 class="player__poster-show-title">{showTitle}</h2>
@@ -63,9 +67,9 @@
     {>"partials/shape" colors=colors /}
   </div>
 
-  <div class="player__ended-view">
+  <div class="player__ended-view" aria-hidden="true">
     <div class="player__ended-view-replay">
-      <button class="player__ended-view-replay-btn js-replay" data-type="replay">
+      <button tabindex="-1" class="player__ended-view-replay-btn js-replay" data-type="replay">
         <div class="player__ended-view-replay-btn-label">Replay video</div>
       </button>
     </div>

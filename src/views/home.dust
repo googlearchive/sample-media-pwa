@@ -28,28 +28,30 @@
     <ul class="home__new-releases-list">
       {#newest}
         <li class="home__new-releases-list-item">
-          <a href="/{slug}/" class="home__new-releases-list-item-link js-item-link">
-            <div class="home__new-releases-list-item-image js-lazy-image item--disabled__unclickable item--disabled__desaturated item--disabled__faded"
-                data-src="{assetPath}/poster-tiny.jpg">
+          <a href="/{slug}/" class="home__new-releases-list-item-link js-item-link" title="{title}, {description}, {duration|timeFormat}, {rating} stars">
+            <div aria-hidden="true">
+              <div class="home__new-releases-list-item-image js-lazy-image item--disabled__unclickable item--disabled__desaturated item--disabled__faded"
+                  data-src="{assetPath}/poster-tiny.jpg">
 
-                <div class="home__new-releases-list-item-image-content js-lazy-image-content"></div>
+                  <div class="home__new-releases-list-item-image-content js-lazy-image-content"></div>
 
-            <noscript>
-              <div class="home__new-releases-list-item-image--no-script"
-                   style="background-image: url({assetPath}/poster-tiny.jpg)"></div>
-            </noscript>
+              <noscript>
+                <div class="home__new-releases-list-item-image--no-script"
+                    style="background-image: url({assetPath}/poster-tiny.jpg)"></div>
+              </noscript>
 
-            </div>
-            <h3 class="home__new-releases-list-item-title primary-light-col">{title}</h3>
-            <p class="home__new-releases-list-item-description">{shortDescription|truncate}</p>
-
-            <div class="home__new-releases-list-item-meta">
-              <div class="home__new-releases-list-item-meta-duration">
-                {duration|timeFormat}
               </div>
+              <h3 class="home__new-releases-list-item-title primary-light-col">{title}</h3>
+              <p class="home__new-releases-list-item-description">{shortDescription|truncate}</p>
 
-              <div class="home__new-releases-list-item-meta-star-rating">
-                {>"partials/star-rating" id=$idx ratingColors=featured.items.colors rating=rating /}
+              <div class="home__new-releases-list-item-meta">
+                <div class="home__new-releases-list-item-meta-duration">
+                  {duration|timeFormat}
+                </div>
+
+                <div class="home__new-releases-list-item-meta-star-rating">
+                  {>"partials/star-rating" id=$idx ratingColors=featured.items.colors rating=rating /}
+                </div>
               </div>
             </div>
           </a>
@@ -81,17 +83,19 @@
       <ul class="home__watch-more-list video-grid">
       {#watchMore}
         <li class="video-grid__item">
-          <a href="/{slug}/" class="home__watch-more-list-item-link js-item-link">
-            <div class="home__watch-more-list-item-image js-lazy-image video-grid__item-image item--disabled__unclickable item--disabled__desaturated item--disabled__faded"
-                data-src="{assetPath}/poster-tiny.jpg">
+          <a href="/{slug}/" class="home__watch-more-list-item-link js-item-link" title="{title}">
+            <div aria-hidden="true">
+              <div class="home__watch-more-list-item-image js-lazy-image video-grid__item-image item--disabled__unclickable item--disabled__desaturated item--disabled__faded"
+                  data-src="{assetPath}/poster-tiny.jpg">
 
-                <div class="home__watch-more-list-item-image-content js-lazy-image-content video-grid__item-image-content"></div>
+                  <div class="home__watch-more-list-item-image-content js-lazy-image-content video-grid__item-image-content"></div>
 
-            <noscript>
-              <div class="home__watch-more-list-item-image--no-script"
-                    style="background-image: url({assetPath}/poster-tiny.jpg)"></div>
-            </noscript>
+              <noscript>
+                <div class="home__watch-more-list-item-image--no-script"
+                      style="background-image: url({assetPath}/poster-tiny.jpg)"></div>
+              </noscript>
 
+              </div>
             </div>
           </a>
 

@@ -114,8 +114,7 @@ class VideoPlayer {
     this._currentDeviceOrientation = undefined;
 
     // Handlers.
-    this._onKeyDown = this._onKeyDown.bind(this);
-    this._onClick = this._onClick.bind(this);
+    this._onRequestVideoStart = this._onRequestVideoStart.bind(this);
     this._onPlayPause = this._onPlayPause.bind(this);
     this._onPlay = this._onPlay.bind(this);
     this._onClose = this._onClose.bind(this);
@@ -244,8 +243,8 @@ class VideoPlayer {
   }
 
   _addVideoPlaybackEventListeners () {
-    this._videoContainer.addEventListener('keydown', this._onKeyDown);
-    this._videoContainer.addEventListener('click', this._onClick);
+    this._videoContainer.addEventListener('request-video-start',
+        this._onRequestVideoStart);
     this._videoContainer.addEventListener('play-pause', this._onPlayPause);
     this._videoContainer.addEventListener('back-30', this._onBack30);
     this._videoContainer.addEventListener('fwd-30', this._onFwd30);
@@ -541,30 +540,17 @@ class VideoPlayer {
     this._videoContainer.classList.toggle(bufferingClass, evt.buffering);
   }
 
-  _onKeyDown (evt) {
-    if (evt.keyCode !== 32) {
-      return;
-    }
+  _onRequestVideoStart () {
+    this._video.classList.add('player__element--active');
 
-    evt.preventDefault();
-    this._onPlayPause();
-  }
+    // Pre-approve the video for playback on mobile.
+    this._video.play().catch(_ => {
+      // The play call will probably be interrupted by Shaka loading,
+      // so quietly swallow the error.
+    });
 
-  _onClick (evt) {
-    const target = evt.target;
-
-    if (target.classList.contains('player__play-button')) {
-      this._video.classList.add('player__element--active');
-
-      // Pre-approve the video for playback on mobile.
-      this._video.play().catch(_ => {
-        // The play call will probably be interrupted by Shaka loading,
-        // so quietly swallow the error.
-      });
-
-      // ... then load it.
-      return this._loadAndPlayVideo();
-    }
+    // ... then load it.
+    return this._loadAndPlayVideo();
   }
 
   _onFullScreenChanged () {

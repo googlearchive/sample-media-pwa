@@ -233,6 +233,7 @@ video::-webkit-media-controls-start-playback-button {
       position: absolute;
     }
 
+    &:focus::before,
     &:hover::before {
       opacity: 1;
     }
@@ -530,6 +531,7 @@ video::-webkit-media-controls-start-playback-button {
         padding: 0;
         margin: 0 16px;
         cursor: pointer;
+        outline: none;
         -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
       }
 

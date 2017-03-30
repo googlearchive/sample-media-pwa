@@ -40,6 +40,10 @@ class VideoControls {
         this._videoControls.querySelector('.js-play-pause-big');
     this._playPauseStandard =
         this._videoControls.querySelector('.js-play-pause-standard');
+    this._playerControls =
+        document.querySelector('.js-play-controls');
+    this._requestVideoStart =
+        document.querySelector('.js-request-video-start');
     this._fullscreen = this._videoControls.querySelector('.js-fullscreen');
     this._chromecast = this._videoControls.querySelector('.js-chromecast');
     this._volume = this._videoControls.querySelector('.js-volume');
@@ -47,6 +51,7 @@ class VideoControls {
     this._timeUsed = this._videoControls.querySelector('.js-time-used');
     this._playhead = this._videoControls.querySelector('.js-playhead');
     this._duration = this._videoControls.querySelector('.js-duration');
+    this._close = this._videoControls.querySelector('.js-close');
     this._replay = document.querySelector('.js-replay');
     this._offline = document.querySelectorAll('.js-offline');
     this._thumbnail = document.querySelector('.js-thumbnail');
@@ -61,6 +66,11 @@ class VideoControls {
     this._castConnected = false;
     this._trackDrag = false;
     this._trackBCR = null;
+    this._lockedFocus = false;
+    this._lastPlaybackState = null;
+
+    this._firstTabStop = this._close;
+    this._lastTabStop = this._videoControls.querySelector('.js-offline');
 
     this.toggleControls = this.toggleControls.bind(this);
     this.showControls = this.showControls.bind(this);
@@ -74,6 +84,8 @@ class VideoControls {
     this._onInputMove = this._onInputMove.bind(this);
     this._onInputUp = this._onInputUp.bind(this);
     this._onResize = this._onResize.bind(this);
+    this._onFocus = this._onFocus.bind(this);
+    this._onBlur = this._onBlur.bind(this);
 
     this._addEventListeners();
   }
@@ -98,11 +110,16 @@ class VideoControls {
 
     if (!this._enabled) {
       this.hideControls(0);
+      this._disableKeyboard();
       this._videoControls.classList.remove('player__controls--active');
+      this._playerControls.setAttribute('aria-hidden', 'true');
       return;
     }
 
+    this._enableKeyboard();
     this._videoControls.classList.add('player__controls--active');
+    this._playerControls.removeAttribute('aria-hidden');
+    this._playPauseBig.focus();
   }
 
   showChromecastButton () {
@@ -139,10 +156,14 @@ class VideoControls {
 
     this._videoControls.addEventListener('click', this._onClick);
     this._replay.addEventListener('click', this._onClick);
+    this._requestVideoStart.addEventListener('click', this._onClick);
 
     Array.from(this._offline).forEach(offline => {
       offline.addEventListener('click', this._onClick);
     });
+
+    this._timeTrack.addEventListener('focus', this._onFocus);
+    this._timeTrack.addEventListener('blur', this._onBlur);
 
     document.addEventListener('keydown', this._onKeyDown);
     document.addEventListener('fullscreenchange', this._onFullscreenChange);
@@ -245,6 +266,43 @@ class VideoControls {
       offline.classList.toggle(offlineClass, state.offline);
       offline.classList.add('fade-in');
     });
+
+    if (state.paused === this._lastPlaybackState) {
+      return;
+    }
+
+    this._lastPlaybackState = state.paused;
+    if (state.paused) {
+      this._unlockFocus();
+    } else {
+      this._lockFocus();
+    }
+  }
+
+  _enableKeyboard () {
+    const buttons = this._videoControls.querySelectorAll('button');
+    Array.from(buttons).forEach(button => {
+      button.setAttribute('tabindex', 0);
+    });
+
+    this._timeTrack.setAttribute('tabindex', 0);
+  }
+
+  _disableKeyboard () {
+    const buttons = this._videoControls.querySelectorAll('button');
+    Array.from(buttons).forEach(button => {
+      button.setAttribute('tabindex', -1);
+    });
+
+    this._timeTrack.setAttribute('tabindex', -1);
+  }
+
+  _lockFocus () {
+    this._lockedFocus = true;
+  }
+
+  _unlockFocus () {
+    this._lockedFocus = false;
   }
 
   _setTimeTrackPosition (normalizedPosition) {
@@ -362,11 +420,59 @@ class VideoControls {
 
   _onKeyDown (evt) {
     switch (evt.keyCode) {
-      case 9:
+      case 9: // Tab
         this.showControls(true);
+
+        if (!this._lockedFocus) {
+          return;
+        }
+
+        if (document.activeElement === this._firstTabStop) {
+          if (!evt.shiftKey) {
+            return;
+          }
+
+          this._lastTabStop.focus();
+          evt.preventDefault();
+        } else if (document.activeElement === this._lastTabStop) {
+          if (evt.shiftKey) {
+            return;
+          }
+
+          this._firstTabStop.focus();
+          evt.preventDefault();
+        }
+
         return;
 
-      case 32:
+      case 37: // Left arrow
+        if (document.activeElement !== this._timeTrack) {
+          return;
+        }
+
+        Utils.fire(this._videoControls, 'back-30');
+        return;
+
+      case 39: // Right arrow
+        if (document.activeElement !== this._timeTrack) {
+          return;
+        }
+
+        Utils.fire(this._videoControls, 'fwd-30');
+        return;
+
+      case 27: // Escape
+        evt.preventDefault();
+        this._close.focus();
+        return;
+
+      case 32: // Space
+        if (document.activeElement !== document.body) {
+          return;
+        }
+
+        evt.preventDefault();
+        evt.stopImmediatePropagation();
         Utils.fire(this._videoControls, 'play-pause');
         return;
     }
@@ -385,14 +491,20 @@ class VideoControls {
       return;
     }
 
-    this._thumbnail.classList.add('player__thumbnail--visible');
-
     // Lazily pick up a read on how wide the track is.
     if (!this._trackBCR) {
       this._trackBCR = evt.target.getBoundingClientRect();
     }
 
     this._evtToTrackPosition(evt);
+  }
+
+  _onFocus () {
+    this._thumbnail.classList.add('player__thumbnail--visible');
+  }
+
+  _onBlur () {
+    this._thumbnail.classList.remove('player__thumbnail--visible');
   }
 
   _onInputMove (evt) {
@@ -416,7 +528,6 @@ class VideoControls {
       return;
     }
 
-    this._thumbnail.classList.remove('player__thumbnail--visible');
 
     if (!this._trackDrag) {
       return;
