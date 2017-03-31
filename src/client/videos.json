@@ -438,6 +438,10 @@
             "dash": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-2/mp4/dash.mpd",
             "hls": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-2/hls/all.m3u8"
           },
+          "drm": {
+            "name": "com.widevine.alpha",
+            "url": "https://widevine-proxy.appspot.com/proxy"
+          },
           "colors": {
             "primary": {
               "r": 149,
@@ -465,57 +469,9 @@
               "b": 148
             }
           }
-        },
-
-        {
-          "released": "2016-09-26T01:00:00.000Z",
-          "title": "Source Map Explorer",
-          "shortDescription": "Learn how to audit what's in your JavaScript bundles that could use some trimming using tools like Source Map Explorer in a new episode of Totally Tooling Tips. ",
-          "description": "Learn how to audit what's in your JavaScript bundles that could use some trimming using tools like Source Map Explorer in a new episode of Totally Tooling Tips. ",
-          "slug": "episode-31",
-          "duration": "185",
-          "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-31",
-          "rating": 5.0,
-          "sources": {
-            "full": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-31/mp4/v-1080p-4500k-libx264.mp4",
-            "dash": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-31/mp4/dash.mpd",
-            "hls": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-31/hls/all.m3u8"
-          },
-          "drm": {
-            "name": "com.widevine.alpha",
-            "url": "https://widevine-proxy.appspot.com/proxy"
-          },
-          "colors": {
-            "primary": {
-              "r": 82,
-              "g": 99,
-              "b": 143
-            },
-            "secondary": {
-              "r": 62,
-              "g": 74,
-              "b": 107
-            },
-            "tertiary": {
-              "r": 41,
-              "g": 50,
-              "b": 72
-            },
-            "quaternary": {
-              "r": 21,
-              "g": 25,
-              "b": 36
-            },
-            "primaryLight": {
-              "r": 164,
-              "g": 198,
-              "b": 255
-            }
-          }
         }
       ]
     },
-
 
     {
       "title": "HTTP 203",
