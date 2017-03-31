@@ -265,6 +265,9 @@ class OfflineCache {
             }).catch(e => {
               console.error(e);
             });
+          })
+          .catch(prefetchErr => {
+            console.warn('Unable to prefetch content:', prefetchErr);
           });
         });
   }
@@ -304,6 +307,16 @@ class OfflineCache {
   }
 
   _getFileSegments (file) {
+    if (file.path.endsWith('mp4')) {
+      return this._getMP4FileSegments(file);
+    } else if (file.path.endsWith('webm')) {
+      return this._getWebMFileSegments(file);
+    }
+
+    throw new Error(`Unsupported file type: ${file.path}`);
+  }
+
+  _getMP4FileSegments (file) {
     const headers = new Headers();
     headers.set('range', `bytes=${file.bytes.start}-${file.bytes.end}`);
 
@@ -311,6 +324,42 @@ class OfflineCache {
         .then(r => r.arrayBuffer())
         .then(sidx => {
           const refs = shaka.media.Mp4SegmentIndexParser(sidx, 0, [], 0);
+          refs.forEach(ref => {
+            ref.startByte += file.bytes.start;
+            ref.endByte += file.bytes.start;
+          });
+
+          refs.push({
+            startByte: 0,
+            endByte: file.bytes.end - 1,
+            startTime: 0,
+            endTime: 0
+          });
+
+          return refs;
+        });
+  }
+
+  _getWebMFileSegments (file) {
+    // Make a request from 0 to the end index indicated in the DASH manifest.
+    // This represents both the Cues and the WebM header, which can then be
+    // sliced out as needed.
+    const headers = new Headers();
+    headers.set('range', `bytes=0-${file.bytes.end}`);
+
+    if (file.path === null) {
+      console.warn('Unable to locate file to prefetch');
+      return;
+    }
+
+    return fetch(file.path, {headers})
+        .then(r => r.arrayBuffer())
+        .then(data => {
+          const cuesData = data.slice(file.bytes.start);
+          const initData = data.slice(0, file.bytes.start);
+          const parser = new shaka.media.WebmSegmentIndexParser();
+          const refs = parser.parse(cuesData, initData, [], 0);
+
           refs.forEach(ref => {
             ref.startByte += file.bytes.start;
             ref.endByte += file.bytes.start;
@@ -359,10 +408,6 @@ class OfflineCache {
         const segment = baseURL.parentNode.querySelector('SegmentBase');
         const path = baseURL.textContent;
         const range = segment.getAttribute('indexRange');
-
-        if (!path.endsWith('mp4')) {
-          return;
-        }
 
         if (!segment) {
           return;

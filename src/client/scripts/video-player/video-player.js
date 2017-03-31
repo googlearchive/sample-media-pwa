@@ -371,7 +371,8 @@ class VideoPlayer {
         restrictions: {
           minHeight: height,
           maxHeight: height,
-          mimeType: 'video/mp4'
+          mimeType: isPrefetched ? Constants.PREFETCH_MIME_TYPE :
+              Constants.OFFLINE_MIME_TYPE
         }
       });
     })
@@ -422,6 +423,13 @@ class VideoPlayer {
         console.log('Switching back to adaptive.');
         netEngine.clearAllResponseFilters();
         this._player.resetConfiguration();
+
+        // Set the player's estimates to be really low.
+        this._player.configure({
+          abr: {
+            defaultBandwidthEstimate: 1000
+          }
+        });
       });
     });
   }

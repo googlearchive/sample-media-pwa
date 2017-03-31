@@ -29,13 +29,15 @@ const constants = {
   // TODO: Make these based on user preference.
   PREFETCH_VIDEO_HEIGHT: 480,
   PREFETCH_MANIFEST: 'mp4/dash.mpd',
-  PREFETCH_VIDEO_PATH: 'mp4/v-0480p-1000k-libx264.mp4',
+  PREFETCH_VIDEO_PATH: 'mp4/v-0480p-0750k-libvpx-vp9.webm',
   PREFETCH_AUDIO_PATH: 'mp4/a-eng-0128k-aac.mp4',
   PREFETCH_DEFAULT_BUFFER_GOAL: 60,
+  PREFETCH_MIME_TYPE: 'video/webm',
 
   OFFLINE_VIDEO_HEIGHT: 720,
   OFFLINE_VIDEO_PATH: 'mp4/v-0720p-2500k-libx264.mp4',
   OFFLINE_AUDIO_PATH: 'mp4/a-eng-0128k-aac.mp4',
+  OFFLINE_MIME_TYPE: 'video/mp4',
 
   OFFLINE_ASSET_LIST: [
     'artwork@256.jpg',

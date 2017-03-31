@@ -1,5 +1,5 @@
 {
-  "featured": "chrome-channel/trailer",
+  "featured": "polymer/sizzle-2015",
   "shows": [
     {
       "title": "Developer Diary",
@@ -468,12 +468,11 @@
         },
 
         {
-          "popular": true,
           "released": "2016-09-26T01:00:00.000Z",
-          "title": "ENCRYPTED SAMPLE",
-          "shortDescription": "ENCRYPTED SAMPLE",
-          "description": "ENCRYPTED SAMPLE",
-          "slug": "encrypted-sample",
+          "title": "Source Map Explorer",
+          "shortDescription": "Learn how to audit what's in your JavaScript bundles that could use some trimming using tools like Source Map Explorer in a new episode of Totally Tooling Tips. ",
+          "description": "Learn how to audit what's in your JavaScript bundles that could use some trimming using tools like Source Map Explorer in a new episode of Totally Tooling Tips. ",
+          "slug": "episode-31",
           "duration": "185",
           "assetPath": "https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-31",
           "rating": 5.0,
