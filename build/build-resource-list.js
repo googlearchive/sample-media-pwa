@@ -60,7 +60,7 @@ const getHomePageAssets = _ => {
       })];
 
   episodes.forEach(e => {
-    assets.push(e.assetPath + '/poster-small.jpg');
+    assets.push(e.assetPath + '/poster-tiny.jpg');
   });
 
   return assets;

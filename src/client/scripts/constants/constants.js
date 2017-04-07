@@ -42,6 +42,7 @@ const constants = {
   OFFLINE_ASSET_LIST: [
     'artwork@256.jpg',
     'artwork@512.jpg',
+    'poster-tiny.jpg',
     'poster-small.jpg',
     'poster.jpg',
     'thumbnail-strip.jpg',
