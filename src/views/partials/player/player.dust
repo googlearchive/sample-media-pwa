@@ -42,7 +42,7 @@
           data-detail-asset-Path="{assetPath}">
           {#drm}
             data-detail-drm="{drm.name}|{drm.url}"
-            data-detail-manifest="{dash}"
+            data-detail-drm-manifest="{dash}"
           {/drm}
         {>"partials/offline"/}
       </button>

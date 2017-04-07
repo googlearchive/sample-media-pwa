@@ -18,6 +18,7 @@
 'use strict';
 
 import Constants from '../constants/constants';
+import LicensePersister from './license-persister';
 
 class OfflineCache {
 
@@ -27,9 +28,46 @@ class OfflineCache {
     }
 
     name = this.convertPathToName(name);
+
+    // If the download is in flight, then assume we simply don't have it,
+    // which should fall things back to the network.
+    if (OfflineCache.getInFlight(name)) {
+      console.log('In flight::do not have!');
+      return Promise.resolve(false);
+    }
+
     return this.purgePartialDownloads(name).then(_ => {
       return caches.has(name);
     });
+  }
+
+  static addInFlight (name) {
+    if (!this._inflight) {
+      this._inflight = new Set();
+    }
+
+    name = this.convertPathToName(name);
+    console.log('Setting in-flight for ', name);
+    return this._inflight.add(name);
+  }
+
+  static getInFlight (name) {
+    if (!this._inflight) {
+      this._inflight = new Set();
+    }
+
+    name = this.convertPathToName(name);
+    return this._inflight.has(name);
+  }
+
+  static removeInFlight (name) {
+    if (!this._inflight) {
+      this._inflight = new Set();
+    }
+
+    console.log('Removing in-flight for ', name);
+    name = this.convertPathToName(name);
+    return this._inflight.delete(name);
   }
 
   static purgePartialDownloads (name) {
@@ -83,7 +121,10 @@ class OfflineCache {
 
               // This is a partial download - purge it.
               console.log(`Purging ${name}`);
-              return caches.delete(name);
+              return Promise.all([
+                caches.delete(name),
+                LicensePersister.remove(name)
+              ]);
             });
           });
     });
@@ -134,7 +175,7 @@ class OfflineCache {
     });
   }
 
-  add (name, assetPath, pagePath, callbacks) {
+  add (name, assetPath, pagePath, callbacks, drmInfo) {
     if (!Constants.SUPPORTS_CACHING) {
       return;
     }
@@ -181,7 +222,17 @@ class OfflineCache {
       })
     });
 
-    return this._download(name, assets, callbacks);
+    const add = [];
+    if (drmInfo) {
+      console.log('Acquiring persistent license');
+      add.push(LicensePersister.persist(name, drmInfo));
+    }
+
+    add.push(this._download(name, assets, callbacks));
+
+    // Mark the download as being in-flight.
+    OfflineCache.addInFlight(name);
+    return Promise.all(add);
   }
 
   prefetch (manifestPath, prefetchLimit=30) {
@@ -537,9 +588,11 @@ class OfflineCache {
     })).then(_ => {
       if (this._cancel.has(name)) {
         this._cancel.delete(name);
+        OfflineCache.removeInFlight(name);
         return onCancelCallback(name);
       }
 
+      OfflineCache.removeInFlight(name);
       onCompleteCallback(byteTotal);
     });
   }
@@ -550,7 +603,10 @@ class OfflineCache {
       this._cancel.delete(name);
     }
 
-    return caches.delete(name);
+    return Promise.all([
+      caches.delete(name),
+      LicensePersister.remove(name)
+    ]);
   }
 }
 

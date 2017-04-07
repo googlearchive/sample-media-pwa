@@ -33,6 +33,22 @@ const loadScript = url => {
   return _scriptCache[url];
 };
 
+const load = ({url, type, body, responseType}={}) => {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(type || 'POST', url);
+    xhr.responseType = responseType || 'arraybuffer';
+    xhr.onload = evt => {
+      resolve(evt.target.response);
+    };
+
+    xhr.onerror = evt => {
+      reject(evt);
+    };
+    xhr.send(body);
+  });
+};
+
 const removeElement = el => {
   el.parentNode.removeChild(el);
 };
@@ -66,6 +82,19 @@ const assert = (predicate, message) => {
   throw new Error(message);
 };
 
+/**
+ * From: https://github.com/google/shaka-player/blob/f9fc4adbe69c108ff752323e9983a93c86c97e36/lib/util/uint8array_utils.js#L53
+ */
+const base64ToUint8Array = str => {
+  const bytes = window.atob(str.replace(/-/g, '+').replace(/_/g, '/'));
+  const result = new Uint8Array(bytes.length);
+  for (let i = 0; i < bytes.length; ++i) {
+    result[i] = bytes.charCodeAt(i);
+  }
+  return result;
+};
+
 export default {
-  loadScript, removeElement, preloadImage, fire, clamp, assert
+  loadScript, removeElement, preloadImage, fire, clamp, assert, load,
+  base64ToUint8Array
 };

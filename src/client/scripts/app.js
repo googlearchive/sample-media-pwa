@@ -285,7 +285,7 @@ class App {
 
     // Assume there's no licensing to account for.
     let offlineLicenseSupport = Promise.resolve(true);
-    if (evt.detail.hasDrm) {
+    if (evt.detail.drm) {
       offlineLicenseSupport = offlineLicenseSupport
           .then(_ => this._ensureShakaSupport())
           .catch(_ => {
@@ -296,9 +296,17 @@ class App {
     }
 
     return offlineLicenseSupport.then(persistentLicensing => {
+      let drmInfo = null;
       if (!persistentLicensing) {
         Toast.create('Unable to download protected video.', {tag: 'offline'});
         return;
+      } else if (evt.detail.drm) {
+        const drmNameUrl = evt.detail.drm.split('|');
+        drmInfo = {
+          name: drmNameUrl[0],
+          url: drmNameUrl[1],
+          manifest: evt.detail.drmManifest
+        };
       }
 
       const pagePath = `/${evt.detail.pagePath}/`;
@@ -340,7 +348,7 @@ class App {
               onProgressCallback: this._onProgressCallback,
               onCompleteCallback: this._onCompleteCallback,
               onCancelCallback: this._onCancelCallback
-            }
+            }, drmInfo
           ).catch(_ => {
             console.error(_);
             Toast.create('Cancelled download.', {tag: 'offline'});

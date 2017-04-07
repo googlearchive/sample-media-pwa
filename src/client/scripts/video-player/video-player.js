@@ -21,6 +21,7 @@ import Constants from '../constants/constants';
 import Utils from '../helpers/utils';
 import VideoControls from './video-controls';
 import OfflineCache from '../helpers/offline-cache';
+import LicensePersister from '../helpers/license-persister';
 
 class VideoPlayer {
 
@@ -232,6 +233,14 @@ class VideoPlayer {
     this._addOrientationEventListeners();
     this._addFullscreenEventListeners();
     this._addRemotePlaybackEventListeners();
+    this._addSessionDecryptionEventListeners();
+  }
+
+  _addSessionDecryptionEventListeners () {
+    this._video.addEventListener('session-restore', evt => {
+      const session = evt.detail;
+      LicensePersister.restore(session, this._href, this._video);
+    });
   }
 
   _addFullscreenEventListeners () {
@@ -375,6 +384,13 @@ class VideoPlayer {
               Constants.OFFLINE_MIME_TYPE
         }
       });
+
+      // In the case where the video is set for offline and there's DRM,
+      // the license should have been persisted already, so disable the DRM
+      // code inside of Shaka and intercept any video encryption events.
+      if (!isPrefetched && this._assetDRM) {
+        this._video.dataset.offlineEncrypted = true;
+      }
     })
     .then(_ => this._player.load(this._manifest))
     .then(_ => {
@@ -452,8 +468,8 @@ class VideoPlayer {
     return boot.then(_ => {
       if (this._video.paused) {
         // TODO: Restore from last known playhead position.
-        this._video.play();
         this._video.volume = 1;
+        this._video.play();
       }
     });
   }
@@ -648,7 +664,7 @@ class VideoPlayer {
   _onVideoStart () {
     this._enablePlayerControls();
     this._setMediaSessionData();
-    this._startChromecastWatch();
+    // this._startChromecastWatch();
     this._startTimeTracking();
   }
 

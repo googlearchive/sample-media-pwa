@@ -35,7 +35,8 @@ drm=item.drm /}
           data-detail-page-path="{fullPath}"
           data-detail-asset-Path="{item.assetPath}"
           {#item.drm}
-            data-detail-has-drm="true"
+            data-detail-drm="{item.drm.name}|{item.drm.url}"
+            data-detail-drm-manifest="{item.sources.dash}"
           {/item.drm}
           data-type="toggle-offline">
           {>"partials/offline" /}
