@@ -41,7 +41,7 @@
               </noscript>
 
               </div>
-              <h3 class="home__new-releases-list-item-title primary-light-col">{title}</h3>
+              <h3 class="home__new-releases-list-item-title primary-light-col {#drm}home__new-releases-list-item-title--protected{/drm}">{title}</h3>
               <p class="home__new-releases-list-item-description">{shortDescription|truncate}</p>
 
               <div class="home__new-releases-list-item-meta">
