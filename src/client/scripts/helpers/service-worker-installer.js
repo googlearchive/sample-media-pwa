@@ -31,34 +31,30 @@ class ServiceWorkerInstaller {
     }
 
     let currentVersion = null;
-    navigator.serviceWorker.onmessage = function (evt) {
-      if (typeof evt.data.version !== 'undefined') {
-        if (currentVersion === null) {
-          currentVersion = evt.data.version;
-        } else {
-          const newVersion = evt.data.version;
-          const cvParts = currentVersion.split('.');
-          const nvParts = newVersion.split('.');
-
-          if (cvParts[0] === nvParts[0]) {
-            console.log('Service Worker moved from ' +
-                      currentVersion + ' to ' + newVersion);
-          } else {
-            Toast.create('Site updated. Refresh to get the latest!');
-          }
-        }
-      }
-    };
-
-    navigator.serviceWorker.ready.then(function (registration) {
-      if (!('pushManager' in registration)) {
+    navigator.serviceWorker.addEventListener('message', function (evt) {
+      if (typeof evt.data.version === 'undefined') {
         return;
+      }
+
+      if (currentVersion === null) {
+        currentVersion = evt.data.version;
+      } else {
+        const newVersion = evt.data.version;
+        const cvParts = currentVersion.split('.');
+        const nvParts = newVersion.split('.');
+
+        if (cvParts[0] === nvParts[0]) {
+          console.log('Service Worker moved from ' +
+                    currentVersion + ' to ' + newVersion);
+        } else {
+          Toast.create('Site updated. Refresh to get the latest!');
+        }
       }
     });
 
     navigator.serviceWorker.register('/sw.js').then(function (registration) {
       if (registration.active) {
-        registration.active.postMessage('version');
+        registration.active.postMessage({action: 'version'});
       }
 
       // We should also start tracking for any updates to the Service Worker.
@@ -74,7 +70,7 @@ class ServiceWorkerInstaller {
           }
 
           if (this.state === 'activated') {
-            registration.active.postMessage('version');
+            registration.active.postMessage({action: 'version'});
           }
 
           console.log('Incoming SW state:', this.state);

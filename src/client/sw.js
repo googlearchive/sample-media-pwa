@@ -24,6 +24,7 @@
 importScripts('{@hash path="dist/client/cache-manifest.js"}{/hash}');
 importScripts('{@hash path="dist/client/third_party/libs/shaka-player.compiled.js"}{/hash}');
 importScripts('{@hash path="dist/client/scripts/ranged-response.js"}{/hash}');
+importScripts('{@hash path="dist/client/scripts/background-fetch-helper.js"}{/hash}');
 
 // TODO: Hook this up to pull from Constants.
 
@@ -99,13 +100,42 @@ self.onactivate = _ => {
 };
 
 self.onmessage = evt => {
-  switch (evt.data) {
+  const action = evt.data.action;
+  if (!action) {
+    console.warn('Message received with no action:', evt);
+    return;
+  }
+
+  switch (action) {
     case 'version':
       evt.source.postMessage({
         version: VERSION
       });
+      return;
 
     case 'offline':
+      const tag = evt.data.tag;
+      const assets = evt.data.assets;
+      const onBackgroundFetched = _ => {
+        evt.source.postMessage({
+          offline: true,
+          success: true,
+          name: tag
+        });
+      };
+
+      const onBackgroundFetchFailed = _ => {
+        evt.source.postMessage({
+          offline: true,
+          success: false,
+          name: tag
+        });
+      };
+
+      BackgroundFetchHelper.fetch(tag, assets, {
+        onBackgroundFetched,
+        onBackgroundFetchFailed
+      });
       return;
   }
 };

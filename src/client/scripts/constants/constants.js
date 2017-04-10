@@ -25,6 +25,7 @@ const constants = {
   CHUNK_SIZE: 1024 * 512,
 
   SUPPORTS_CACHING: ('caches' in self),
+  SUPPORTS_BACKGROUND_FETCH: ('BackgroundFetchManager' in self),
 
   // TODO: Make these based on user preference.
   PREFETCH_VIDEO_HEIGHT: 480,

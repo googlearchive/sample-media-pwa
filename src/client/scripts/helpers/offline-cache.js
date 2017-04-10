@@ -19,6 +19,7 @@
 
 import Constants from '../constants/constants';
 import LicensePersister from './license-persister';
+import Utils from './utils';
 
 class OfflineCache {
 
@@ -157,6 +158,15 @@ class OfflineCache {
 
   constructor () {
     this._cancel = new Set();
+
+    if (!Constants.SUPPORTS_BACKGROUND_FETCH) {
+      return;
+    }
+
+    this._serviceWorkerCallbacks = null;
+    this._onServiceWorkerMessage = this._onServiceWorkerMessage.bind(this);
+    navigator.serviceWorker.addEventListener('message',
+        this._onServiceWorkerMessage);
   }
 
   cancel (name) {
@@ -203,20 +213,31 @@ class OfflineCache {
 
       assets.push({
         request: `${assetPath}/${dest}`,
-        response: fetch(`${assetPath}/${src}`, {mode: 'cors'}),
+        response: null,
+        responseInfo: {
+          url: `${assetPath}/${src}`,
+          options: {
+            mode: 'cors'
+          }
+        },
         chunk
       });
     });
 
     // Ensure that the request for the page isn't gzipped in response.
-    const headers = new Headers();
-    headers.set('X-No-Compression', true);
+    const headers = {
+      'X-No-Compression': true
+    };
 
     assets.push({
       request: pagePath,
-      response: fetch(pagePath, {
-        headers
-      })
+      response: null,
+      responseInfo: {
+        url: pagePath,
+        options: {
+          headers
+        }
+      }
     });
 
     const tasks = [];
@@ -225,7 +246,20 @@ class OfflineCache {
       tasks.push(LicensePersister.persist(name, drmInfo));
     }
 
-    tasks.push(this._download(name, assets, callbacks));
+    if (Constants.SUPPORTS_BACKGROUND_FETCH) {
+      tasks.push(this._downloadBackground(name, assets, callbacks));
+    } else {
+      assets.forEach(asset => {
+        const {url, options} = asset.responseInfo;
+        if (options.headers) {
+          options.headers = new Headers(options.headers);
+        }
+
+        asset.response = fetch(url, options);
+      });
+
+      tasks.push(this._downloadForeground(name, assets, callbacks));
+    }
 
     // Mark the download as being in-flight.
     OfflineCache.addInFlight(name);
@@ -305,7 +339,7 @@ class OfflineCache {
 
             fetches.push(makeRequest({path: manifestPath}));
 
-            return this._download('prefetch', fetches, {
+            return this._downloadForeground('prefetch', fetches, {
               onProgressCallback () {},
               onCompleteCallback () {
                 console.log(`Prefetched ${prefetchLimit}s.`);
@@ -320,7 +354,7 @@ class OfflineCache {
         });
   }
 
-  _download (name, fetches, callbacks) {
+  _downloadForeground (name, fetches, callbacks) {
     name = OfflineCache.convertPathToName(name);
 
     const downloads = Promise.all(fetches.map(r => r.response));
@@ -334,11 +368,48 @@ class OfflineCache {
               return cache.put(asset.request, response);
             }
 
-            return this._cacheInChunks(cache, response);
+            return Utils.cacheInChunks(cache, response);
           });
         }));
       });
     });
+  }
+
+  _downloadBackground (name, assets, callbacks) {
+    this._serviceWorkerCallbacks = callbacks;
+    navigator.serviceWorker.ready.then(registration => {
+      if (!registration.active) {
+        return;
+      }
+
+      console.log('Asking SW to background fetch assets');
+      registration.active.postMessage({
+        action: 'offline',
+        tag: name,
+        assets
+      });
+    });
+  }
+
+  _onServiceWorkerMessage (evt) {
+    const {offline, success, name} = evt.data;
+    // Ignore messages not intended for this.
+    if (!offline) {
+      return;
+    }
+
+    OfflineCache.removeInFlight(name);
+    if (!this._serviceWorkerCallbacks) {
+      return;
+    }
+
+    if (success) {
+      this._serviceWorkerCallbacks.onCompleteCallback();
+    } else {
+      this._serviceWorkerCallbacks.onCancelCallback();
+    }
+
+    this._serviceWorkerCallbacks = null;
   }
 
   _getManifest (manifestPath) {
@@ -486,65 +557,6 @@ class OfflineCache {
     });
 
     return ranges;
-  }
-
-  _cacheInChunks (cache, response) {
-    const clone = response.clone();
-    const reader = clone.body.getReader();
-    const contentRange = clone.headers.get('content-range');
-    const headers = new Headers(clone.headers);
-
-    // If we've made a range request we will now need to check the full
-    // length of the video file, and update the header accordingly. This
-    // will be for the case where we're prefetching the video, and we need
-    // to pretend that the entire file is available despite only part
-    // requesting the file.
-    if (contentRange) {
-      headers.set('Content-Length',
-          parseInt(contentRange.split('/')[1], 10));
-    }
-
-    let total = parseInt(response.headers.get('content-length'), 10);
-    let i = 0;
-    let buffer = new Uint8Array(Math.min(total, Constants.CHUNK_SIZE));
-    let bufferId = 0;
-
-    const commitBuffer = bufferOut => {
-      headers.set('x-chunk-size', bufferOut.byteLength);
-      const cacheId = clone.url + '_' + bufferId;
-      const chunkResponse = new Response(bufferOut, {
-        headers
-      });
-      cache.put(cacheId, chunkResponse);
-    };
-
-    const onStreamData = result => {
-      if (result.done) {
-        commitBuffer(buffer, bufferId);
-        return;
-      }
-
-      // Copy the bytes over.
-      for (let b = 0; b < result.value.length; b++) {
-        buffer[i++] = result.value[b];
-
-        if (i === Constants.CHUNK_SIZE) {
-          // Commit this buffer.
-          commitBuffer(buffer, bufferId);
-
-          // Reduce the expected amount, and go again.
-          total -= Constants.CHUNK_SIZE;
-          i = 0;
-          buffer = new Uint8Array(Math.min(total, Constants.CHUNK_SIZE));
-          bufferId++;
-        }
-      }
-
-      // Get the next chunk.
-      return reader.read().then(onStreamData);
-    };
-
-    reader.read().then(onStreamData);
   }
 
   _trackDownload (name, responses, {

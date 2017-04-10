@@ -17,6 +17,8 @@
 
 'use strict';
 
+import Constants from '../constants/constants';
+
 const _scriptCache = {};
 const loadScript = url => {
   _scriptCache[url] = _scriptCache[url] || new Promise((resolve, reject) => {
@@ -94,7 +96,66 @@ const base64ToUint8Array = str => {
   return result;
 };
 
+const cacheInChunks = (cache, response) =>{
+  const clone = response.clone();
+  const reader = clone.body.getReader();
+  const contentRange = clone.headers.get('content-range');
+  const headers = new Headers(clone.headers);
+
+  // If we've made a range request we will now need to check the full
+  // length of the video file, and update the header accordingly. This
+  // will be for the case where we're prefetching the video, and we need
+  // to pretend that the entire file is available despite only part
+  // requesting the file.
+  if (contentRange) {
+    headers.set('Content-Length',
+        parseInt(contentRange.split('/')[1], 10));
+  }
+
+  let total = parseInt(response.headers.get('content-length'), 10);
+  let i = 0;
+  let buffer = new Uint8Array(Math.min(total, Constants.CHUNK_SIZE));
+  let bufferId = 0;
+
+  const commitBuffer = bufferOut => {
+    headers.set('x-chunk-size', bufferOut.byteLength);
+    const cacheId = clone.url + '_' + bufferId;
+    const chunkResponse = new Response(bufferOut, {
+      headers
+    });
+    cache.put(cacheId, chunkResponse);
+  };
+
+  const onStreamData = result => {
+    if (result.done) {
+      commitBuffer(buffer, bufferId);
+      return;
+    }
+
+    // Copy the bytes over.
+    for (let b = 0; b < result.value.length; b++) {
+      buffer[i++] = result.value[b];
+
+      if (i === Constants.CHUNK_SIZE) {
+        // Commit this buffer.
+        commitBuffer(buffer, bufferId);
+
+        // Reduce the expected amount, and go again.
+        total -= Constants.CHUNK_SIZE;
+        i = 0;
+        buffer = new Uint8Array(Math.min(total, Constants.CHUNK_SIZE));
+        bufferId++;
+      }
+    }
+
+    // Get the next chunk.
+    return reader.read().then(onStreamData);
+  };
+
+  return reader.read().then(onStreamData);
+};
+
 export default {
   loadScript, removeElement, preloadImage, fire, clamp, assert, load,
-  base64ToUint8Array
+  base64ToUint8Array, cacheInChunks
 };

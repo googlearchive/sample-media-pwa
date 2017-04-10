@@ -42,7 +42,8 @@ const entries = [
   'client/scripts/app.js',
   'client/scripts/downloads.js',
   'client/scripts/settings.js',
-  'client/scripts/ranged-response.js'
+  'client/scripts/ranged-response.js',
+  'client/scripts/background-fetch-helper.js'
 ];
 
 let cache;
