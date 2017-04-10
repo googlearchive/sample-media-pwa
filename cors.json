@@ -3,8 +3,7 @@
     "origin": [
         "http://localhost:8080",
         "https://biograf-155113.appspot-preview.com",
-        "https://biograf-155113.appspot.com/",
-        "https://shaka-player-demo.appspot.com"
+        "https://biograf-155113.appspot.com/"
     ],
     "responseHeader": ["Content-Type", "Range", "Content-Range", "X-From-Cache"],
     "method": ["GET", "HEAD", "OPTIONS"],
