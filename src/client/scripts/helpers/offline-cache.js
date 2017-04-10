@@ -32,7 +32,6 @@ class OfflineCache {
     // If the download is in flight, then assume we simply don't have it,
     // which should fall things back to the network.
     if (OfflineCache.getInFlight(name)) {
-      console.log('In flight::do not have!');
       return Promise.resolve(false);
     }
 
@@ -47,7 +46,6 @@ class OfflineCache {
     }
 
     name = this.convertPathToName(name);
-    console.log('Setting in-flight for ', name);
     return this._inflight.add(name);
   }
 
@@ -65,7 +63,6 @@ class OfflineCache {
       this._inflight = new Set();
     }
 
-    console.log('Removing in-flight for ', name);
     name = this.convertPathToName(name);
     return this._inflight.delete(name);
   }
@@ -222,17 +219,17 @@ class OfflineCache {
       })
     });
 
-    const add = [];
+    const tasks = [];
     if (drmInfo) {
       console.log('Acquiring persistent license');
-      add.push(LicensePersister.persist(name, drmInfo));
+      tasks.push(LicensePersister.persist(name, drmInfo));
     }
 
-    add.push(this._download(name, assets, callbacks));
+    tasks.push(this._download(name, assets, callbacks));
 
     // Mark the download as being in-flight.
     OfflineCache.addInFlight(name);
-    return Promise.all(add);
+    return Promise.all(tasks);
   }
 
   prefetch (manifestPath, prefetchLimit=30) {
