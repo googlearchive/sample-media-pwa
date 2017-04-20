@@ -709,7 +709,7 @@ class VideoPlayer {
     if (Math.abs(evt.gamma) < 10 || Math.abs(evt.beta) > 10) {
       this._previousDeviceOrientation = this._currentDeviceOrientation;
       // When device is rotated back to portrait, unlock the screen orientation.
-      if (this._previousDeviceOrientation == 'landscape') {
+      if (this._previousDeviceOrientation == 'landscape' && !this._fsLocked) {
         screen.orientation.unlock();
         window.removeEventListener('deviceorientation',
           this._onDeviceOrientationChange);

@@ -203,6 +203,7 @@ class VideoControls {
       timeout = VideoControls.HIDE_TIMEOUT;
     }
 
+    this._onBlur();
     this._cancelPendingHide();
     this._pendingHide = setTimeout(_ => {
       this._videoControls.classList.remove('player__controls--visible');
@@ -502,6 +503,12 @@ class VideoControls {
       return;
     }
 
+    // The focus event won't necessarily fire for touch, so force the onFocus
+    // behavior here.
+    if (evt.touches) {
+      this._onFocus();
+    }
+
     // Lazily pick up a read on how wide the track is.
     if (!this._trackBCR) {
       this._trackBCR = evt.target.getBoundingClientRect();
@@ -538,7 +545,6 @@ class VideoControls {
       this.showControls();
       return;
     }
-
 
     if (!this._trackDrag) {
       return;
