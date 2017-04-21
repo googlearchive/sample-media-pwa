@@ -63,7 +63,6 @@ class RangedResponse {
       }
 
       // Now pick the first possible match.
-      console.log('Found match in ' + cachesWithMatch[0]);
       return cachesWithMatch[0];
     });
   }
