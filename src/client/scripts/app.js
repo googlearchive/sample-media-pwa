@@ -69,6 +69,16 @@ class App {
 
     this._initMenuAndOffline();
     this._initVideoPlayer();
+    this._addDownloadEventListeners();
+  }
+
+  _addDownloadEventListeners () {
+    document.body.addEventListener('download-cancel',
+        this._onCancelCallback);
+    document.body.addEventListener('download-progress',
+        this._onProgressCallback);
+    document.body.addEventListener('download-complete',
+        this._onCompleteCallback);
   }
 
   _initMenuAndOffline () {
@@ -93,6 +103,26 @@ class App {
     return this._videoPlayer.init().then(_ => {
       this._videoPlayer.update();
       this._addVideoEventListeners();
+
+      // Now check if there are active background fetches.
+      this._offlineCache.getActiveBackgroundFetches().then(fetches => {
+        if (fetches.length === 0) {
+          return;
+        }
+
+        const href = video.parentNode.dataset.href;
+        if (!href) {
+          return;
+        }
+
+        const fetchingCurrentVideo = fetches.find(fetch => fetch === href);
+        if (!fetchingCurrentVideo) {
+          return;
+        }
+
+        console.log('Active fetch!', fetchingCurrentVideo);
+        this._videoPlayer.updateOfflineProgress(0, true);
+      });
     }, err => {
       console.log(err);
     });
@@ -245,18 +275,26 @@ class App {
     this._processAppConnectivityState();
   }
 
-  _onCancelCallback (name) {
+  _onCancelCallback (evt) {
+    const {name} = evt.detail;
+
     OfflineCache.purgePartialDownloads(name).then(_ => {
       this._videoPlayer.updateOfflineProgress(0);
-      this._onCompleteCallback();
+      this._onCompleteCallback({detail: {name}});
     });
   }
 
-  _onProgressCallback (bytesLoaded, bytesTotal) {
-    this._videoPlayer.updateOfflineProgress(bytesLoaded / bytesTotal);
+  _onProgressCallback (evt) {
+    const {bytesLoaded, bytesTotal, isBackground} = evt.detail;
+
+    this._videoPlayer.updateOfflineProgress(bytesLoaded / bytesTotal,
+        isBackground);
   }
 
-  _onCompleteCallback () {
+  _onCompleteCallback (evt) {
+    const {name} = evt.detail;
+    console.log('Download complete: ' + name);
+
     switch (this._offlineDownloadState) {
       case App.VIDEO_DOWNLOAD_STATES.ADDING:
           Toast.create('Downloaded video.', {tag: 'offline'});
@@ -268,6 +306,7 @@ class App {
     }
 
     this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.IDLE;
+    this._videoPlayer.updateOfflineProgress(0);
     this._videoPlayer.update();
   }
 
@@ -338,22 +377,17 @@ class App {
           this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.REMOVING;
           Toast.create('Deleting video.', {tag: 'offline'});
           return this._offlineCache.remove(name).then(_ => {
-            this._onCompleteCallback();
+            this._onCompleteCallback({detail: {name}});
           });
         } else {
           this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.ADDING;
           Toast.create('Caching video for offline.', {tag: 'offline'});
-          return this._offlineCache.add(
-            name, assetPath, pagePath, {
-              onProgressCallback: this._onProgressCallback,
-              onCompleteCallback: this._onCompleteCallback,
-              onCancelCallback: this._onCancelCallback
-            }, drmInfo
-          ).catch(_ => {
-            console.error(_);
-            Toast.create('Cancelled download.', {tag: 'offline'});
-            this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.IDLE;
-          });
+          return this._offlineCache.add(name, assetPath, pagePath, drmInfo)
+              .catch(_ => {
+                console.error(_);
+                Toast.create('Cancelled download.', {tag: 'offline'});
+                this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.IDLE;
+              });
         }
       });
     });

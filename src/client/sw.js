@@ -116,26 +116,7 @@ self.onmessage = evt => {
     case 'offline':
       const tag = evt.data.tag;
       const assets = evt.data.assets;
-      const onBackgroundFetched = _ => {
-        evt.source.postMessage({
-          offline: true,
-          success: true,
-          name: tag
-        });
-      };
-
-      const onBackgroundFetchFailed = _ => {
-        evt.source.postMessage({
-          offline: true,
-          success: false,
-          name: tag
-        });
-      };
-
-      BackgroundFetchHelper.fetch(tag, assets, {
-        onBackgroundFetched,
-        onBackgroundFetchFailed
-      });
+      BackgroundFetchHelper.fetch(tag, assets);
       return;
   }
 };

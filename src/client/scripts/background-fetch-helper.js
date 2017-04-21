@@ -59,16 +59,7 @@ class BackgroundFetchHelper {
     });
   }
 
-  _broadcastToAllClients () {
-    console.log('Broadcast to all.');
-  }
-
   _onBackgroundFetched (evt) {
-    if (!this._fetchCallbacks) {
-      this._broadcastToAllClients();
-      return;
-    }
-
     const tag = evt.tag;
     idbKeyval.get(tag).then(assets => {
       if (!assets) {
@@ -98,19 +89,37 @@ class BackgroundFetchHelper {
           return Utils.cacheInChunks(cache, response);
         }));
       }).then(_ => {
-        this._fetchCallbacks.onBackgroundFetched.call();
+        this._notifyAllClients({
+          offline: true,
+          success: true,
+          name: evt.tag
+        });
+
         this._teardown(evt.tag);
       });
     });
   }
 
+  _notifyAllClients (msg) {
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client => {
+        console.log(msg, client);
+        client.postMessage(msg);
+      });
+    });
+  };
+
   _onBackgroundFetchFailed (evt) {
-    this._fetchCallbacks.onBackgroundFetchFailed.call();
+    this._notifyAllClients({
+      offline: true,
+      success: false,
+      name: evt.tag
+    });
+
     this._teardown(evt.tag);
   }
 
   _teardown (tag) {
-    this._fetchCallbacks = null;
     return idbKeyval.delete(tag);
   }
 }

@@ -234,8 +234,14 @@ class VideoControls {
     this._setThumbnailImagePosition(normalizedTime);
   }
 
-  updateOfflineProgress (percentage) {
+  updateOfflineProgress (percentage, isBackground=false) {
     Array.from(this._offline).forEach(offline => {
+      if (isBackground) {
+        offline.classList.add('toggle-offline--indeterminate');
+        return;
+      }
+
+      offline.classList.remove('toggle-offline--indeterminate');
       DownloadProgress.update(offline, percentage);
     });
   }

@@ -8,8 +8,11 @@
     <use fill="#FFF" fill-rule="evenodd" xlink:href="#offline-mask"/>
   </svg>
 
-  <svg class="is-downloading"  x="2" y="2" height="20" width="20" viewBox="0 0 24 24">
+  <svg class="is-downloading" x="2" y="2" height="20" width="20" viewBox="0 0 24 24">
     <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" fill="#FFFFFF"></path>
   </svg>
 
 </svg>
+
+<div class="spinner">
+</div>

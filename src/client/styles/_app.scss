@@ -142,6 +142,24 @@ a {
     pointer-events: none;
   }
 
+  .spinner {
+    display: none;
+    width: 24px;
+    height: 24px;
+    background: url(/static/images/spinner.png) center center no-repeat;
+    background-size: 16px 16px;
+    border-radius: 50%;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    animation-name: rotate;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+  }
+
   .is-offline {
     display: none;
   }
@@ -157,6 +175,24 @@ a {
 
     .is-downloading {
       display: none;
+    }
+
+    .spinner {
+      display: none;
+    }
+  }
+
+  &--indeterminate {
+    .is-offline {
+      display: none;
+    }
+
+    .is-downloading {
+      display: none;
+    }
+
+    .spinner {
+      display: block;
     }
   }
 }
@@ -211,6 +247,13 @@ a {
   animation-fill-mode: forwards;
 }
 
+.rotate {
+  animation-name: rotate;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
 @keyframes fadeAndScaleIn {
   from {
     transform: scale(0.98);
@@ -241,5 +284,15 @@ a {
 
   to {
     opacity: 1;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
   }
 }

@@ -179,12 +179,12 @@ class VideoPlayer {
     });
   }
 
-  updateOfflineProgress (percentage) {
+  updateOfflineProgress (percentage, isBackground=false) {
     if (!this._videoControls) {
       return;
     }
 
-    this._videoControls.updateOfflineProgress(percentage);
+    this._videoControls.updateOfflineProgress(percentage, isBackground);
   }
 
   stop () {

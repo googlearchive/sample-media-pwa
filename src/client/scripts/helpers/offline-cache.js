@@ -163,7 +163,6 @@ class OfflineCache {
       return;
     }
 
-    this._serviceWorkerCallbacks = null;
     this._onServiceWorkerMessage = this._onServiceWorkerMessage.bind(this);
     navigator.serviceWorker.addEventListener('message',
         this._onServiceWorkerMessage);
@@ -182,7 +181,7 @@ class OfflineCache {
     });
   }
 
-  add (name, assetPath, pagePath, callbacks, drmInfo) {
+  add (name, assetPath, pagePath, drmInfo) {
     if (!Constants.SUPPORTS_CACHING) {
       return;
     }
@@ -247,7 +246,7 @@ class OfflineCache {
     }
 
     if (Constants.SUPPORTS_BACKGROUND_FETCH) {
-      tasks.push(this._downloadBackground(name, assets, callbacks));
+      tasks.push(this._downloadBackground(name, assets));
     } else {
       assets.forEach(asset => {
         const {url, options} = asset.responseInfo;
@@ -258,7 +257,7 @@ class OfflineCache {
         asset.response = fetch(url, options);
       });
 
-      tasks.push(this._downloadForeground(name, assets, callbacks));
+      tasks.push(this._downloadForeground(name, assets));
     }
 
     // Mark the download as being in-flight.
@@ -339,14 +338,10 @@ class OfflineCache {
 
             fetches.push(makeRequest({path: manifestPath}));
 
-            return this._downloadForeground('prefetch', fetches, {
-              onProgressCallback () {},
-              onCompleteCallback () {
-                console.log(`Prefetched ${prefetchLimit}s.`);
-              }
-            }).catch(e => {
-              console.error(e);
-            });
+            return this._downloadForeground('prefetch', fetches)
+                .catch(e => {
+                  console.error(e);
+                });
           })
           .catch(prefetchErr => {
             console.warn('Unable to prefetch content:', prefetchErr);
@@ -354,12 +349,12 @@ class OfflineCache {
         });
   }
 
-  _downloadForeground (name, fetches, callbacks) {
+  _downloadForeground (name, fetches) {
     name = OfflineCache.convertPathToName(name);
 
     const downloads = Promise.all(fetches.map(r => r.response));
     return downloads.then(responses => {
-      this._trackDownload(name, responses, callbacks);
+      this._trackDownload(name, responses);
 
       return caches.open(name).then(cache => {
         return Promise.all(fetches.map(asset => {
@@ -375,19 +370,34 @@ class OfflineCache {
     });
   }
 
-  _downloadBackground (name, assets, callbacks) {
-    this._serviceWorkerCallbacks = callbacks;
+  _downloadBackground (name, assets) {
     navigator.serviceWorker.ready.then(registration => {
       if (!registration.active) {
         return;
       }
 
       console.log('Asking SW to background fetch assets');
+      Utils.fire(document.body, 'download-progress', {
+        bytesLoaded: 0,
+        bytesTotal: 1,
+        isBackground: true
+      });
+
       registration.active.postMessage({
         action: 'offline',
         tag: name,
         assets
       });
+    });
+  }
+
+  getActiveBackgroundFetches () {
+    if (!Constants.SUPPORTS_BACKGROUND_FETCH) {
+      return Promise.resolve([]);
+    }
+
+    return navigator.serviceWorker.ready.then(registration => {
+      return registration.backgroundFetch.getTags();
     });
   }
 
@@ -399,17 +409,11 @@ class OfflineCache {
     }
 
     OfflineCache.removeInFlight(name);
-    if (!this._serviceWorkerCallbacks) {
-      return;
-    }
-
     if (success) {
-      this._serviceWorkerCallbacks.onCompleteCallback();
+      Utils.fire(document.body, 'download-complete', {name});
     } else {
-      this._serviceWorkerCallbacks.onCancelCallback();
+      Utils.fire(document.body, 'download-cancel', {name});
     }
-
-    this._serviceWorkerCallbacks = null;
   }
 
   _getManifest (manifestPath) {
@@ -559,23 +563,15 @@ class OfflineCache {
     return ranges;
   }
 
-  _trackDownload (name, responses, {
-    onProgressCallback,
-    onCompleteCallback,
-    onCancelCallback
-  }={
-    onProgressCallback () {},
-    onCompleteCallback () {},
-    onCancelCallback () {}
-  }) {
-    let byteCount = 0;
-    const byteTotal = responses.reduce((byteTotal, r) => {
+  _trackDownload (name, responses) {
+    let bytesLoaded = 0;
+    const bytesTotal = responses.reduce((bytesTotal, r) => {
       let responseLength = parseInt(r.headers.get('Content-Length'), 10);
       if (Number.isNaN(responseLength)) {
         responseLength = 0;
       }
 
-      return byteTotal + responseLength;
+      return bytesTotal + responseLength;
     }, 0);
 
     Promise.all(responses.map(response => {
@@ -586,8 +582,11 @@ class OfflineCache {
             return resolve();
           }
 
-          byteCount += result.value.length;
-          onProgressCallback(byteCount, byteTotal);
+          bytesLoaded += result.value.length;
+          Utils.fire(document.body, 'download-progress', {
+            bytesLoaded,
+            bytesTotal
+          });
           return reader.read().then(onStreamData);
         };
 
@@ -598,11 +597,17 @@ class OfflineCache {
       if (this._cancel.has(name)) {
         this._cancel.delete(name);
         OfflineCache.removeInFlight(name);
-        return onCancelCallback(name);
+        Utils.fire(document.body, 'download-cancel', {
+          name
+        });
+        return;
       }
 
       OfflineCache.removeInFlight(name);
-      onCompleteCallback(byteTotal);
+      Utils.fire(document.body, 'download-complete', {
+        bytesTotal,
+        name
+      });
     });
   }
 
