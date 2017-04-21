@@ -39,13 +39,47 @@ class RangedResponse {
     return true;
   }
 
+  static getBestCacheMatch (request) {
+    return caches.keys().then(cacheNames => {
+      return Promise.all(cacheNames.map(cacheName => {
+        return caches.match(`${request.url}_0`, {cacheName: cacheName})
+            .then(response => {
+              if (response) {
+                return cacheName;
+              }
+
+              return null;
+            });
+      }));
+    }).then(possibleMatches => {
+      let cachesWithMatch = possibleMatches.filter(m => m !== null);
+      if (cachesWithMatch.length === 0) {
+        return null;
+      }
+
+      // If there's more than one match, exclude the prefetch cache.
+      if (cachesWithMatch.length > 1) {
+        cachesWithMatch = cachesWithMatch.filter(m => m !== 'prefetch');
+      }
+
+      // Now pick the first possible match.
+      console.log('Found match in ' + cachesWithMatch[0]);
+      return cachesWithMatch[0];
+    });
+  }
+
   static canHandle (request) {
     if (!RangedResponse._isRangeRequest(request)) {
       return Promise.resolve(false);
     }
 
-    // First check for the first chunk in cache storage.
-    return caches.match(`${request.url}_0`)
+    return this.getBestCacheMatch(request).then(cacheName => {
+      if (!cacheName) {
+        return false;
+      }
+
+      // Check for the first chunk in cache storage.
+      return caches.match(`${request.url}_0`, {cacheName: cacheName})
         .then(firstChunk => {
           if (!firstChunk) {
             return false;
@@ -66,8 +100,8 @@ class RangedResponse {
           const endIndex = Math.floor(end / Constants.CHUNK_SIZE);
 
           return Promise.all([
-            caches.match(`${request.url}_${startIndex}`),
-            caches.match(`${request.url}_${endIndex}`)
+            caches.match(`${request.url}_${startIndex}`, {cacheName: cacheName}),
+            caches.match(`${request.url}_${endIndex}`, {cacheName: cacheName})
           ]).then(v => {
             // Start by checking that there are at least two responses.
             let hasData = v.every(r => !!r);
@@ -93,6 +127,7 @@ class RangedResponse {
             return finalByteInEndChunk >= end;
           });
         });
+    });
   }
 
   static _isOpaqueOrError (response) {
@@ -162,17 +197,24 @@ class RangedResponse {
       return response;
     }
 
-    return caches.match(request.url + '_0').then(chunkedResponse => {
-      if (chunkedResponse) {
-        return RangedResponse._createFromChunks(request);
+    return this.getBestCacheMatch(request).then(cacheName => {
+      if (!cacheName) {
+        return null;
       }
 
-      return RangedResponse._createFromEntireBuffer(request);
+      return caches.match(request.url + '_0', {cacheName: cacheName})
+          .then(chunkedResponse => {
+            if (chunkedResponse) {
+              return RangedResponse._createFromChunks(request, cacheName);
+            }
+
+            return RangedResponse._createFromEntireBuffer(request, cacheName);
+          });
     });
   }
 
-  static _createFromEntireBuffer (request) {
-    return caches.match(request).then(response => {
+  static _createFromEntireBuffer (request, cacheName) {
+    return caches.match(request, {cacheName: cacheName}).then(response => {
       if (RangedResponse._isOpaqueOrError(response)) {
         return response;
       }
@@ -193,7 +235,7 @@ class RangedResponse {
     });
   }
 
-  static _createFromChunks (request) {
+  static _createFromChunks (request, cacheName) {
     try {
       const header = request.headers.get('Range');
       const rangeHeader = header.trim().toLowerCase();
@@ -205,7 +247,7 @@ class RangedResponse {
       // If the start and end come from the same chunk then pull that chunk
       // from the cache and use it directly.
       if (startIndex === endIndex) {
-        return caches.match(request.url + '_' + startIndex)
+        return caches.match(request.url + '_' + startIndex, {cacheName: cacheName})
             .then(response => {
               return response.arrayBuffer().then(responseBuffer => {
                 return RangedResponse._createRangedResponse(responseBuffer,
@@ -221,7 +263,7 @@ class RangedResponse {
 
       for (let i = startIndex; i <= endIndex; i++) {
         cachedResponses.push(
-          caches.match(request.url + '_' + i)
+          caches.match(request.url + '_' + i, {cacheName: cacheName})
         );
       }
 

@@ -296,6 +296,12 @@ class OfflineCache {
     return this._getManifest(manifestPath)
         .then(manifest => this._getRanges(manifestPath, manifest))
         .then(ranges => {
+          // This would happen if the video is cached for offline, no need
+          // to prefetch this content.
+          if (ranges.audio.path === null || ranges.video.path === null) {
+            return;
+          }
+
           return Promise.all([
             this._getFileSegments(ranges.audio),
             this._getFileSegments(ranges.video)

@@ -352,6 +352,7 @@ class VideoPlayer {
   _chooseOfflineContentIfAvailable () {
     let isAvailableOffline = false;
     let isPrefetched = false;
+    let isFullyDownloaded = false;
 
     return Promise.all([
       // Or we've prefetched a chunk of it.
@@ -361,7 +362,14 @@ class VideoPlayer {
       OfflineCache.has(this._href)
     ]).then(c => {
       isAvailableOffline = c.some(v => v);
-      isPrefetched = c[0];
+      isPrefetched = !!c[0];
+      isFullyDownloaded = !!c[1];
+
+      // Favour the offline version over the prefetched.
+      if (isFullyDownloaded) {
+        console.log('Fully downloaded: disabling prefetch');
+        isPrefetched = false;
+      }
     })
     .then(_ => {
       // If we have nothing in any cache, then this is all for nought.
@@ -394,12 +402,13 @@ class VideoPlayer {
     })
     .then(_ => this._player.load(this._manifest))
     .then(_ => {
-      if (!isAvailableOffline) {
+      if (!isPrefetched) {
         return;
       }
 
       // Lock the player to the offline stream.
       const tracks = this._player.getTracks().filter(t => {
+        console.log(t);
         return t.height === Constants.PREFETCH_VIDEO_HEIGHT;
       });
 
