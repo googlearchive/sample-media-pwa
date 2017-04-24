@@ -32,15 +32,13 @@ class BackgroundFetchHelper {
 
     self.addEventListener('backgroundfetched',
         this._onBackgroundFetched);
-
-    this._fetchCallbacks = null;
   }
 
-  fetch (tag, assets, callbacks) {
+  fetch (tag, assets) {
     // Store the assets that are being background fetched because there may be
     // a teardown in the SW and the responses will need to be hooked back
     // up when the responses come in.
-    idbKeyval.set(tag, assets).then(_ => {
+    idbKeyval.set(`bg-${tag}`, assets).then(_ => {
       const requests = assets.map(asset => {
         const {url, options} = asset.responseInfo;
         if (options.headers) {
@@ -54,18 +52,19 @@ class BackgroundFetchHelper {
       const options = {
         title: 'Downloading show for offline.'
       };
-      this._fetchCallbacks = callbacks;
       registration.backgroundFetch.fetch(tag, requests, options);
     });
   }
 
   _onBackgroundFetched (evt) {
     const tag = evt.tag;
-    idbKeyval.get(tag).then(assets => {
+    idbKeyval.get(`bg-${tag}`).then(assets => {
       if (!assets) {
         console.error('Unknown background fetch.');
         return;
       }
+
+      console.log(assets);
 
       return caches.open(tag).then(cache => {
         const fetches = evt.fetches;
@@ -120,7 +119,7 @@ class BackgroundFetchHelper {
   }
 
   _teardown (tag) {
-    return idbKeyval.delete(tag);
+    return idbKeyval.delete(`bg-${tag}`);
   }
 }
 

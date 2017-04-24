@@ -58,11 +58,12 @@ class LicensePersister {
 
     return tasks.then(_ => {
       return idbKeyval.get(videoName).then(storedSession => {
-        console.log('Restoring session: ', storedSession);
         if (!storedSession) {
+          throw new Error('Unable to restore license; please download again.');
           return;
         }
 
+        console.log('Restoring session: ', storedSession);
         return session.load(storedSession);
       });
     });
