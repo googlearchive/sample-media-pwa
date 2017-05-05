@@ -158,7 +158,7 @@ class App {
   }
 
   _processSettings () {
-    Settings.get('prefetch').then(shouldPrefetch => {
+    Settings.get('prefetch', true).then(shouldPrefetch => {
       if (!shouldPrefetch) {
         return OfflineCache.removeAllPrefetched();
       }

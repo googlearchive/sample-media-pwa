@@ -203,9 +203,9 @@ class VideoControls {
       timeout = VideoControls.HIDE_TIMEOUT;
     }
 
-    this._onBlur();
     this._cancelPendingHide();
     this._pendingHide = setTimeout(_ => {
+      this._onBlur();
       this._videoControls.classList.remove('player__controls--visible');
     }, timeout);
   }

@@ -230,7 +230,7 @@
         },
 
         {
-          "popular": true,
+          "popular": false,
           "released": "2017-02-26T16:46:31.376Z",
           "title": "2016 Sizzle Reel",
           "shortDescription": "The sizzle reel for the Polymer Summit 2016.",
@@ -281,7 +281,7 @@
       "description": "Well, it's only the Chrome Developer Videos",
       "episodes": [
         {
-          "popular": true,
+          "popular": false,
           "released": "2017-01-26T16:46:31.376Z",
           "title": "Chrome Channel Trailer",
           "shortDescription": "The trailer for the Chrome Channel.",

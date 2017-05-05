@@ -21,7 +21,7 @@ import Toast from './toast';
 
 class ServiceWorkerInstaller {
   static get SUPPORTS_OFFLINE () {
-    return ('ReadableStream' in window);
+    return ('serviceWorker' in navigator) && ('ReadableStream' in window);
   }
 
   static init () {
