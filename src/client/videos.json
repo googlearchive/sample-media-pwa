@@ -1,5 +1,5 @@
 {
-  "featured": "polymer/sizzle-2015",
+  "featured": "polymer/sizzle-2016",
   "shows": [
     {
       "title": "Developer Diary",
@@ -246,29 +246,29 @@
           },
           "colors": {
             "primary": {
-              "r": 34,
-              "g": 41,
-              "b": 97
+              "r": 18,
+              "g": 143,
+              "b": 165
             },
             "secondary": {
-              "r": 26,
-              "g": 31,
-              "b": 73
+              "r": 14,
+              "g": 107,
+              "b": 124
             },
             "tertiary": {
-              "r": 17,
-              "g": 21,
-              "b": 49
+              "r": 9,
+              "g": 72,
+              "b": 83
             },
             "quaternary": {
-              "r": 9,
-              "g": 10,
-              "b": 24
+              "r": 5,
+              "g": 36,
+              "b": 41
             },
             "primaryLight": {
-              "r": 68,
-              "g": 82,
-              "b": 194
+              "r": 36,
+              "g": 255,
+              "b": 255
             }
           }
         }
