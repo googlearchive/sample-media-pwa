@@ -26,6 +26,7 @@ import Settings from './helpers/settings';
 import VideoLibrary from './helpers/video-library';
 import SideNav from './side-nav/side-nav';
 import Constants from './constants/constants';
+import Utils from './helpers/utils';
 
 class App {
   static get CONNECTIVITY_STATES () {
@@ -68,7 +69,14 @@ class App {
     });
 
     this._initMenuAndOffline();
-    this._initVideoPlayer();
+    this._initVideoPlayer().then(_ => {
+      if (window.location.hash !== '#autoplay') {
+        return;
+      }
+
+      const reqVideoStart = document.querySelector('.js-request-video-start');
+      Utils.fire(reqVideoStart, 'request-video-start');
+    });
     this._addDownloadEventListeners();
   }
 
