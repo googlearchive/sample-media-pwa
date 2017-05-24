@@ -11,82 +11,83 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <!doctype html>
-<head>
-  <meta charset="utf-8">
-  <meta name="author" content="Paul Lewis" />
-  <meta name="viewport" content="width=device-width,minimum-scale=1.0">
-  <meta name="theme-color" content="#1D2227">
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="author" content="Paul Lewis" />
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0">
+    <meta name="theme-color" content="#1D2227">
 
-  <link rel="icon" href="/static/images/icon@256.png">
-  <link rel="manifest" href="{@hash path="dist/client/manifest.json"}{/hash}">
-  <title>{title}</title>
+    <link rel="icon" href="/static/images/icon@256.png">
+    <link rel="manifest" href="{@hash path="dist/client/manifest.json"}{/hash}">
+    <title>{title}</title>
 
-  {#css}
-    <link rel="stylesheet" href="{@hash path=.}{/hash}">
-  {/css}
+    {#css}
+      <link rel="stylesheet" href="{@hash path=.}{/hash}">
+    {/css}
 
-  <style>
-    {#colors}
-    .primary-bg {
-      background: rgb({primary.r}, {primary.g}, {primary.b});
-    }
+    <style>
+      {#colors}
+      .primary-bg {
+        background: rgb({primary.r}, {primary.g}, {primary.b});
+      }
 
-    .primary-fill {
-      fill: rgb({primary.r}, {primary.g}, {primary.b});
-    }
+      .primary-fill {
+        fill: rgb({primary.r}, {primary.g}, {primary.b});
+      }
 
-    .primary-col, a {
-      color: rgb({primary.r}, {primary.g}, {primary.b});
-    }
+      .primary-col, a {
+        color: rgb({primary.r}, {primary.g}, {primary.b});
+      }
 
-    .primary-light-bg {
-      background-color: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
-    }
+      .primary-light-bg {
+        background-color: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
+      }
 
-    .primary-light-fill {
-      fill: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
-    }
+      .primary-light-fill {
+        fill: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
+      }
 
-    .primary-light-col {
-      color: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
-    }
+      .primary-light-col {
+        color: rgb({primaryLight.r}, {primaryLight.g}, {primaryLight.b});
+      }
 
-    .secondary-col {
-      color: rgb({secondary.r}, {secondary.g}, {secondary.b});
-    }
+      .secondary-col {
+        color: rgb({secondary.r}, {secondary.g}, {secondary.b});
+      }
 
-    .quaternary-col {
-      color: rgb({quaternary.r}, {quaternary.g}, {quaternary.b});
-    }
-    {/colors}
+      .quaternary-col {
+        color: rgb({quaternary.r}, {quaternary.g}, {quaternary.b});
+      }
+      {/colors}
 
-    {styles|s}
-  </style>
-</head>
-<!-- Version {version} -->
-<body>
-  <header class="app__header">
-    <div class="app__header-content">
-      <button class="js-menu-show app__header-menu-toggle">
-        Biograf
-      </button>
+      {styles|s}
+    </style>
+  </head>
+  <!-- Version {version} -->
+  <body>
+    <header class="app__header">
+      <div class="app__header-content">
+        <button class="js-menu-show app__header-menu-toggle">
+          Biograf
+        </button>
+      </div>
+    </header>
+
+    <div class="js-side-nav side-nav">
+      <nav class="js-side-nav-container side-nav__container">
+        <section class="side-nav__header primary-bg">
+          {>"partials/side-nav-header" /}
+
+          <h2 class="side-nav__header-title" aria-hidden="true">Biograf</h2>
+        </section>
+
+        <button class="js-menu-hide side-nav__hide">close</button>
+
+        <ul class="side-nav__content">
+          <li><a class="primary-light-col" href="/">Home</a></li>
+          <li><a class="primary-light-col" href="/downloads/">Manage downloads</a></li>
+          <li><a class="primary-light-col" href="/settings/">Settings</a></li>
+        </ul>
+      </nav>
     </div>
-  </header>
-
-  <div class="js-side-nav side-nav">
-    <nav class="js-side-nav-container side-nav__container">
-      <section class="side-nav__header primary-bg">
-        {>"partials/side-nav-header" /}
-
-        <h2 class="side-nav__header-title" aria-hidden="true">Biograf</h2>
-      </section>
-
-      <button class="js-menu-hide side-nav__hide">close</button>
-
-      <ul class="side-nav__content">
-        <li><a class="primary-light-col" href="/">Home</a></li>
-        <li><a class="primary-light-col" href="/downloads/">Manage downloads</a></li>
-        <li><a class="primary-light-col" href="/settings/">Settings</a></li>
-      </ul>
-    </nav>
-  </div>
