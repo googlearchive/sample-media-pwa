@@ -52,6 +52,8 @@ video::-webkit-media-controls-start-playback-button {
 
   &--ended {
     .player__ended-view {
+      display: flex;
+      
       animation-name: fadeIn;
       animation-duration: 0.3s;
       animation-timing-function: cubic-bezier(0, 0, 0.4, 1);
@@ -72,7 +74,7 @@ video::-webkit-media-controls-start-playback-button {
     z-index: 100;
     opacity: 0;
     pointer-events: none;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
 
@@ -366,7 +368,7 @@ video::-webkit-media-controls-start-playback-button {
     top: 0;
     left: 0;
     opacity: 0;
-    display: flex;
+    display: none;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
@@ -375,6 +377,7 @@ video::-webkit-media-controls-start-playback-button {
     pointer-events: none;
 
     &--active {
+      display: flex;
       pointer-events: auto;
       z-index: 2;
     }
