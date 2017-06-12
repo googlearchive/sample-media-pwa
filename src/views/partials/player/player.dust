@@ -60,6 +60,9 @@
       </div>
       <h2 class="player__poster-show-title">{showTitle}</h2>
       <h3 class="player__poster-episode-title">{episodeTitle}</h3>
+      {#episodeDescription}
+      <div class="player__poster-episode-description">{episodeDescription|linkify|s}</div>
+      {/episodeDescription}
     </div>
   </div>
 

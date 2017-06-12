@@ -339,6 +339,17 @@ video::-webkit-media-controls-start-playback-button {
       font-size: 12px;
     }
 
+    &-episode-description {
+      margin: 12px 0 0 0;
+      line-height: 1.5;
+      font-weight: 400;
+      font-size: 14px;
+      color: #FFF;
+      opacity: 0.8;
+      max-width: 300px;
+      display: none;
+    }
+
     &::before {
       content: '';
       flex: 1;
@@ -354,6 +365,7 @@ video::-webkit-media-controls-start-playback-button {
       position: absolute;
       left: 0;
       top: 0;
+      pointer-events: none;
     }
   }
 
@@ -844,6 +856,14 @@ video::-webkit-media-controls-start-playback-button {
         opacity: 0.9;
       }
     }
+  }
+}
+
+@media (min-width: 1000px) {
+  .player__poster-episode-description {
+    font-size: 16px;
+    margin-top: 16px;
+    max-width: 350px;
   }
 }
 

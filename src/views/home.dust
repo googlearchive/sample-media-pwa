@@ -4,6 +4,7 @@
   colors=featured.items.colors
   showTitle=featured.breadcrumbs[0]
   episodeTitle=featured.items.title
+  episodeDescription=featured.items.description
   dash=featured.items.sources.dash
   hls=featured.items.sources.hls
   castSrc=featured.items.sources.full
