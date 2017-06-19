@@ -169,7 +169,7 @@ class RangedResponse {
     };
   }
 
-  static _createRangedResponse (buffer, headers, start, end, offset=0) {
+  static _createRangedResponse (blob, headers, start, end, offset=0) {
     let s = start - offset;
     let e = end - offset;
     let total = parseInt(headers.get('Content-Length'), 10);
@@ -178,14 +178,14 @@ class RangedResponse {
       throw new Error('Unable to create byte range: content-length not set.');
     }
 
-    const slicedBuffer = buffer.slice(s, e);
-    const slicedResponse = new Response(slicedBuffer, {
+    const slicedBlob = blob.slice(s, e);
+    const slicedResponse = new Response(slicedBlob, {
       status: 206,
       headers
     });
 
     slicedResponse.headers.set('X-From-Cache', 'true');
-    slicedResponse.headers.set('Content-Length', slicedBuffer.byteLength);
+    slicedResponse.headers.set('Content-Length', slicedBlob.size);
     slicedResponse.headers.set('Content-Range',
         `bytes ${start}-${end - 1}/${total}`);
     return slicedResponse;
@@ -224,8 +224,8 @@ class RangedResponse {
       try {
         const {start, end} = RangedResponse._getStartAndEnd(rangeHeader);
 
-        return response.arrayBuffer().then(buffer => {
-          return this._createRangedResponse(buffer,
+        return response.blob().then(blob => {
+          return this._createRangedResponse(blob,
               response.headers, start, end);
         });
       } catch (e) {
@@ -248,8 +248,8 @@ class RangedResponse {
       if (startIndex === endIndex) {
         return caches.match(request.url + '_' + startIndex, {cacheName: cacheName})
             .then(response => {
-              return response.arrayBuffer().then(responseBuffer => {
-                return RangedResponse._createRangedResponse(responseBuffer,
+              return response.blob().then(blob => {
+                return RangedResponse._createRangedResponse(blob,
                   response.headers, start, end, offset);
               });
             });
@@ -289,7 +289,8 @@ class RangedResponse {
           }).then(_ => {
             // The start and end indexes need shifting back because we're not
             // slicing the entire array buffer, just the relevant chunks.
-            return RangedResponse._createRangedResponse(responseBuffer, headers,
+            const blob = new Blob(responseBuffer);
+            return RangedResponse._createRangedResponse(blob, headers,
                 start, end, offset);
           });
     } catch (e) {
