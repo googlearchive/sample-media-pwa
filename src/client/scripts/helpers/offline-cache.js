@@ -403,7 +403,12 @@ class OfflineCache {
     }
 
     return navigator.serviceWorker.ready.then(registration => {
-      return registration.backgroundFetch.getTags();
+      // FIXME: `getTags()` is deprecated in favour of `getIds()`. Remove this
+      // check around the Chrome 62 stable release, which is late October 2017.
+      if (BackgroundFetchManager.prototype.hasOwnProperty('getTags'))
+        return registration.backgroundFetch.getTags();
+
+      return registration.backgroundFetch.getIds();
     });
   }
 

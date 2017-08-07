@@ -34,11 +34,11 @@ class BackgroundFetchHelper {
         this._onBackgroundFetched);
   }
 
-  fetch (tag, assets) {
+  fetch (id, assets) {
     // Store the assets that are being background fetched because there may be
     // a teardown in the SW and the responses will need to be hooked back
     // up when the responses come in.
-    idbKeyval.set(`bg-${tag}`, assets).then(_ => {
+    idbKeyval.set(`bg-${id}`, assets).then(_ => {
       const requests = assets.map(asset => {
         const {url, options} = asset.responseInfo;
         if (options.headers) {
@@ -52,13 +52,16 @@ class BackgroundFetchHelper {
       const options = {
         title: 'Downloading show for offline.'
       };
-      registration.backgroundFetch.fetch(tag, requests, options);
+      registration.backgroundFetch.fetch(id, requests, options);
     });
   }
 
   _onBackgroundFetched (evt) {
-    const tag = evt.tag;
-    idbKeyval.get(`bg-${tag}`).then(assets => {
+    // FIXME: `evt.tag` is deprecated in favour of `evt.id`. Remove this or
+    // around the Chrome 62 stable release, which is late October 2017.
+    const id = evt.id || evt.tag;
+
+    idbKeyval.get(`bg-${id}`).then(assets => {
       if (!assets) {
         console.error('Unknown background fetch.');
         return;
@@ -66,7 +69,7 @@ class BackgroundFetchHelper {
 
       console.log(assets);
 
-      return caches.open(tag).then(cache => {
+      return caches.open(id).then(cache => {
         const fetches = evt.fetches;
         return Promise.all(assets.map(asset => {
           const fetch = fetches.find(r => {
@@ -91,10 +94,10 @@ class BackgroundFetchHelper {
         this._notifyAllClients({
           offline: true,
           success: true,
-          name: evt.tag
+          name: id
         });
 
-        this._teardown(evt.tag);
+        this._teardown(id);
       });
     });
   }
@@ -109,17 +112,21 @@ class BackgroundFetchHelper {
   };
 
   _onBackgroundFetchFailed (evt) {
+    // FIXME: `evt.tag` is deprecated in favour of `evt.id`. Remove this or
+    // around the Chrome 62 stable release, which is late October 2017.
+    const id = evt.id || evt.tag;
+
     this._notifyAllClients({
       offline: true,
       success: false,
-      name: evt.tag
+      name: id
     });
 
-    this._teardown(evt.tag);
+    this._teardown(id);
   }
 
-  _teardown (tag) {
-    return idbKeyval.delete(`bg-${tag}`);
+  _teardown (id) {
+    return idbKeyval.delete(`bg-${id}`);
   }
 }
 
