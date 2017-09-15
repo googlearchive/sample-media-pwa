@@ -391,7 +391,7 @@ class OfflineCache {
 
       registration.active.postMessage({
         action: 'offline',
-        tag: name,
+        id: name,
         assets
       });
     });

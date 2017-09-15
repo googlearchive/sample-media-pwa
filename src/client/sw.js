@@ -114,9 +114,9 @@ self.onmessage = evt => {
       return;
 
     case 'offline':
-      const tag = evt.data.tag;
+      const id = evt.data.id;
       const assets = evt.data.assets;
-      BackgroundFetchHelper.fetch(tag, assets);
+      BackgroundFetchHelper.fetch(id, assets);
       return;
   }
 };
