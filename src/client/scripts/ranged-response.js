@@ -289,7 +289,7 @@ class RangedResponse {
           }).then(_ => {
             // The start and end indexes need shifting back because we're not
             // slicing the entire array buffer, just the relevant chunks.
-            const blob = new Blob(responseBuffer);
+            const blob = new Blob([responseBuffer]);
             return RangedResponse._createRangedResponse(blob, headers,
                 start, end, offset);
           });
