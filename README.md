@@ -12,6 +12,7 @@ This is a sample media app to demonstrate media functionality in the context of 
 1. Clone the repo
 1. `cd sample-media-pwa`
 1. `npm install`
+1. `npm run dev`
 
 ### Setting up some secrets
 
