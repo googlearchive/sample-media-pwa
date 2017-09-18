@@ -30,11 +30,17 @@ class LicensePersister {
     return 'video/mp4; codecs="avc1.4d401f"';
   }
 
+  static get ROBUSTNESS () {
+    // Widevine L3
+    return 'SW_SECURE_DECODE';
+  }
+
   static get CONFIG () {
     return [{
       initDataTypes: [LicensePersister.CONTENT_FORMAT],
       videoCapabilities: [{
-        contentType: LicensePersister.CONTENT_TYPE
+        contentType: LicensePersister.CONTENT_TYPE,
+        robustness: LicensePersister.ROBUSTNESS
       }],
       persistentState: 'required',
       sessionTypes: ['persistent-license']
