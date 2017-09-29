@@ -183,7 +183,7 @@ class OfflineCache {
 
   add (name, assetPath, pagePath, drmInfo) {
     if (!Constants.SUPPORTS_CACHING) {
-      return;
+      return Promise.reject(new Error("does not support caching"));
     }
 
     const assets = [];
@@ -346,7 +346,7 @@ class OfflineCache {
 
             return this._downloadForeground('prefetch', fetches)
                 .catch(e => {
-                  console.error(e);
+                  console.error("_downloadForeground prefetch", e);
                 });
           })
           .catch(prefetchErr => {

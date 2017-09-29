@@ -294,7 +294,7 @@ class RangedResponse {
                 start, end, offset);
           });
     } catch (e) {
-      console.log(e);
+      console.error("RangedResponses cachedResponses:", e);
       return new Response(e.message, {status: 400});
     };
   }

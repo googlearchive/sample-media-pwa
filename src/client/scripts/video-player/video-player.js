@@ -408,7 +408,7 @@ class VideoPlayer {
 
       // Lock the player to the offline stream.
       const tracks = this._player.getTracks().filter(t => {
-        console.log(t);
+        console.log("track:", t);
         return t.height === Constants.PREFETCH_VIDEO_HEIGHT;
       });
 
@@ -619,7 +619,7 @@ class VideoPlayer {
     this._video.play().then(_ => {
       this._updateVideoControlsWithPlayerState();
     }, err => {
-      console.warn(err);
+      console.warn("_updateVideoControlsWithPlayerState:", err);
     });
   }
 
