@@ -132,7 +132,7 @@ class App {
         this._videoPlayer.updateOfflineProgress(0, true);
       });
     }, err => {
-      console.error("video player init err:", err);
+      console.error("Video player init err:", err);
     });
   }
 
@@ -392,7 +392,7 @@ class App {
           Toast.create('Caching video for offline.', {tag: 'offline'});
           return this._offlineCache.add(name, assetPath, pagePath, drmInfo)
               .catch(_ => {
-                console.error("offlineCache add:", _);
+                console.error("OfflineCache add:", _);
                 Toast.create('Cancelled download.', {tag: 'offline'});
                 this._offlineDownloadState = App.VIDEO_DOWNLOAD_STATES.IDLE;
               });

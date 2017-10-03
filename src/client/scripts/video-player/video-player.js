@@ -408,7 +408,7 @@ class VideoPlayer {
 
       // Lock the player to the offline stream.
       const tracks = this._player.getTracks().filter(t => {
-        console.log("track:", t);
+        console.log("Track:", t);
         return t.height === Constants.PREFETCH_VIDEO_HEIGHT;
       });
 
@@ -525,7 +525,7 @@ class VideoPlayer {
   }
 
   _startChromecastWatch () {
-    console.log('_startChromecastWatch');
+    console.log('StartChromecastWatch');
     if (!VideoPlayer.SUPPORTS_REMOTE_PLAYBACK) {
       this._videoControls.hideChromecastButton();
       return;
@@ -533,7 +533,7 @@ class VideoPlayer {
 
     this._castVideo.src = this._castSrc;
     this._castVideo.remote.watchAvailability(available => {
-      console.log('_startChromecastWatch:' + available);
+      console.log('StartChromecastWatch:' + available);
       if (available) {
         this._videoControls.showChromecastButton();
         return;
@@ -619,7 +619,7 @@ class VideoPlayer {
     this._video.play().then(_ => {
       this._updateVideoControlsWithPlayerState();
     }, err => {
-      console.warn("_updateVideoControlsWithPlayerState:", err);
+      console.warn("OnPlay:", err);
     });
   }
 
@@ -749,17 +749,17 @@ class VideoPlayer {
   }
 
   _onRemoteConnect () {
-    console.log('_onRemoteConnect');
+    console.log('OnRemoteConnect');
     this._videoControls.castConnected = true;
   }
 
   _onRemoteConnecting () {
-    console.log('_onRemoteConnecting');
+    console.log('OnRemoteConnecting');
     this._videoControls.castConnecting = true;
   }
 
   _onRemoteDisconnect () {
-    console.log('_onRemoteDisconnect');
+    console.log('OnRemoteDisconnect');
     this._videoControls.castConnected = false;
   }
 

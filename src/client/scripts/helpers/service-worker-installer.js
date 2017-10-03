@@ -77,7 +77,7 @@ class ServiceWorkerInstaller {
         };
       };
     }, function (err) {
-      console.warn("service worker registration unsuccessful:", err);
+      console.warn("Service worker registration unsuccessful:", err);
     });
   }
 }

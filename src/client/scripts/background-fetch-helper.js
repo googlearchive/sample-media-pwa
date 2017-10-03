@@ -67,7 +67,7 @@ class BackgroundFetchHelper {
         return;
       }
 
-      console.log(assets);
+      console.log("Assets:", assets);
 
       return caches.open(id).then(cache => {
         const fetches = evt.fetches;

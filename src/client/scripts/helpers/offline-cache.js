@@ -346,7 +346,7 @@ class OfflineCache {
 
             return this._downloadForeground('prefetch', fetches)
                 .catch(e => {
-                  console.error("_downloadForeground prefetch", e);
+                  console.error("DownloadForeground prefetch", e);
                 });
           })
           .catch(prefetchErr => {
