@@ -5,3 +5,5 @@ src/config
 src/data/videos
 src/client/videos
 build/build-for-prod.sh
+.history
+.vscode
