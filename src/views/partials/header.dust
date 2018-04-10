@@ -19,6 +19,7 @@ limitations under the License.
     <meta name="theme-color" content="#1D2227">
 
     <link rel="icon" href="/static/images/icon@256.png">
+    <link rel="apple-touch-icon" href="/static/images/apple-touch-icon@180.png">
     <link rel="manifest" href="{@hash path="dist/client/manifest.json"}{/hash}">
     <title>{title}</title>
 
