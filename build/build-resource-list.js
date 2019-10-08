@@ -109,5 +109,5 @@ Promise.all([
     `const cacheManifest = ${JSON.stringify(resourceList, null, 2)};\n`
   ].join('\n');
 
-  fs.writeFile('./dist/client/cache-manifest.js', manifest);
+  fs.writeFileSync('./dist/client/cache-manifest.js', manifest);
 });
