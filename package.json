@@ -12,7 +12,7 @@
     "copy-server": "cp -R src/server dist",
     "copy-config": "cp -R src/config dist",
     "copy-views": "cp -R src/views dist",
-    "copy-client": "copy \"src/client/**/*.*\" \"!src/client/scripts/**/*.*\" \"!src/client/styles/**/*.*\" \"!src/client/videos/**/*.*\" dist/client",
+    "copy-client": "node build/copy-client.js",
     "serve": "nodemon -e dust,js,css,json dist/server/index.js",
     "dev": "npm run build && parallelshell \"npm run watch\" \"npm run serve\"",
     "watch": "npm-watch",
