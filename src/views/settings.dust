@@ -3,7 +3,7 @@
 <section class="settings main-content">
   <div class="settings__content content-block">
     <h2 class="settings__content-title secondary-col">Settings</h2>
-    <p class="settings__text settings__content-description">This is where you an update your settings.</p>
+    <p class="settings__text settings__content-description">This is where you can update your settings.</p>
 
     <div class="settings__content-list js-content-list">
       <div class="settings__content-list-group">
@@ -22,9 +22,9 @@
 
           <p class="settings__text settings__content-list-group-item-description">
             When enabled, the app will periodically prefetch the first portion of
-            popular content. This means that you when you want to watch video
+             popular content. This means that you when you want to watch video
             it can begin playback immediately without buffering. Please note:
-            this feature will use bandwidth.</p>
+             this feature will use bandwidth.</p>
         </div>
       </div>
 
